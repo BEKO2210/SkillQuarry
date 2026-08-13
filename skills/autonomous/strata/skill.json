@@ -1,0 +1,49 @@
+{
+  "name": "strata",
+  "displayName": "Strata",
+  "version": "1.0.0",
+  "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.",
+  "category": "autonomous",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata",
+  "icon": "../../../assets/strata-logo.svg",
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "cli": "strata",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh"
+  },
+  "compatibility": ["claude-code"],
+  "platforms": ["linux", "macos"],
+  "requires": {
+    "python": ">=3.10",
+    "binaries": ["git", "claude"],
+    "packages": []
+  },
+  "permissions": {
+    "filesystem": "read-write within the target git repository",
+    "shell": "spawns `claude` and the user-supplied --verify commands",
+    "network": "only indirectly, through Claude Code",
+    "environment": "none read by the runner itself"
+  },
+  "state": {
+    "directory": ".strata",
+    "git": "registered in .git/info/exclude, .gitignore untouched"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py --min 100",
+    "count": 100,
+    "coverage": "100% of runner.py executable lines",
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "tested",
+  "keywords": [
+    "autonomous",
+    "agent-loop",
+    "ralph",
+    "context-management",
+    "handoff",
+    "crash-recovery",
+    "verification"
+  ]
+}

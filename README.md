@@ -12,6 +12,7 @@
 [![Forks](https://img.shields.io/github/forks/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Forks)](https://github.com/BEKO2210/SkillQuarry/network/members)
 [![Issues](https://img.shields.io/github/issues/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Issues)](https://github.com/BEKO2210/SkillQuarry/issues)
 [![Pull Requests](https://img.shields.io/github/issues-pr/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Pull%20Requests)](https://github.com/BEKO2210/SkillQuarry/pulls)
+[![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Strata%20tests)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
 [![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=for-the-badge)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/BEKO2210/SkillQuarry?style=for-the-badge&logo=git)](https://github.com/BEKO2210/SkillQuarry/commits/main)
 
@@ -20,7 +21,7 @@
 [**Overview**](#overview) ·
 [**Marketplace**](#skill-marketplace) ·
 [**Skill Standard**](#skill-standard) ·
-[**Ralph GH**](#ralph-generational-handoff) ·
+[**Strata**](#strata) ·
 [**Security**](#security) ·
 [**Roadmap**](#roadmap)
 
@@ -154,7 +155,13 @@ Compatibility labels describe technical targets only and do not imply affiliatio
 
 SkillQuarry is intended to become a searchable marketplace for agent capabilities.
 
-Potential categories include:
+## Available now
+
+| Skill | Category | What it does | Agents | Quality |
+|---|---|---|---|---|
+| **[Strata](skills/autonomous/strata)** | Autonomous agents | Runs a long task as a chain of fresh Claude Code processes that hand a validated handoff forward, with independent verification of completion and crash-safe state | Claude Code | Tested — [100 tests, 100% coverage](skills/autonomous/strata/TEST_REPORT.md) |
+
+## Planned categories
 
 | Category | Examples |
 |---|---|
@@ -247,13 +254,42 @@ Additional metadata may eventually describe:
 
 ---
 
-# Featured Concept
+# Featured Skill
 
-## Ralph Generational Handoff
+## Strata
+
+<div align="center">
+
+<img src="assets/strata-banner.svg" alt="Strata — generational handoff runner for Claude Code" width="760">
+
+<br>
+
+[![Status](https://img.shields.io/badge/status-tested-2ea043?style=for-the-badge)](skills/autonomous/strata/TEST_REPORT.md)
+[![Tests](https://img.shields.io/badge/tests-100%20passing-2ea043?style=for-the-badge)](skills/autonomous/strata/TEST_REPORT.md)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-2ea043?style=for-the-badge)](skills/autonomous/strata/TEST_REPORT.md)
+[![Dependencies](https://img.shields.io/badge/dependencies-none-5b8298?style=for-the-badge)](skills/autonomous/strata#install)
+
+</div>
 
 ### Fresh context. Persistent progress. Controlled autonomy.
 
-One of the first systems being developed around SkillQuarry is **Ralph Generational Handoff**.
+The first skill in the quarry is **[Strata](skills/autonomous/strata)** — a
+generational handoff runner for Claude Code, and this repository's implementation
+of the Ralph generational-handoff concept.
+
+```bash
+cd skills/autonomous/strata && ./install.sh
+
+strata start "Fix the repository so lint and build pass without weakening checks." \
+  --verify "npm run lint" \
+  --verify "npm run build" \
+  --max-generations 20 \
+  --max-budget-usd 3
+```
+
+Documentation: **[README](skills/autonomous/strata/README.md)** ·
+**[SKILL.md](skills/autonomous/strata/SKILL.md)** ·
+**[Test report](skills/autonomous/strata/TEST_REPORT.md)**
 
 Traditional autonomous agent loops can accumulate increasingly large conversation histories.
 
@@ -267,7 +303,7 @@ Over long-running tasks this may lead to:
 - difficult crash recovery
 - runaway autonomous loops
 
-Ralph Generational Handoff uses a different architecture.
+Strata uses a different architecture.
 
 Each generation performs work, verifies its progress, creates a compact handoff, and then terminates.
 
@@ -579,13 +615,13 @@ skillquarry search testing
 ### Inspect
 
 ```bash
-skillquarry info ralph-generational-handoff
+skillquarry info strata
 ```
 
 ### Install
 
 ```bash
-skillquarry install ralph-generational-handoff
+skillquarry install strata
 ```
 
 ### Validate
@@ -618,21 +654,21 @@ These commands describe the intended interface and may not yet be implemented.
 - [x] Define project vision
 - [x] Choose Apache License 2.0
 - [x] Define initial marketplace concept
-- [x] Design Ralph Generational Handoff concept
+- [x] Design the generational handoff concept
 - [ ] Finalize the SkillQuarry skill specification
 - [ ] Add machine-readable schema
 - [ ] Add contribution guidelines
 - [ ] Add security policy
 - [ ] Add code of conduct
-- [ ] Add CI validation
+- [x] Add CI validation
 
 ## Phase 2 — First Skills
 
-- [ ] Add Ralph Generational Handoff
-- [ ] Add automated skill tests
+- [x] Add the first skill: Strata
+- [x] Add automated skill tests
 - [ ] Add example skills
-- [ ] Add compatibility metadata
-- [ ] Add permission metadata
+- [x] Add compatibility metadata
+- [x] Add permission metadata
 - [ ] Add skill validation
 
 ## Phase 3 — Registry

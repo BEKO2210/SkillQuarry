@@ -1,0 +1,44 @@
+name: strata
+
+on:
+  push:
+    paths:
+      - "skills/autonomous/strata/**"
+      - ".github/workflows/strata-tests.yml"
+  pull_request:
+    paths:
+      - "skills/autonomous/strata/**"
+      - ".github/workflows/strata-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Configure git identity for repository fixtures
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+
+      - name: Run the suite with a 100% coverage gate
+        working-directory: skills/autonomous/strata
+        run: python3 tests/run_tests.py --min 100
+
+      - name: Install and uninstall round trip
+        working-directory: skills/autonomous/strata
+        env:
+          STRATA_PREFIX: ${{ runner.temp }}/strata-prefix
+        run: |
+          ./install.sh
+          "$STRATA_PREFIX/bin/strata" --version
+          ./uninstall.sh
