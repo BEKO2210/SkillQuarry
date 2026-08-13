@@ -1,39 +1,32 @@
 <div align="center">
 
-<img src="docs/assets/skillquarry-logo.svg" alt="SkillQuarry" width="120" />
-
-# SkillQuarry
+# ⛏️ SkillQuarry
 
 ### The open marketplace for agent skills.
 
-**Discover, install, build, test, and share reusable skills for AI coding agents.**
-
-[![GitHub Stars](https://img.shields.io/github/stars/YOUR_USERNAME/skillquarry?style=for-the-badge&logo=github&label=Stars)](https://github.com/YOUR_USERNAME/skillquarry/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/YOUR_USERNAME/skillquarry?style=for-the-badge&logo=github&label=Forks)](https://github.com/YOUR_USERNAME/skillquarry/network/members)
-[![GitHub Issues](https://img.shields.io/github/issues/YOUR_USERNAME/skillquarry?style=for-the-badge&logo=github)](https://github.com/YOUR_USERNAME/skillquarry/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/YOUR_USERNAME/skillquarry?style=for-the-badge&logo=github)](https://github.com/YOUR_USERNAME/skillquarry/pulls)
-
-[![CI](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/skillquarry/ci.yml?branch=main&style=for-the-badge&label=CI&logo=githubactions)](https://github.com/YOUR_USERNAME/skillquarry/actions)
-[![Security](https://img.shields.io/badge/Security-Policy-success?style=for-the-badge&logo=shield)](SECURITY.md)
-[![License](https://img.shields.io/github/license/YOUR_USERNAME/skillquarry?style=for-the-badge)](LICENSE)
-[![Latest Release](https://img.shields.io/github/v/release/YOUR_USERNAME/skillquarry?style=for-the-badge&logo=github)](https://github.com/YOUR_USERNAME/skillquarry/releases)
-[![Last Commit](https://img.shields.io/github/last-commit/YOUR_USERNAME/skillquarry?style=for-the-badge&logo=git)](https://github.com/YOUR_USERNAME/skillquarry/commits/main)
+**Discover, build, test, share, and install reusable capabilities for AI coding agents.**
 
 <br />
 
-[**Explore Skills**](#-skill-marketplace) ·
-[**Quick Start**](#-quick-start) ·
-[**Build a Skill**](#-build-a-skill) ·
-[**Ralph GH**](#-ralph-generational-handoff) ·
-[**Contribute**](#-contributing)
+[![GitHub Stars](https://img.shields.io/github/stars/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Stars)](https://github.com/BEKO2210/SkillQuarry/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Forks)](https://github.com/BEKO2210/SkillQuarry/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/BEKO2210/SkillQuarry?style=for-the-badge&logo=github)](https://github.com/BEKO2210/SkillQuarry/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/BEKO2210/SkillQuarry?style=for-the-badge&logo=github)](https://github.com/BEKO2210/SkillQuarry/pulls)
+[![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=for-the-badge)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/BEKO2210/SkillQuarry?style=for-the-badge&logo=git)](https://github.com/BEKO2210/SkillQuarry/commits/main)
 
 <br />
 
-<img src="docs/assets/skillquarry-demo.gif" alt="SkillQuarry demo" width="900" />
+[**Why SkillQuarry?**](#why-skillquarry) ·
+[**Marketplace**](#skill-marketplace) ·
+[**Skill Standard**](#skill-standard) ·
+[**Ralph GH**](#ralph-generational-handoff) ·
+[**Roadmap**](#roadmap) ·
+[**Contributing**](#contributing)
 
 <br />
 
-> **One repository. One open standard. An ecosystem of reusable intelligence.**
+> **Build capabilities once. Share intelligence everywhere.**
 
 </div>
 
@@ -41,217 +34,475 @@
 
 ## What is SkillQuarry?
 
-**SkillQuarry** is an open ecosystem and marketplace for reusable AI-agent skills.
+**SkillQuarry** is an open-source ecosystem for reusable AI-agent skills.
 
-Instead of writing the same instructions, workflows, hooks, prompts, and automation logic again and again, SkillQuarry turns them into portable, testable, versioned building blocks.
+AI coding agents are becoming increasingly capable, but much of their useful behavior still lives inside giant prompts, private configuration files, shell scripts, hooks, isolated repositories, and undocumented workflows.
 
-A SkillQuarry skill can teach an agent how to:
+SkillQuarry aims to turn those capabilities into **small, portable, inspectable, testable, and versioned components**.
 
-- debug a production application
+A SkillQuarry skill may teach an agent how to:
+
+- debug an application
 - review a pull request
-- design a modern interface
-- perform security analysis
+- perform a security audit
+- improve UI and UX
+- run tests and diagnose failures
+- manage releases
 - optimize context usage
 - orchestrate autonomous coding loops
-- test an Android application
-- audit a repository
+- recover from interrupted work
 - generate documentation
-- perform release engineering
-- coordinate multiple agents
-- recover from failed autonomous runs
-- and much more
+- inspect repositories
+- perform Android workflows
+- automate DevOps operations
+- coordinate multiple specialized agents
 
-SkillQuarry is designed to become a **vendor-neutral home for agent capabilities**.
-
-<br />
-
-<div align="center">
-
-**Claude Code · Codex · Gemini · Agent Frameworks · Hooks · MCP · CLI Tools · Autonomous Workflows**
-
-</div>
+The goal is to make agent capabilities reusable instead of repeatedly rebuilding the same prompt logic from scratch.
 
 ---
 
 ## Why SkillQuarry?
 
-Modern coding agents are incredibly capable, but useful agent behavior is still scattered across:
+Today, powerful agent workflows are fragmented across:
 
-- giant prompts
-- private dotfiles
+- `SKILL.md` files
+- system prompts
+- Claude Code plugins
+- hooks
+- MCP integrations
 - shell scripts
-- GitHub gists
-- custom hooks
-- undocumented workflows
-- isolated repositories
-- proprietary agent configurations
+- GitHub repositories
+- local configuration
+- custom agent frameworks
+- private automation setups
 
-SkillQuarry gives these capabilities a home.
+SkillQuarry provides a common place to **discover, understand, test, and distribute** these capabilities.
 
-Every skill should be:
+Every high-quality SkillQuarry skill should aim to be:
 
-**Discoverable. Portable. Inspectable. Testable. Versioned. Composable.**
+**Discoverable · Portable · Inspectable · Testable · Versioned · Composable · Secure**
 
 ---
 
 ## Vision
 
-We believe the future of AI development is not one giant agent.
+The future of AI development is unlikely to be one enormous agent that knows everything.
 
-It is an ecosystem of **small, specialized, reusable capabilities** that agents can discover and combine dynamically.
+Instead, agents can become more capable by dynamically combining **small specialized skills**.
 
-Think of SkillQuarry as:
+SkillQuarry is designed around a simple idea:
 
-> **npm for agent capabilities.**
+> **A package ecosystem for agent capabilities.**
 
-or:
+Similar to how developers install reusable software libraries instead of rewriting everything themselves, AI agents should be able to reuse well-defined capabilities.
 
-> **A package registry for intelligence.**
+The long-term experience should feel as simple as:
 
-The long-term goal is simple:
+```bash
+skillquarry search security
+skillquarry install repository-auditor
+skillquarry update
 
-**Install a capability as easily as you install a software package.**
-
----
-
-## Skill Marketplace
-
-<div align="center">
-
-<img src="docs/assets/marketplace.gif" alt="SkillQuarry Marketplace" width="900" />
-
-</div>
-
-SkillQuarry is designed around a searchable skill catalog.
-
-| Category | Examples |
-|---|---|
-| 🧠 Agent Intelligence | Planning, reasoning workflows, handoffs |
-| 💻 Coding | Refactoring, migrations, debugging |
-| 🧪 Testing | Unit, integration, E2E, regression |
-| 🔐 Security | Auditing, dependency analysis, hardening |
-| 🎨 UI / UX | Design review, accessibility, responsive UI |
-| 📦 DevOps | CI/CD, Docker, releases, deployment |
-| 📱 Mobile | Android, iOS, Play Store workflows |
-| 🌐 Web | Frontend, backend, APIs, performance |
-| 📚 Documentation | README, API docs, architecture |
-| 🤖 Autonomous Agents | Ralph loops, repair agents, orchestration |
-| 🔌 Integrations | MCP, hooks, APIs, external tools |
-| 🛠️ Utilities | Git, repository inspection, automation |
+The implementation of the SkillQuarry CLI and registry is part of the project roadmap.
 
 ---
 
-## Featured Skill
+Vendor Neutral
 
-# Ralph Generational Handoff
+SkillQuarry is intentionally designed not to depend on a single AI provider.
 
-> **Fresh context. Persistent progress. Controlled autonomy.**
+The ecosystem can support skills and adapters for environments such as:
 
-Traditional autonomous agent loops can accumulate enormous amounts of conversational context over time.
+<div align="center">"Claude Code" (https://img.shields.io/badge/Claude_Code-Target-191919?style=for-the-badge)
+"Codex" (https://img.shields.io/badge/Codex-Target-191919?style=for-the-badge)
+"Gemini" (https://img.shields.io/badge/Gemini-Target-191919?style=for-the-badge)
+"MCP" (https://img.shields.io/badge/MCP-Target-191919?style=for-the-badge)
 
-Ralph Generational Handoff approaches the problem differently.
+</div>Compatibility always depends on the individual skill and its declared requirements.
 
-Each generation receives a **fresh context** while inheriting only the smallest useful verified handoff from the previous generation.
+SkillQuarry does not imply endorsement by any AI provider or platform.
 
-<div align="center">
+---
 
-<img src="docs/assets/ralph-generational-handoff.gif" alt="Ralph Generational Handoff" width="860" />
+Skill Marketplace
 
-</div>
+SkillQuarry is intended to grow into a searchable open marketplace of agent capabilities.
 
-### How it works
+Potential categories include:
 
-```text
+Category| Examples
+🧠 Agent Intelligence| Planning, context management, handoffs
+💻 Coding| Debugging, refactoring, migrations
+🧪 Testing| Unit tests, integration tests, E2E
+🔐 Security| Auditing, hardening, dependency analysis
+🎨 UI / UX| Accessibility, responsive design, design review
+📦 DevOps| CI/CD, deployment, Docker, releases
+📱 Mobile| Android, iOS, store workflows
+🌐 Web| Frontend, backend, APIs, performance
+📚 Documentation| README files, architecture, API docs
+🤖 Autonomous Agents| Ralph loops, repair agents, orchestration
+🔌 Integrations| MCP, hooks, APIs
+🛠️ Utilities| Git, repository analysis, automation
+
+The marketplace itself is under development.
+
+---
+
+Skill Standard
+
+A SkillQuarry skill should be understandable without requiring the user to reverse-engineer it.
+
+A mature skill package may contain:
+
+my-skill/
+├── SKILL.md
+├── skill.json
+├── README.md
+├── tests/
+├── examples/
+├── hooks/
+└── scripts/
+
+Not every skill needs every directory.
+
+The exact SkillQuarry specification is still being developed.
+
+---
+
+Suggested Skill Metadata
+
+A skill manifest should eventually describe information such as:
+
+{
+  "name": "example-skill",
+  "version": "1.0.0",
+  "description": "A reusable capability for AI coding agents.",
+  "category": "coding",
+  "license": "Apache-2.0",
+  "compatibility": [
+    "claude-code",
+    "codex"
+  ]
+}
+
+Future versions of the schema may additionally declare:
+
+- required tools
+- filesystem access
+- network access
+- shell execution
+- supported operating systems
+- supported agent environments
+- dependencies
+- permissions
+- checksums
+- test status
+- maintainer information
+
+---
+
+Ralph Generational Handoff
+
+One of the first concepts being developed for SkillQuarry is Ralph Generational Handoff.
+
+Fresh context. Persistent progress. Controlled autonomy.
+
+Traditional autonomous agent loops may continue working inside an increasingly large conversation context.
+
+Over long-running tasks this can create several problems:
+
+- unnecessary context growth
+- repeated token processing
+- irrelevant historical information
+- degraded focus
+- higher cost
+- difficult crash recovery
+- uncontrolled autonomous loops
+
+Ralph Generational Handoff explores a different architecture.
+
+Each generation performs useful work, produces a compact verified handoff, and then terminates.
+
+The next generation starts with a fresh context and receives only the information required to continue.
+
 Generation 001
       │
       ├── Work
       ├── Test
       ├── Verify
       │
-      └── Create compact handoff
+      └── Compact Handoff
                │
                ▼
-        Context terminates
+        Fresh Context
                │
                ▼
 Generation 002
       │
-      ├── Load objective
-      ├── Load verified handoff
-      ├── Read only relevant files
-      ├── Continue exact next action
+      ├── Load Objective
+      ├── Load Handoff
+      ├── Read Relevant Files
+      ├── Continue Work
       │
-      └── Create next handoff
+      └── Compact Handoff
                │
                ▼
               ...
 
-Why?
-
-Because repeatedly carrying an entire conversation forward can become expensive and noisy.
-
-Ralph GH instead follows one principle:
+The guiding principle is:
 
 «Remember information only when remembering it is cheaper than rediscovering it.»
 
-Safety mechanisms
+---
 
-Ralph GH includes protections for:
+Generational Handoff
 
-- atomic handoff writes
-- interrupted generations
-- invalid state
+Before a generation ends, it should leave its successor a concise state containing only information useful for continuing the task.
+
+Typical handoff information includes:
+
+- primary objective
+- verified progress
+- modified files
+- test status
+- important discoveries
+- failed approaches
+- approaches that should not be repeated
+- unresolved problems
+- files to inspect next
+- exact next action
+- completion criteria
+
+The full previous conversation does not need to be carried forward.
+
+---
+
+Why Fresh Context?
+
+Consider a long autonomous task.
+
+A traditional loop can look like:
+
+Run 1 → Context grows
+Run 2 → Context grows
+Run 3 → Context grows
+Run 4 → Context grows
+...
+
+A generational architecture instead looks like:
+
+Run 1 → Handoff → Context ends
+Run 2 → Handoff → Context ends
+Run 3 → Handoff → Context ends
+...
+
+The goal is not simply to erase context.
+
+The important part is creating a high-quality transition before context is discarded.
+
+Without that transition, the next generation might waste resources rediscovering everything.
+
+---
+
+Reliability Principles
+
+Long-running autonomous agents should not be trusted purely because they claim they succeeded.
+
+SkillQuarry favors external verification whenever possible.
+
+For example:
+
+Agent says COMPLETE
+        │
+        ▼
+Independent verification
+        │
+   ┌────┴────┐
+   │         │
+ PASS       FAIL
+   │         │
+ Finish    Continue
+
+A completion statement should not override failing tests.
+
+---
+
+Safety Goals
+
+Robust autonomous skills should protect against problems such as:
+
+- incomplete handoffs
+- corrupted state
+- interrupted processes
 - false completion claims
-- stalled loops
+- repeated failed approaches
+- infinite loops
 - runaway token usage
+- runaway cost
 - process timeouts
-- dirty repositories
-- duplicate runners
-- external verification
-- bounded handoff sizes
-- bounded Git context
-- generation limits
-- turn limits
-- optional cost limits
+- multiple concurrent runners
+- excessively large context injection
+- destructive repository operations
+
+Where possible, safety should be enforced by the orchestration layer rather than relying only on the model to remember instructions.
 
 ---
 
-Architecture
+Skill Quality
 
-                         ┌───────────────────────┐
-                         │      SkillQuarry      │
-                         │       Registry        │
-                         └───────────┬───────────┘
-                                     │
-                   ┌─────────────────┼─────────────────┐
-                   │                 │                 │
-                   ▼                 ▼                 ▼
-             ┌───────────┐     ┌───────────┐     ┌───────────┐
-             │   Skill   │     │   Skill   │     │   Skill   │
-             │     A     │     │     B     │     │     C     │
-             └─────┬─────┘     └─────┬─────┘     └─────┬─────┘
-                   │                 │                 │
-                   └─────────────────┼─────────────────┘
-                                     │
-                                     ▼
-                         ┌───────────────────────┐
-                         │    Agent Adapter      │
-                         └───────────┬───────────┘
-                                     │
-                      ┌──────────────┼──────────────┐
-                      ▼              ▼              ▼
-                Claude Code       Codex         Others
+A marketplace becomes valuable only when users can evaluate whether a skill is trustworthy.
+
+SkillQuarry plans to introduce quality levels based on objective validation.
+
+Level| Meaning
+Experimental| Early-stage capability
+Verified| Structure and metadata validated
+Tested| Automated tests available
+Trusted| Reproducible testing and security checks
+Certified| Highest SkillQuarry quality standard
+
+These levels are planned and are not yet implemented.
 
 ---
 
-Repository Structure
+Future Skill Information
 
-skillquarry/
+Marketplace listings may eventually expose:
+
+- name
+- description
+- version
+- author
+- license
+- compatibility
+- permissions
+- dependencies
+- required tools
+- source repository
+- checksum
+- test status
+- security status
+- supported platforms
+- version history
+- installation instructions
+
+This gives users information before allowing an agent skill to execute.
+
+---
+
+Security
+
+Agent skills must be treated as executable capabilities, not harmless text files.
+
+Depending on their design, they may instruct an agent to:
+
+- execute shell commands
+- modify files
+- access repositories
+- communicate with external services
+- read environment variables
+- interact with APIs
+- install dependencies
+- perform Git operations
+
+Users should always review third-party skills before execution.
+
+SkillQuarry's planned security model includes:
+
+- explicit permission manifests
+- source checksums
+- dependency inspection
+- secret scanning
+- static analysis
+- command auditing
+- signed releases
+- reproducible packaging
+- security advisories
+- transparent installation behavior
+- community reporting
+
+Security work is part of the ongoing roadmap.
+
+---
+
+Testing Philosophy
+
+A skill should not be considered reliable simply because its creator says it works.
+
+It should demonstrate that it works.
+
+SkillQuarry encourages testing from simple scenarios through adversarial failure cases.
+
+Level 1 — Beginner
+
+Verify the simplest intended workflow.
+
+Level 2 — Everyday Developer
+
+Test realistic multi-step usage.
+
+Level 3 — Advanced
+
+Introduce failures and verify recovery.
+
+Level 4 — Expert
+
+Verify that independent checks can reject incorrect agent conclusions.
+
+Level 5 — Adversarial
+
+Test loops, malformed state, interruptions, pathological input, and resource exhaustion.
+
+---
+
+Design Principles
+
+Open by Default
+
+Skills should be inspectable whenever possible.
+
+Vendor Neutral
+
+The ecosystem should not be controlled by one AI provider.
+
+Local First
+
+Capabilities should work locally whenever reasonable.
+
+Explicit Permissions
+
+Users should understand what a skill can access.
+
+Composable
+
+Small specialized skills should be able to work together.
+
+Testable
+
+Agent behavior should be measurable.
+
+Reproducible
+
+A specific skill version should behave as predictably as practical.
+
+Transparent
+
+Installation and executable behavior should not be hidden.
+
+Fail Safely
+
+When uncertain, autonomous workflows should prefer stopping over destructive guessing.
+
+---
+
+Planned Repository Structure
+
+As SkillQuarry grows, the repository may evolve toward a structure similar to:
+
+SkillQuarry/
 │
 ├── skills/
 │   ├── autonomous/
-│   │   └── ralph-generational-handoff/
-│   │
 │   ├── coding/
 │   ├── testing/
 │   ├── security/
@@ -270,11 +521,8 @@ skillquarry/
 │   └── generic/
 │
 ├── cli/
-│
 ├── tests/
-│
 ├── docs/
-│   └── assets/
 │
 ├── .github/
 │   ├── workflows/
@@ -287,30 +535,13 @@ skillquarry/
 ├── LICENSE
 └── README.md
 
----
-
-Quick Start
-
-Clone SkillQuarry:
-
-git clone https://github.com/YOUR_USERNAME/skillquarry.git
-cd skillquarry
-
-Explore available skills:
-
-ls skills
-
-Open a skill:
-
-cd skills/autonomous/ralph-generational-handoff
-
-Read its documentation and installation instructions.
+This is a target architecture, not a claim that every directory currently exists.
 
 ---
 
 Planned CLI
 
-The long-term SkillQuarry experience is designed to feel like a package manager.
+The future SkillQuarry CLI is intended to provide a package-manager-like experience.
 
 Search
 
@@ -324,192 +555,19 @@ Install
 
 skillquarry install ralph-generational-handoff
 
+Validate
+
+skillquarry validate ./my-skill
+
 Update
 
 skillquarry update
 
-List installed skills
+Diagnose
 
-skillquarry list
+skillquarry doctor
 
-Validate a skill
-
-skillquarry validate ./my-skill
-
----
-
-Build a Skill
-
-A SkillQuarry skill should be self-contained and easy to inspect.
-
-Example:
-
-my-skill/
-│
-├── SKILL.md
-├── skill.json
-├── README.md
-├── tests/
-├── hooks/
-├── scripts/
-└── examples/
-
-Minimal metadata
-
-{
-  "name": "my-skill",
-  "version": "1.0.0",
-  "description": "A reusable capability for AI coding agents.",
-  "category": "coding",
-  "license": "MIT",
-  "compatibility": [
-    "claude-code",
-    "codex"
-  ]
-}
-
----
-
-Skill Quality Standard
-
-A marketplace is only useful if users can trust what they install.
-
-SkillQuarry aims to grade skills using automated checks.
-
-Proposed quality levels
-
-Level| Meaning
-🟤 Experimental| Early prototype
-⚪ Verified| Schema and structure validated
-🟡 Tested| Automated tests included
-🟢 Trusted| Reproducible test suite and security review
-💎 Certified| Highest SkillQuarry quality level
-
-Every published skill can eventually expose:
-
-- version
-- compatibility
-- permissions
-- required tools
-- test status
-- security status
-- maintainer
-- license
-- last update
-- install count
-- rating
-- source integrity
-- checksum
-
----
-
-Security First
-
-Agent skills can execute powerful workflows.
-
-SkillQuarry therefore treats skills as code, not harmless text.
-
-Before installing a third-party skill, users should be able to inspect exactly what it can access and execute.
-
-Planned protections include:
-
-- permission manifests
-- command allowlists
-- source checksums
-- signed releases
-- reproducible packages
-- dependency inspection
-- static analysis
-- secret scanning
-- malicious prompt detection
-- sandbox compatibility
-- transparent install scripts
-- community reporting
-- security advisories
-
-Please report vulnerabilities according to "SECURITY.md" (SECURITY.md).
-
----
-
-Testing Philosophy
-
-A skill should not be considered reliable because its author says it works.
-
-It should prove it.
-
-SkillQuarry encourages testing at multiple levels:
-
-Level 1 — Beginner
-
-Does the skill work for the simplest intended use case?
-
-Level 2 — Everyday Developer
-
-Does it work through multiple realistic operations?
-
-Level 3 — Advanced
-
-Does it recover when something unexpected fails?
-
-Level 4 — Expert
-
-Does independent verification detect incorrect agent conclusions?
-
-Level 5 — Adversarial / Pro
-
-Does the system remain safe under loops, malformed state, interruptions, and pathological inputs?
-
----
-
-Marketplace Principles
-
-SkillQuarry is being designed around several non-negotiable principles.
-
-Open by default
-
-Skills should be inspectable.
-
-Vendor neutral
-
-The ecosystem should not depend on one AI provider.
-
-Local first
-
-A skill should work locally whenever possible.
-
-Explicit permissions
-
-Users should know what a skill can access before running it.
-
-Composable
-
-Small skills should work together.
-
-Testable
-
-Agent behavior should be measurable.
-
-Reproducible
-
-The same skill version should behave predictably.
-
-No black boxes
-
-Installation logic and executable components should remain visible.
-
----
-
-Compatibility
-
-<div align="center">"Claude Code" (https://img.shields.io/badge/Claude_Code-Compatible-191919?style=for-the-badge)
-"Codex" (https://img.shields.io/badge/Codex-Planned-191919?style=for-the-badge)
-"Gemini" (https://img.shields.io/badge/Gemini-Planned-191919?style=for-the-badge)
-"MCP" (https://img.shields.io/badge/MCP-Compatible-191919?style=for-the-badge)
-"Linux" (https://img.shields.io/badge/Linux-Supported-191919?style=for-the-badge&logo=linux)
-"macOS" (https://img.shields.io/badge/macOS-Planned-191919?style=for-the-badge&logo=apple)
-"Windows" (https://img.shields.io/badge/Windows-Planned-191919?style=for-the-badge&logo=windows)
-
-</div>«Compatibility badges describe SkillQuarry support targets and do not imply endorsement by the respective vendors.»
+These commands describe the planned interface and may not yet be implemented.
 
 ---
 
@@ -517,157 +575,144 @@ Roadmap
 
 Phase 1 — Foundation
 
-- [x] Define SkillQuarry concept
-- [x] Design generational agent architecture
-- [x] Build first autonomous skill
-- [x] Add crash recovery
-- [x] Add independent verification
-- [x] Add stall detection
-- [ ] Finalize skill specification
-- [ ] Add JSON schema
-- [ ] Add repository CI
+- [x] Create SkillQuarry repository
+- [x] Define project vision
+- [x] Choose Apache 2.0 license
+- [x] Define initial marketplace concept
+- [x] Design Ralph Generational Handoff concept
+- [ ] Finalize SkillQuarry skill specification
+- [ ] Add machine-readable schema
+- [ ] Add contribution guidelines
+- [ ] Add security policy
+- [ ] Add code of conduct
+- [ ] Add CI validation
 
-Phase 2 — Registry
+Phase 2 — First Skills
 
-- [ ] Searchable skill registry
-- [ ] Semantic versioning
-- [ ] Compatibility metadata
-- [ ] Skill validation
-- [ ] Checksums
-- [ ] Automated test badges
-- [ ] Category system
+- [ ] Add Ralph Generational Handoff
+- [ ] Add automated skill tests
+- [ ] Add example skills
+- [ ] Add compatibility metadata
+- [ ] Add permission metadata
+- [ ] Add skill validation
 
-Phase 3 — CLI
+Phase 3 — Registry
+
+- [ ] Build skill registry
+- [ ] Add semantic versioning
+- [ ] Add category system
+- [ ] Add checksums
+- [ ] Add compatibility filtering
+- [ ] Add automated validation
+- [ ] Add security metadata
+
+Phase 4 — CLI
 
 - [ ] "skillquarry search"
+- [ ] "skillquarry info"
 - [ ] "skillquarry install"
 - [ ] "skillquarry update"
 - [ ] "skillquarry validate"
 - [ ] "skillquarry doctor"
-- [ ] Agent adapters
 
-Phase 4 — Marketplace
+Phase 5 — Marketplace
 
 - [ ] Web marketplace
-- [ ] Skill pages
 - [ ] Search and filtering
+- [ ] Skill detail pages
 - [ ] Maintainer profiles
-- [ ] Ratings
-- [ ] Install analytics
 - [ ] Version history
+- [ ] Compatibility information
 - [ ] Security information
+- [ ] Install statistics
+- [ ] Community discovery
 
-Phase 5 — Ecosystem
+Phase 6 — Ecosystem
 
 - [ ] Signed skill packages
-- [ ] Community verification
 - [ ] Skill dependencies
 - [ ] Skill composition
+- [ ] Community verification
 - [ ] Automatic agent discovery
 - [ ] Remote registries
-- [ ] Enterprise registries
-- [ ] Public SkillQuarry API
-
----
-
-Example Future Experience
-
-Imagine opening a repository and telling your agent:
-
-«Find and install the best verified security audit skill.»
-
-The agent searches SkillQuarry, evaluates compatibility and permissions, installs the selected skill, executes it, verifies the results, and records exactly what happened.
-
-That is the direction.
+- [ ] Private registries
+- [ ] Enterprise support
+- [ ] Public registry API
 
 ---
 
 Contributing
 
-SkillQuarry is intended to be community-driven.
+SkillQuarry is intended to become a community-driven project.
 
-Contributions are welcome for:
+Future contributions may include:
 
 - new skills
-- adapters
 - testing infrastructure
-- security improvements
-- documentation
+- agent adapters
+- registry development
 - CLI development
+- security tooling
+- documentation
 - marketplace development
 - schema design
 - bug fixes
-- ideas
+- feature proposals
 
-Please read "CONTRIBUTING.md" (CONTRIBUTING.md) before opening a pull request.
+Until a dedicated "CONTRIBUTING.md" is added, contributors can use GitHub Issues and Pull Requests to propose improvements.
 
 ---
 
-Adding Your Skill
+Creating a Skill
 
-1. Fork this repository.
-2. Create a directory in the appropriate category.
-3. Add your "SKILL.md".
-4. Add metadata.
-5. Add tests.
-6. Run the validator.
-7. Open a pull request.
+A good contribution should clearly explain:
 
-Every submission should clearly explain:
+1. What the skill does.
+2. Which agents or environments it supports.
+3. Which permissions it requires.
+4. Whether it executes external commands.
+5. Which files or services it may access.
+6. How it was tested.
+7. Which limitations are known.
+8. Which license applies.
 
-- what the skill does
-- which agents it supports
-- what permissions it needs
-- whether it runs external commands
-- how it was tested
-- known limitations
+Security-sensitive behavior should never be hidden.
 
 ---
 
 Community
 
-If SkillQuarry becomes useful to you:
+If you find the project useful, you can help by:
 
-⭐ Star the repository
-🍴 Fork it
-🧠 Build a skill
-🐛 Report problems
-🔐 Report security issues responsibly
-🤝 Contribute improvements
-
-Every contribution helps build a more open agent ecosystem.
+- ⭐ starring the repository
+- 🍴 forking the project
+- 🧠 contributing a skill
+- 🐛 reporting bugs
+- 💡 suggesting features
+- 🔐 reporting security problems responsibly
+- 🤝 contributing code or documentation
 
 ---
 
 Star History
 
-<div align="center">""Star History Chart" (https://api.star-history.com/svg?repos=YOUR_USERNAME/skillquarry&type=Date)" (https://star-history.com/#YOUR_USERNAME/skillquarry&Date)
+<div align="center">""Star History Chart" (https://api.star-history.com/svg?repos=BEKO2210/SkillQuarry&type=Date)" (https://star-history.com/#BEKO2210/SkillQuarry&Date)
 
 </div>---
 
 Contributors
 
-<div align="center"><a href="https://github.com/YOUR_USERNAME/skillquarry/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=YOUR_USERNAME/skillquarry" alt="SkillQuarry contributors" />
+<div align="center"><a href="https://github.com/BEKO2210/SkillQuarry/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=BEKO2210/SkillQuarry" alt="SkillQuarry contributors" />
 </a></div>---
-
-Support the Project
-
-The best way to support SkillQuarry right now is simple:
-
-Star the repository and build something useful with it.
-
-If this project grows, additional sponsorship and maintainer programs may be introduced later.
-
----
 
 License
 
-SkillQuarry is released under the terms defined in the repository's "LICENSE" (LICENSE) file.
+SkillQuarry is licensed under the Apache License 2.0.
 
-Individual community skills may declare their own compatible licenses.
+See "LICENSE" (LICENSE) for the full license text.
 
-Always check a skill's metadata before redistribution or commercial use.
+Individual third-party skills added to the ecosystem may use different compatible licenses. Always inspect the license declared by a skill before redistribution or commercial use.
 
 ---
 
@@ -675,27 +720,25 @@ Disclaimer
 
 SkillQuarry is an independent open-source project.
 
-References to Claude, Claude Code, Codex, Gemini, MCP, GitHub, or other products and trademarks are used only to describe compatibility.
+Names such as Claude, Claude Code, Codex, Gemini, GitHub, MCP, and other trademarks belong to their respective owners and are referenced solely for compatibility and descriptive purposes.
 
-SkillQuarry is not endorsed by or affiliated with the respective trademark owners unless explicitly stated otherwise.
+SkillQuarry is not affiliated with or endorsed by those companies unless explicitly stated.
 
-AI agents can modify files, execute commands, and interact with external systems.
+AI agents can execute commands, modify files, install software, and interact with external systems.
 
-Always review permissions and third-party skills before execution.
+Always review third-party skills and their permissions before execution.
 
 ---
 
-<div align="center"><br /><img src="docs/assets/skillquarry-logo.svg" width="72" alt="SkillQuarry" />SkillQuarry
+<div align="center"><br />⛏️ SkillQuarry
 
 Build capabilities once. Share intelligence everywhere.
 
-<br />"Report Bug" (https://github.com/YOUR_USERNAME/skillquarry/issues/new?template=bug_report.yml)
-·
-"Request Feature" (https://github.com/YOUR_USERNAME/skillquarry/issues/new?template=feature_request.yml)
-·
-"Contribute" (CONTRIBUTING.md)
+<br />""Repository" (https://img.shields.io/badge/GitHub-BEKO2210%2FSkillQuarry-181717?style=for-the-badge&logo=github)" (https://github.com/BEKO2210/SkillQuarry)
 
-<br />If you believe reusable agent skills should be open, portable, and testable — give SkillQuarry a ⭐.
+<br />Open skills. Open agents. Open ecosystem.
+
+<br />If you want to help build an open marketplace for reusable agent intelligence, give SkillQuarry a ⭐.
 
 </div>
 ```
