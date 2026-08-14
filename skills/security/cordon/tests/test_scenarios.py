@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest import mock
 
 import cordon.core as c
-from harness import RepoFixture, run
+from harness import create_non_utf8_file, RepoFixture, run
 
 
 class FixtureTest(unittest.TestCase):
@@ -120,12 +120,11 @@ class AdversarialScenario(FixtureTest):
 class AdversarialByteFilenameScenario(FixtureTest):
     def test_non_utf8_git_filename_survives_audit_and_json(self) -> None:
         baseline = c.current_head(self.fx.root)
-        raw = os.fsencode(self.fx.root) + b"/src/invalid-\xff.py"
-        fd = os.open(raw, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        try:
-            os.write(fd, b"x = 1\n")
-        finally:
-            os.close(fd)
+        if create_non_utf8_file(self.fx.root / "src", b"invalid-\xff.py", b"x = 1\n") is None:
+            # APFS refuses non-UTF-8 names outright; the decoding path is still covered.
+            self.assertEqual(c._display_path(b"src/invalid-\xff.py"), "src/invalid-\udcff.py")
+            self.assertIn(b"\\udc", c.canonical_json({"p": c._display_path(b"x-\xff")}))
+            self.skipTest("filesystem rejects non-UTF-8 filenames")
         audit = c.audit_policy(
             self.fx.root,
             baseline,

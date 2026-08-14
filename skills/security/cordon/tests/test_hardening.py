@@ -14,7 +14,7 @@ from pathlib import Path
 from unittest import mock
 
 import cordon.core as c
-from harness import RepoFixture, run
+from harness import RepoFixture, create_non_utf8_file, run
 
 
 class Base(unittest.TestCase):
@@ -629,7 +629,9 @@ class IndexFlagTests(Base):
 
     def test_non_utf8_hidden_path_survives_reporting(self) -> None:
         raw = b"src/weird-\xff.bin"
-        (self.fx.root / os.fsdecode(raw)).write_bytes(b"payload\n")
+        if create_non_utf8_file(self.fx.root / "src", b"weird-\xff.bin", b"payload\n") is None:
+            self.assertIn("weird-", c._hidden_path_remedy((raw,)))
+            self.skipTest("filesystem rejects non-UTF-8 filenames")
         run("git", "add", "-A", cwd=self.fx.root)
         run("git", "commit", "-q", "-m", "byte path", cwd=self.fx.root)
         subprocess.run(["git", "update-index", "--skip-worktree", os.fsdecode(raw)],

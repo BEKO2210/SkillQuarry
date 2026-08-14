@@ -68,6 +68,24 @@ sys.exit(int(action.get("exit", 0)))
 '''
 
 
+def create_non_utf8_file(directory: Path, name: bytes, content: bytes) -> bytes | None:
+    """Create a file whose name is not valid UTF-8, or return None where that is impossible.
+
+    ext4 stores raw bytes, so Linux can hold such a name; APFS validates UTF-8 and
+    rejects it with EILSEQ. The distinction belongs to the filesystem, not to Cordon.
+    """
+    raw = os.fsencode(directory) + b"/" + name
+    try:
+        fd = os.open(raw, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except OSError:
+        return None
+    try:
+        os.write(fd, content)
+    finally:
+        os.close(fd)
+    return raw
+
+
 def run(*args: str, cwd: Path, check: bool = True, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(args, cwd=cwd, text=True, capture_output=True, check=check, env=env)
 
