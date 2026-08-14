@@ -1,0 +1,80 @@
+name: LockScope pro evaluation
+
+on:
+  push:
+    branches:
+      - test/lockscope-pro-20260814
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: never
+  RUST_BACKTRACE: 1
+
+jobs:
+  semantic:
+    name: semantic / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust + rust-analyzer
+        shell: bash
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup component add clippy --toolchain 1.97.1
+          rustup component add rust-analyzer --toolchain 1.97.1
+          rustup component add rust-src --toolchain 1.97.1
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          rust-analyzer --version
+          python3 --version
+      - name: Syntax check harness
+        run: |
+          python3 -m py_compile \
+            experiments/lockscope/semantic_probe.py \
+            experiments/lockscope/repair_defer_lock.py \
+            experiments/lockscope/run_pro_fixture.py
+      - name: Run frozen semantic + compiler + repair matrix
+        working-directory: experiments/lockscope
+        run: |
+          set -o pipefail
+          python3 run_pro_fixture.py | tee lockscope-pro-fixture-result.json
+
+  real:
+    name: real repositories + repair
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust + rust-analyzer
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup component add clippy --toolchain 1.97.1
+          rustup component add rust-analyzer --toolchain 1.97.1
+          rustup component add rust-src --toolchain 1.97.1
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          rust-analyzer --version
+          python3 --version
+          git --version
+          cc --version | head -n 1
+      - name: Syntax check harness
+        run: |
+          python3 -m py_compile \
+            experiments/lockscope/semantic_probe.py \
+            experiments/lockscope/repair_defer_lock.py \
+            experiments/lockscope/run_pro_real.py
+      - name: Run frozen historical + real repair matrix
+        working-directory: experiments/lockscope
+        run: |
+          set -o pipefail
+          python3 run_pro_real.py | tee lockscope-pro-real-result.json

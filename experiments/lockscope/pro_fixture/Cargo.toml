@@ -1,0 +1,9 @@
+[package]
+name = "lockscope-pro-fixture"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+tokio = { version = "=1.47.1", features = ["rt-multi-thread", "macros", "sync", "time"] }
+parking_lot = "=0.12.4"
