@@ -1,0 +1,29 @@
+name: LockScope small evaluation
+
+on:
+  push:
+    branches:
+      - test/lockscope-small-20260814-v2
+    paths:
+      - 'experiments/lockscope/**'
+      - '.github/workflows/lockscope-small-eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Environment
+        run: |
+          python3 --version
+          git --version
+      - name: Syntax check
+        run: python3 -m py_compile experiments/lockscope/lockscope_probe.py experiments/lockscope/run_small_test.py
+      - name: Run frozen small test
+        working-directory: experiments/lockscope
+        run: python3 run_small_test.py | tee lockscope-small-result.json
