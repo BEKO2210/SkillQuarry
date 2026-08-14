@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">RanGate logo</title>
+  <desc id="desc">A selective membrane ring with a narrow central transport gate.</desc>
+  <defs>
+    <linearGradient id="ring" x1="32" y1="32" x2="224" y2="224" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="92" fill="none" stroke="url(#ring)" stroke-width="24"/>
+  <circle cx="128" cy="128" r="55" fill="none" stroke="#64748B" stroke-width="10" stroke-dasharray="18 13"/>
+  <path d="M112 55v55H78v36h34v55h32v-55h34v-36h-34V55z" fill="#0F172A" stroke="#F8FAFC" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="13" fill="#14B8A6"/>
+</svg>
