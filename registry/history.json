@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "cordon": {
+      "commits": [
+        {
+          "date": "2026-08-14T02:53:01+00:00",
+          "sha": "eaf8b0a",
+          "subject": "feat: the skillquarry client — roadmap phase 4 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:39:00+00:00",
+          "sha": "6b4b7dc",
+          "subject": "feat: registry with checksums, security metadata and filtering — phase 3 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:41:25+00:00",
+          "sha": "a6c4045",
+          "subject": "docs(cordon): record the platform results the review actually produced",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:39:44+00:00",
+          "sha": "731471f",
+          "subject": "fix(cordon): let the byte-path tests adapt to the filesystem, not the other way round",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:36:25+00:00",
+          "sha": "c578616",
+          "subject": "feat: add Cordon, close an audit bypass, and generate the README from manifests",
+          "version": "1.0.0"
+        }
+      ],
+      "last_changed": "2026-08-14T02:53:01+00:00",
+      "versions": [
+        {
+          "date": "2026-08-14T01:36:25+00:00",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    "rangate": {
+      "commits": [
+        {
+          "date": "2026-08-14T02:53:01+00:00",
+          "sha": "eaf8b0a",
+          "subject": "feat: the skillquarry client — roadmap phase 4 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:39:00+00:00",
+          "sha": "6b4b7dc",
+          "subject": "feat: registry with checksums, security metadata and filtering — phase 3 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:32:11+00:00",
+          "sha": "1af17c8",
+          "subject": "docs(rangate): bring the third skill into the repository's visual family",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:25:17+00:00",
+          "sha": "4fa8a64",
+          "subject": "fix: keep Rust build output out of the repository",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:24:56+00:00",
+          "sha": "cca2886",
+          "subject": "feat: add the reference skill and a scaffolder — roadmap phase 2 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:17:58+00:00",
+          "sha": "1fe5f52",
+          "subject": "fix(rangate): make the compile-fail proofs prove the reason, not just the failure",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:03:33+00:00",
+          "sha": "7c59a01",
+          "subject": "fix(rangate): conform manifest to SkillQuarry schema",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:02:30+00:00",
+          "sha": "7bd021d",
+          "subject": "docs(rangate): bind review card to real CI evidence",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:02:04+00:00",
+          "sha": "d9bc963",
+          "subject": "docs(rangate): freeze Linux macOS and Miri evidence",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:54:04+00:00",
+          "sha": "eb3d9e8",
+          "subject": "docs(rangate): add independent verification card",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:53:47+00:00",
+          "sha": "f4f42e6",
+          "subject": "docs(rangate): add reproducible test report",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:53:20+00:00",
+          "sha": "feb0046",
+          "subject": "test(rangate): add reproducible stdlib test harness",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:52:48+00:00",
+          "sha": "faa39be",
+          "subject": "test(rangate): add adversarial unsafe-boundary fixture",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:52:31+00:00",
+          "sha": "b0f474c",
+          "subject": "test(rangate): add dependency-free Rust fixture",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:52:22+00:00",
+          "sha": "5eeb2f9",
+          "subject": "feat(rangate): add symmetric uninstaller",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:52:14+00:00",
+          "sha": "f0bd421",
+          "subject": "feat(rangate): add dependency-free installer",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:52:04+00:00",
+          "sha": "d7bafe2",
+          "subject": "feat(rangate): add marketplace manifest",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:51:47+00:00",
+          "sha": "692a18a",
+          "subject": "docs(rangate): add skill documentation",
+          "version": null
+        },
+        {
+          "date": "2026-08-14T01:51:22+00:00",
+          "sha": "18341e2",
+          "subject": "docs(rangate): add biological and Rust boundary reference",
+          "version": null
+        },
+        {
+          "date": "2026-08-14T01:50:55+00:00",
+          "sha": "80cb2a1",
+          "subject": "feat(rangate): add Rust unsafe boundary protocol",
+          "version": null
+        }
+      ],
+      "last_changed": "2026-08-14T02:53:01+00:00",
+      "versions": [
+        {
+          "date": "2026-08-14T01:52:04+00:00",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    "strata": {
+      "commits": [
+        {
+          "date": "2026-08-14T02:53:01+00:00",
+          "sha": "eaf8b0a",
+          "subject": "feat: the skillquarry client — roadmap phase 4 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T02:39:00+00:00",
+          "sha": "6b4b7dc",
+          "subject": "feat: registry with checksums, security metadata and filtering — phase 3 complete",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-14T01:36:25+00:00",
+          "sha": "c578616",
+          "subject": "feat: add Cordon, close an audit bypass, and generate the README from manifests",
+          "version": "1.0.0"
+        },
+        {
+          "date": "2026-08-13T23:53:38+00:00",
+          "sha": "4a37a29",
+          "subject": "feat: add Strata, the first SkillQuarry skill",
+          "version": "1.0.0"
+        }
+      ],
+      "last_changed": "2026-08-14T02:53:01+00:00",
+      "versions": [
+        {
+          "date": "2026-08-13T23:53:38+00:00",
+          "version": "1.0.0"
+        }
+      ]
+    }
+  }
+}

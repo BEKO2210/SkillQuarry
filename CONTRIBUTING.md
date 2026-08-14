@@ -21,6 +21,9 @@ python3 tools/test_validate_skills.py   # tests for the validator
 python3 tools/test_new_skill.py         # tests for the scaffolder and the template
 python3 tools/test_registry.py          # tests for the registry query/verify tool
 python3 tools/registry.py verify        # registry checksums match the files on disk
+python3 tools/build_history.py --check  # version history matches git
+python3 tools/build_site.py --check     # the marketplace site matches the registry
+python3 tools/package_skills.py --check # release archives match the sources
 
 cd cli && python3 tests/run_tests.py --min 100        # the skillquarry client
 cd ../templates/example-skill && python3 tests/run_tests.py --min 100

@@ -682,7 +682,8 @@ SkillQuarry/
 │
 ├── registry/
 │   ├── schema.json             manifest schema, enforced in CI
-│   └── skills.json             generated index: versions, checksums, security
+│   ├── skills.json             generated index: versions, checksums, security
+│   └── history.json            generated version history
 │
 ├── cli/
 │   └── skillquarry.py          the client: search, install, update, doctor
@@ -697,6 +698,9 @@ SkillQuarry/
 │   ├── validate_skills.py      validates manifests and their layout
 │   ├── new_skill.py            scaffolds a new skill from the template
 │   ├── registry.py             query and verify the registry
+│   ├── build_site.py           renders the static marketplace
+│   ├── build_history.py        derives version history from git
+│   ├── package_skills.py       builds reproducible release archives
 │   └── test_*.py               tests for the tooling itself
 │
 ├── docs/
@@ -812,6 +816,20 @@ python3 tools/build_site.py --check   # fail if it is out of date
 It is published to GitHub Pages on every change, and because it is plain files it
 can just as well be served from any web server pointed at `site/`.
 
+The site also shows **how often each skill was downloaded**. Every release
+publishes one reproducible archive per skill, and GitHub counts downloads per
+asset; the page reads those public numbers directly from the release API. Nothing
+is measured about the reader — no cookies, no identifiers, no request to anything
+but GitHub — and the page works unchanged when that request fails.
+
+```bash
+python3 tools/package_skills.py           # reproducible dist/<skill>-<version>.tar.gz + SHA256SUMS
+python3 tools/build_history.py            # version history from git
+```
+
+A release is cut by pushing a `skills-*` tag; the workflow validates the registry,
+rebuilds the archives and uploads them.
+
 ### Still planned
 
 A published package so `skillquarry` can be installed without cloning, remote
@@ -869,12 +887,12 @@ registries and signed releases.
 - [x] Web marketplace (static, generated from the registry, published on GitHub Pages)
 - [x] Search and filtering (in the browser, no backend)
 - [x] Skill detail pages
-- [ ] Maintainer profiles
-- [ ] Version history
+- [x] Maintainer profiles (generated from the `maintainers` field)
+- [x] Version history (derived from git into `registry/history.json`)
 - [x] Compatibility information
 - [x] Security information
-- [ ] Install statistics — needs a backend; deliberately not built
-- [ ] Community discovery
+- [x] Install statistics (GitHub's public per-asset download counts — no tracking)
+- [x] Community discovery (recently updated, keyword browsing, maintainers, discussions)
 
 ## Phase 6 — Ecosystem
 

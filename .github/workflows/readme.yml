@@ -34,6 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # build_history reads the commit history; a shallow clone would truncate it.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -46,6 +49,8 @@ jobs:
           python3 tools/test_new_skill.py
           python3 tools/test_registry.py
           python3 tools/test_build_site.py
+          python3 tools/test_package_skills.py
+          python3 tools/test_build_history.py
 
       # The template is the example every contribution is copied from, so its own
       # suite runs here; a rotten example would be inherited by every new skill.
@@ -69,23 +74,25 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           python3 tools/render_readme.py --check
+          python3 tools/build_history.py --check
           python3 tools/build_site.py --check
 
       - name: Regenerate README, registry and site
         if: github.event_name != 'pull_request'
         run: |
           python3 tools/render_readme.py
+          python3 tools/build_history.py
           python3 tools/build_site.py
 
       - name: Commit if the manifests moved ahead of the README
         if: github.event_name != 'pull_request'
         run: |
-          if git diff --quiet -- README.md registry/skills.json site; then
+          if git diff --quiet -- README.md registry site; then
             echo "README, registry and site already match the manifests."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md registry/skills.json site
+          git add README.md registry site
           git commit -m "docs: regenerate README, registry and site from skill manifests [skip ci]"
           git push

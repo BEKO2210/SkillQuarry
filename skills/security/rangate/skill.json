@@ -5,6 +5,13 @@
   "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.",
   "category": "security",
   "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
   "tagline": "Unsafe stays behind the membrane. Safe Rust gets typed capabilities.",
   "banner": "assets/rangate-banner.svg",
   "agents": [

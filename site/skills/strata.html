@@ -14,6 +14,7 @@
   <img class="banner" src="../assets/strata-banner.svg" alt="Strata">
   <h1 class="title">Strata</h1>
   <p class="subtitle">Every generation is a fresh context. Only a validated core sample crosses the boundary.</p>
+  <p class="who">Maintained by <a href="../maintainers/BEKO2210.html">Belkis Aslani</a> · <span class="installs" data-installs="strata"></span></p>
   <p>Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.</p>
   <h2>What it does</h2>
   <ul class="plain">
@@ -51,12 +52,39 @@ strata start &quot;Fix the repository so lint and build pass without weakening c
     <tr><th>Writes outside the repository</th><td>no</td></tr>
     <tr><th>Irreversible operations</th><td>none declared</td></tr>
     <tr><th>Independently reviewed</th><td>Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.</td></tr>
-    <tr><th>Checksum</th><td>sha256:165f933f64dcf61d80569826365baba0c3f105abc351a493885b27b5762f280e</td></tr>
+    <tr><th>Checksum</th><td>sha256:c04aff49c8b5530620dfbd5f390cf5dfd953dc8dfccdfd92a7e635beab7c1b78</td></tr>
+  </table>
+  <h2>History</h2>
+  <table>
+    <tr><th>1.0.0</th><td>2026-08-13</td></tr>
+  </table>
+  <table>
+    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/eaf8b0a">eaf8b0a</a> feat: the skillquarry client — roadmap phase 4 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/6b4b7dc">6b4b7dc</a> feat: registry with checksums, security metadata and filtering — phase 3 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/c578616">c578616</a> feat: add Cordon, close an audit bypass, and generate the README from manifests</td></tr>    <tr><th><time>2026-08-13</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/4a37a29">4a37a29</a> feat: add Strata, the first SkillQuarry skill</td></tr>
   </table>
   <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata/SKILL.md">SKILL.md</a></p>
 </main>
+<script>// Same public source as the overview: GitHub's own per-asset download counter.
+fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
+  .then((response) => (response.ok ? response.json() : []))
+  .then((releases) => {
+    const counts = new Map();
+    for (const release of releases) {
+      for (const asset of release.assets || []) {
+        const match = /^([a-z0-9-]+)-\d+\.\d+\.\d+\.tar\.gz$/.exec(asset.name);
+        if (match) counts.set(match[1], (counts.get(match[1]) || 0) + (asset.download_count || 0));
+      }
+    }
+    for (const element of document.querySelectorAll('[data-installs]')) {
+      const count = counts.get(element.dataset.installs);
+      if (count !== undefined) {
+        element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+      }
+    }
+  })
+  .catch(() => {});</script>
 <footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
 · <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
 </div></footer>
 </body>

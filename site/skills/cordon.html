@@ -14,6 +14,7 @@
   <img class="banner" src="../assets/cordon-banner.svg" alt="Cordon">
   <h1 class="title">Cordon</h1>
   <p class="subtitle">Limit the blast radius. Verify the result.</p>
+  <p class="who">Maintained by <a href="../maintainers/BEKO2210.html">Belkis Aslani</a> · <span class="installs" data-installs="cordon"></span></p>
   <p>Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.</p>
   <h2>What it does</h2>
   <ul class="plain">
@@ -52,12 +53,39 @@ cordon run &quot;Fix the parser regression and touch nothing else.&quot; \
     <tr><th>Writes outside the repository</th><td>no</td></tr>
     <tr><th>Irreversible operations</th><td>none declared</td></tr>
     <tr><th>Independently reviewed</th><td>Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.</td></tr>
-    <tr><th>Checksum</th><td>sha256:3f97b55471397b7e6e55f53cc4a8cd4c08ad5c1049adfc0ecf9e1975b22765e5</td></tr>
+    <tr><th>Checksum</th><td>sha256:571f9c5da352eaf6e940988f9f89dd2418d2d30cb65443ef523d87117f04ca64</td></tr>
+  </table>
+  <h2>History</h2>
+  <table>
+    <tr><th>1.0.0</th><td>2026-08-14</td></tr>
+  </table>
+  <table>
+    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/eaf8b0a">eaf8b0a</a> feat: the skillquarry client — roadmap phase 4 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/6b4b7dc">6b4b7dc</a> feat: registry with checksums, security metadata and filtering — phase 3 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/a6c4045">a6c4045</a> docs(cordon): record the platform results the review actually produced</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/731471f">731471f</a> fix(cordon): let the byte-path tests adapt to the filesystem, not the other way round</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/c578616">c578616</a> feat: add Cordon, close an audit bypass, and generate the README from manifests</td></tr>
   </table>
   <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon/SKILL.md">SKILL.md</a></p>
 </main>
+<script>// Same public source as the overview: GitHub's own per-asset download counter.
+fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
+  .then((response) => (response.ok ? response.json() : []))
+  .then((releases) => {
+    const counts = new Map();
+    for (const release of releases) {
+      for (const asset of release.assets || []) {
+        const match = /^([a-z0-9-]+)-\d+\.\d+\.\d+\.tar\.gz$/.exec(asset.name);
+        if (match) counts.set(match[1], (counts.get(match[1]) || 0) + (asset.download_count || 0));
+      }
+    }
+    for (const element of document.querySelectorAll('[data-installs]')) {
+      const count = counts.get(element.dataset.installs);
+      if (count !== undefined) {
+        element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+      }
+    }
+  })
+  .catch(() => {});</script>
 <footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
 · <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
 </div></footer>
 </body>

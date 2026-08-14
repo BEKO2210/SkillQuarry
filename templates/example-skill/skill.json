@@ -5,6 +5,13 @@
   "description": "The reference skill every SkillQuarry contribution is copied from: a small, fully tested capability that shows the required layout, manifest, installer, tests and coverage gate.",
   "category": "utilities",
   "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
   "tagline": "Copy this shape, replace the logic.",
   "agents": [
     "claude-code"

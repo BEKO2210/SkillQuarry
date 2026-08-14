@@ -14,6 +14,7 @@
   <img class="banner" src="../assets/rangate-banner.svg" alt="RanGate">
   <h1 class="title">RanGate</h1>
   <p class="subtitle">Unsafe stays behind the membrane. Safe Rust gets typed capabilities.</p>
+  <p class="who">Maintained by <a href="../maintainers/BEKO2210.html">Belkis Aslani</a> · <span class="installs" data-installs="rangate"></span></p>
   <p>Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.</p>
   <h2>What it does</h2>
   <ul class="plain">
@@ -48,12 +49,39 @@ skillquarry install rangate</code></pre>
     <tr><th>Writes outside the repository</th><td>no</td></tr>
     <tr><th>Irreversible operations</th><td>rewrites Rust source files in the target project in place; review the diff before committing</td></tr>
     <tr><th>Independently reviewed</th><td>Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.</td></tr>
-    <tr><th>Checksum</th><td>sha256:e6aad308504e5163c0f28d2011ea7618c9d48ae571f69cf0cd1fbb2a24e59202</td></tr>
+    <tr><th>Checksum</th><td>sha256:c95273737fb8c68ee9f55c7913da874cac7f57b1b7b611bf27ec9197e8c83b39</td></tr>
+  </table>
+  <h2>History</h2>
+  <table>
+    <tr><th>1.0.0</th><td>2026-08-14</td></tr>
+  </table>
+  <table>
+    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/eaf8b0a">eaf8b0a</a> feat: the skillquarry client — roadmap phase 4 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/6b4b7dc">6b4b7dc</a> feat: registry with checksums, security metadata and filtering — phase 3 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/1af17c8">1af17c8</a> docs(rangate): bring the third skill into the repository&#x27;s visual family</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/4fa8a64">4fa8a64</a> fix: keep Rust build output out of the repository</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/cca2886">cca2886</a> feat: add the reference skill and a scaffolder — roadmap phase 2 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/1fe5f52">1fe5f52</a> fix(rangate): make the compile-fail proofs prove the reason, not just the failure</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/7c59a01">7c59a01</a> fix(rangate): conform manifest to SkillQuarry schema</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/7bd021d">7bd021d</a> docs(rangate): bind review card to real CI evidence</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/d9bc963">d9bc963</a> docs(rangate): freeze Linux macOS and Miri evidence</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/eb3d9e8">eb3d9e8</a> docs(rangate): add independent verification card</td></tr>
   </table>
   <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate/SKILL.md">SKILL.md</a></p>
 </main>
+<script>// Same public source as the overview: GitHub's own per-asset download counter.
+fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
+  .then((response) => (response.ok ? response.json() : []))
+  .then((releases) => {
+    const counts = new Map();
+    for (const release of releases) {
+      for (const asset of release.assets || []) {
+        const match = /^([a-z0-9-]+)-\d+\.\d+\.\d+\.tar\.gz$/.exec(asset.name);
+        if (match) counts.set(match[1], (counts.get(match[1]) || 0) + (asset.download_count || 0));
+      }
+    }
+    for (const element of document.querySelectorAll('[data-installs]')) {
+      const count = counts.get(element.dataset.installs);
+      if (count !== undefined) {
+        element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+      }
+    }
+  })
+  .catch(() => {});</script>
 <footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
 · <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
 </div></footer>
 </body>

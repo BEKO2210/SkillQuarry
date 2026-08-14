@@ -7,3 +7,6 @@ __pycache__/
 
 # Rust build output (the fixture is source only)
 target/
+
+# Release archives (rebuilt reproducibly by tools/package_skills.py)
+dist/

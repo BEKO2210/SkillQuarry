@@ -5,6 +5,13 @@
   "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.",
   "category": "security",
   "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
   "tagline": "Limit the blast radius. Verify the result.",
   "banner": "assets/cordon-banner.svg",
   "agents": [

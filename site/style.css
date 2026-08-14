@@ -75,3 +75,25 @@ ul.plain { padding-left: 20px; color: var(--muted); }
 footer { border-top: 1px solid var(--edge); margin-top: 40px; padding: 22px 0 50px; color: var(--dim); font-size: 14px; }
 .back { display: inline-block; margin: 22px 0 10px; font-size: 14px; }
 .banner { width: 100%; max-width: 760px; height: auto; margin: 6px 0 18px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 34px 0 4px; }
+.section-head h2 { margin: 0; font-size: 20px; }
+.section-head a { font-size: 14px; }
+.strip { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; padding: 0; list-style: none; }
+.strip li { border: 1px solid var(--edge); border-radius: 10px; padding: 8px 13px; background: var(--raised); font-size: 14px; }
+.strip .when { color: var(--dim); }
+.cloud { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+.cloud button {
+  font: inherit; font-size: 13px; cursor: pointer; padding: 3px 11px; border-radius: 999px;
+  background: var(--raised); color: var(--muted); border: 1px solid var(--edge);
+}
+.cloud button:hover { color: var(--accent); border-color: var(--accent-deep); }
+.installs { color: var(--dim); font-size: 13px; }
+.installs b { color: var(--accent); }
+.cta {
+  border: 1px solid var(--edge); border-left: 3px solid var(--accent-deep); border-radius: var(--radius);
+  background: var(--raised); padding: 18px 20px; margin: 26px 0 40px;
+}
+.cta h2 { margin: 0 0 6px; font-size: 19px; }
+.cta p { margin: 0 0 8px; color: var(--muted); }
+.who { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+time { color: var(--dim); }

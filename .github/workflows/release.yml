@@ -1,0 +1,49 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "skills-*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to create or reuse, e.g. skills-2026.08.14"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify the registry before packaging anything
+        run: |
+          python3 tools/validate_skills.py
+          python3 tools/registry.py verify
+
+      - name: Build reproducible skill archives
+        run: python3 tools/package_skills.py
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --title "Skills $TAG" \
+              --notes "Reproducible skill archives. Verify with \`sha256sum -c SHA256SUMS\`.
+          Each archive's download count is what the marketplace shows as installs."
+          fi
+          gh release upload "$TAG" dist/* --clobber
+          gh release view "$TAG" --json assets --jq '.assets[].name'

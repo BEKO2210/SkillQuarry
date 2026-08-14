@@ -105,9 +105,9 @@ class EscapingTests(unittest.TestCase):
         manifest = {"tagline": '"><script>alert(3)</script>', "highlights": ["<b>bold</b>"],
                     "quickstart": "echo '<script>'"}
         rendered = bs.card(hostile, manifest) + bs.build_detail(hostile, manifest)
-        # Nothing dangerous survives as markup; the same characters as text are fine.
-        self.assertNotIn("<script", rendered)
-        self.assertNotIn("<img", rendered)
+        # The page's own <script> block is expected; nothing from the manifest is.
+        self.assertNotIn("<script>alert", rendered)
+        self.assertNotIn("<img src=x", rendered)
         self.assertNotIn('onerror="alert', rendered)
         self.assertIn("&lt;script&gt;", rendered)
         self.assertIn("&quot;", rendered)
@@ -115,10 +115,81 @@ class EscapingTests(unittest.TestCase):
     def test_the_embedded_json_cannot_close_its_own_script_tag(self):
         with mock.patch.object(bs, "load_registry", return_value=[skill(description="</script><script>x")]):
             with mock.patch.object(bs, "load_manifest", return_value={}):
-                index = bs.build_index(bs.load_registry(), {"example": {}})
+                index = bs.build_index(bs.load_registry(), {"example": {}}, {})
         blob = re.search(r'id="skill-data">(.*?)</script>', index, re.S).group(1)
         self.assertIn("<\\/script>", blob)
         json.loads(blob)
+
+
+class DiscoveryTests(unittest.TestCase):
+    """Phase 5's discovery surface: history, maintainers, keywords, install counts."""
+
+    def setUp(self):
+        self.files = bs.render()
+        self.index = self.files["index.html"]
+
+    def test_recently_updated_is_ordered_by_the_commit_history(self):
+        history = bs.load_history()
+        expected = sorted(history, key=lambda name: history[name]["last_changed"] or "", reverse=True)
+        positions = [self.index.index(f'skills/{name}.html">') for name in expected
+                     if f'skills/{name}.html">' in self.index]
+        section = self.index[self.index.index("Recently updated"):]
+        order = [name for name in expected if f'skills/{name}.html' in section]
+        self.assertEqual(order[0], expected[0])
+        self.assertTrue(positions)
+
+    def test_detail_pages_carry_the_version_timeline_and_commits(self):
+        history = bs.load_history()
+        for name, entry in history.items():
+            page = self.files[f"skills/{name}.html"]
+            with self.subTest(skill=name):
+                self.assertIn("History", page)
+                for item in entry["versions"]:
+                    self.assertIn(item["version"], page)
+                if entry["commits"]:
+                    self.assertIn(entry["commits"][0]["sha"], page)
+
+    def test_every_maintainer_has_a_page_listing_their_skills(self):
+        manifests = {str(s["name"]): bs.load_manifest(s) for s in bs.load_registry()}
+        people = bs.maintainer_index(manifests)
+        self.assertTrue(people)
+        self.assertIn("maintainers/index.html", self.files)
+        for handle, person in people.items():
+            page = self.files[f"maintainers/{handle}.html"]
+            with self.subTest(maintainer=handle):
+                self.assertIn(f"https://github.com/{handle}", page)
+                for skill in person["skills"]:
+                    self.assertIn(f"../skills/{skill}.html", page)
+
+    def test_skills_link_back_to_their_maintainer(self):
+        page = self.files["skills/strata.html"]
+        self.assertIn("../maintainers/BEKO2210.html", page)
+
+    def test_keyword_cloud_offers_real_keywords(self):
+        manifests = {str(s["name"]): bs.load_manifest(s) for s in bs.load_registry()}
+        keywords = {k for m in manifests.values() for k in m.get("keywords") or []}
+        rendered = bs.keyword_cloud(manifests)
+        self.assertTrue(any(f'data-keyword="{word}"' in rendered for word in keywords))
+
+    def test_every_skill_has_a_place_for_its_download_count(self):
+        for entry in bs.load_registry():
+            with self.subTest(skill=entry["name"]):
+                self.assertIn(f'data-installs="{entry["name"]}"', self.index)
+                self.assertIn(f'data-installs="{entry["name"]}"', self.files[f"skills/{entry['name']}.html"])
+
+    def test_the_only_external_call_is_the_public_release_api(self):
+        calls = re.findall(r"fetch\('([^']+)'\)", self.index + self.files["skills/strata.html"])
+        self.assertTrue(calls)
+        for url in calls:
+            self.assertEqual(url, "https://api.github.com/repos/BEKO2210/SkillQuarry/releases")
+
+    def test_the_page_still_works_when_that_call_fails(self):
+        for page in (self.index, self.files["skills/strata.html"]):
+            self.assertIn("catch", page)
+
+    def test_the_contribution_call_to_action_points_at_real_places(self):
+        for target in ("CONTRIBUTING.md", "docs/SKILL-SPEC.md", "issues/new/choose", "discussions"):
+            self.assertIn(target, self.index)
 
 
 class FailureTests(unittest.TestCase):
@@ -137,6 +208,25 @@ class FailureTests(unittest.TestCase):
     def test_a_missing_manifest_is_reported(self):
         with self.assertRaisesRegex(bs.SiteError, "cannot read"):
             bs.load_manifest({"name": "ghost", "path": "skills/none/ghost"})
+
+    def test_a_missing_history_file_is_reported(self):
+        with mock.patch.object(bs, "HISTORY", Path("/nonexistent/history.json")):
+            with self.assertRaisesRegex(bs.SiteError, "build_history"):
+                bs.load_history()
+
+    def test_a_malformed_history_file_is_reported(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            handle.write("{ not json")
+            broken = Path(handle.name)
+        self.addCleanup(broken.unlink)
+        with mock.patch.object(bs, "HISTORY", broken):
+            with self.assertRaisesRegex(bs.SiteError, "cannot read"):
+                bs.load_history()
+        broken.write_text('{"schema_version": 1}', encoding="utf-8")
+        with mock.patch.object(bs, "HISTORY", broken):
+            with self.assertRaisesRegex(bs.SiteError, "no skills object"):
+                bs.load_history()
 
 
 class CheckModeTests(unittest.TestCase):

@@ -5,6 +5,13 @@
   "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.",
   "category": "autonomous",
   "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
   "tagline": "Every generation is a fresh context. Only a validated core sample crosses the boundary.",
   "banner": "assets/strata-banner.svg",
   "agents": [

@@ -38,23 +38,45 @@
         <p class="tagline">Every generation is a fresh context. Only a validated core sample crosses the boundary.</p>
         <p>Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.</p>
         <div class="tags"><span class="tag accent">Autonomous agents</span><span class="tag ok">100 tests</span><span class="tag">Claude Code</span></div>
+        <p class="installs" data-installs="strata"></p>
       </article>
       <article class="card" data-name="cordon">
         <h2><a href="skills/cordon.html">Cordon</a></h2>
         <p class="tagline">Limit the blast radius. Verify the result.</p>
         <p>Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.</p>
         <div class="tags"><span class="tag accent">Security</span><span class="tag ok">64 tests</span><span class="tag">Claude Code</span><span class="tag">Any agent (manual mode)</span></div>
+        <p class="installs" data-installs="cordon"></p>
       </article>
       <article class="card" data-name="rangate">
         <h2><a href="skills/rangate.html">RanGate</a></h2>
         <p class="tagline">Unsafe stays behind the membrane. Safe Rust gets typed capabilities.</p>
         <p>Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.</p>
         <div class="tags"><span class="tag accent">Security</span><span class="tag ok">14 tests</span><span class="tag ok">offline</span><span class="tag warn">destructive</span><span class="tag">Claude Code</span></div>
+        <p class="installs" data-installs="rangate"></p>
       </article>
   </div>
   <p class="empty" id="empty" hidden>No skill matches those filters.</p>
+
+  <div class="section-head"><h2>Recently updated</h2><span class="when">from the commit history</span></div>
+  <ul class="strip"><li><a href="skills/strata.html">Strata</a> <span class="when">2026-08-14</span></li><li><a href="skills/cordon.html">Cordon</a> <span class="when">2026-08-14</span></li><li><a href="skills/rangate.html">RanGate</a> <span class="when">2026-08-14</span></li></ul>
+
+  <div class="section-head"><h2>Browse by keyword</h2></div>
+  <ul class="cloud"><li><button type="button" data-keyword="verification">verification</button></li><li><button type="button" data-keyword="agent-loop">agent-loop</button></li><li><button type="button" data-keyword="agent-safety">agent-safety</button></li><li><button type="button" data-keyword="audit">audit</button></li><li><button type="button" data-keyword="autonomous">autonomous</button></li><li><button type="button" data-keyword="blast-radius">blast-radius</button></li><li><button type="button" data-keyword="change-envelope">change-envelope</button></li><li><button type="button" data-keyword="claude-code">claude-code</button></li><li><button type="button" data-keyword="compiler-driven">compiler-driven</button></li><li><button type="button" data-keyword="context-management">context-management</button></li><li><button type="button" data-keyword="crash-recovery">crash-recovery</button></li><li><button type="button" data-keyword="ffi">ffi</button></li><li><button type="button" data-keyword="git">git</button></li><li><button type="button" data-keyword="guardrail">guardrail</button></li><li><button type="button" data-keyword="handoff">handoff</button></li><li><button type="button" data-keyword="lifetimes">lifetimes</button></li><li><button type="button" data-keyword="memory-safety">memory-safety</button></li><li><button type="button" data-keyword="miri">miri</button></li></ul>
+
+  <div class="section-head"><h2>Maintainers</h2><a href="maintainers/index.html">All maintainers &rarr;</a></div>
+  <ul class="strip"><li><a href="maintainers/BEKO2210.html">Belkis Aslani</a> <span class="when">3 skills</span></li></ul>
+
+  <div class="cta">
+    <h2>Add your skill</h2>
+    <p>A skill is a directory with a manifest, an agent-facing SKILL.md, tests and a test report.
+       Scaffold one from the reference skill, open a pull request, and CI checks the rest.</p>
+    <p><a href="https://github.com/BEKO2210/SkillQuarry/blob/main/CONTRIBUTING.md">Contributing</a> ·
+       <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/docs/SKILL-SPEC.md">Skill specification</a> ·
+       <a href="https://github.com/BEKO2210/SkillQuarry/issues/new/choose">Propose a skill</a> ·
+       <a href="https://github.com/BEKO2210/SkillQuarry/discussions">Discussions</a></p>
+  </div>
 </main>
-<script type="application/json" id="skill-data">[{"category": "autonomous", "checksum": "sha256:165f933f64dcf61d80569826365baba0c3f105abc351a493885b27b5762f280e", "compatibility": ["claude-code"], "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.", "displayName": "Strata", "license": "Apache-2.0", "name": "strata", "path": "skills/autonomous/strata", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["git", "claude"], "packages": [], "python": ">=3.10"}, "security": {"destructive_operations": [], "network_access": "indirect", "requires_secrets": false, "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.", "runs_external_commands": true, "threat_model": "TEST_REPORT.md", "writes_outside_repository": false}, "tests": {"count": 100, "coverage": "100% of runner.py executable lines"}, "version": "1.0.0", "workflow": "strata-tests.yml"}, {"category": "security", "checksum": "sha256:3f97b55471397b7e6e55f53cc4a8cd4c08ad5c1049adfc0ecf9e1975b22765e5", "compatibility": ["claude-code", "agent-neutral-manual-mode"], "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.", "displayName": "Cordon", "license": "Apache-2.0", "name": "cordon", "path": "skills/security/cordon", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["git"], "packages": [], "python": ">=3.10"}, "security": {"destructive_operations": [], "network_access": "indirect", "requires_secrets": false, "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.", "runs_external_commands": true, "threat_model": "README.md", "writes_outside_repository": false}, "tests": {"count": 64, "coverage": "100% of core.py executable lines (989/989)"}, "version": "1.0.0", "workflow": "cordon-tests.yml"}, {"category": "security", "checksum": "sha256:e6aad308504e5163c0f28d2011ea7618c9d48ae571f69cf0cd1fbb2a24e59202", "compatibility": ["claude-code"], "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.", "displayName": "RanGate", "license": "Apache-2.0", "name": "rangate", "path": "skills/security/rangate", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["cargo", "rustc"], "packages": [], "python": ">=3.10 (test harness only)"}, "security": {"destructive_operations": ["rewrites Rust source files in the target project in place; review the diff before committing"], "network_access": "none", "requires_secrets": false, "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.", "runs_external_commands": true, "threat_model": "TEST_REPORT.md", "writes_outside_repository": false}, "tests": {"count": 14, "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"}, "version": "1.0.0", "workflow": "rangate-tests.yml"}]</script>
+<script type="application/json" id="skill-data">[{"category": "autonomous", "checksum": "sha256:c04aff49c8b5530620dfbd5f390cf5dfd953dc8dfccdfd92a7e635beab7c1b78", "compatibility": ["claude-code"], "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.", "displayName": "Strata", "license": "Apache-2.0", "name": "strata", "path": "skills/autonomous/strata", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["git", "claude"], "packages": [], "python": ">=3.10"}, "security": {"destructive_operations": [], "network_access": "indirect", "requires_secrets": false, "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.", "runs_external_commands": true, "threat_model": "TEST_REPORT.md", "writes_outside_repository": false}, "tests": {"count": 100, "coverage": "100% of runner.py executable lines"}, "version": "1.0.0", "workflow": "strata-tests.yml"}, {"category": "security", "checksum": "sha256:571f9c5da352eaf6e940988f9f89dd2418d2d30cb65443ef523d87117f04ca64", "compatibility": ["claude-code", "agent-neutral-manual-mode"], "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.", "displayName": "Cordon", "license": "Apache-2.0", "name": "cordon", "path": "skills/security/cordon", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["git"], "packages": [], "python": ">=3.10"}, "security": {"destructive_operations": [], "network_access": "indirect", "requires_secrets": false, "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.", "runs_external_commands": true, "threat_model": "README.md", "writes_outside_repository": false}, "tests": {"count": 64, "coverage": "100% of core.py executable lines (989/989)"}, "version": "1.0.0", "workflow": "cordon-tests.yml"}, {"category": "security", "checksum": "sha256:c95273737fb8c68ee9f55c7913da874cac7f57b1b7b611bf27ec9197e8c83b39", "compatibility": ["claude-code"], "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.", "displayName": "RanGate", "license": "Apache-2.0", "name": "rangate", "path": "skills/security/rangate", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["cargo", "rustc"], "packages": [], "python": ">=3.10 (test harness only)"}, "security": {"destructive_operations": ["rewrites Rust source files in the target project in place; review the diff before committing"], "network_access": "none", "requires_secrets": false, "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.", "runs_external_commands": true, "threat_model": "TEST_REPORT.md", "writes_outside_repository": false}, "tests": {"count": 14, "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"}, "version": "1.0.0", "workflow": "rangate-tests.yml"}]</script>
 <script>const skills = JSON.parse(document.getElementById('skill-data').textContent);
 const controls = ['q', 'agent', 'platform', 'category', 'quality'].map((id) => document.getElementById(id));
 const toggles = ['offline', 'nosecrets'].map((id) => document.getElementById(id));
@@ -96,9 +118,50 @@ function apply() {
 for (const el of [...controls, ...toggles]) {
   el.addEventListener(el.tagName === 'INPUT' && el.type !== 'checkbox' ? 'input' : 'change', apply);
 }
-apply();</script>
+for (const button of document.querySelectorAll('.cloud button')) {
+  button.addEventListener('click', () => {
+    controls[0].value = button.dataset.keyword;
+    apply();
+    document.getElementById('grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+apply();
+
+// Install counts come from GitHub's public release API: one asset per skill
+// version, counted by GitHub itself. Nothing is sent about the reader, and the
+// page works unchanged when the request fails or is blocked.
+async function loadInstalls() {
+  let releases;
+  try {
+    const response = await fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases');
+    if (!response.ok) return;
+    releases = await response.json();
+  } catch (error) {
+    return;
+  }
+  const counts = new Map();
+  for (const release of releases) {
+    for (const asset of release.assets || []) {
+      const match = /^([a-z0-9-]+)-\d+\.\d+\.\d+\.tar\.gz$/.exec(asset.name);
+      if (!match) continue;
+      counts.set(match[1], (counts.get(match[1]) || 0) + (asset.download_count || 0));
+    }
+  }
+  if (counts.size === 0) return;
+  for (const element of document.querySelectorAll('[data-installs]')) {
+    const count = counts.get(element.dataset.installs);
+    if (count === undefined) continue;
+    element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+  }
+  const grid = document.getElementById('grid');
+  [...grid.children]
+    .sort((a, b) => (counts.get(b.dataset.name) || 0) - (counts.get(a.dataset.name) || 0))
+    .forEach((card) => grid.appendChild(card));
+}
+loadInstalls();</script>
 <footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
 · <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
 </div></footer>
 </body>
