@@ -1,0 +1,81 @@
+name: PerfForge pro evaluation
+
+on:
+  push:
+    branches:
+      - test/perfforge-pro-20260815
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic:
+    name: synthetic-pro / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Syntax check
+        run: python -m py_compile experiments/perfforge/run_pro_test.py
+      - name: Run frozen synthetic matrix
+        working-directory: experiments/perfforge
+        run: |
+          set -o pipefail
+          python run_pro_test.py --mode synthetic | tee pro-synthetic-result.json
+      - name: Confirm binding result
+        working-directory: experiments/perfforge
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('pro-synthetic-result.json'))
+          assert d['verdict']=='PASS_SYNTHETIC', d
+          assert d['summary']['exact']==8, d['summary']
+          assert not d['summary']['false_accepts'], d['summary']
+          assert not d['summary']['false_rejects'], d['summary']
+          assert d['summary']['elapsed_seconds'] < 360, d['summary']
+          PY
+
+  real:
+    name: real-pro / pinned repositories
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Pin Rust toolchain
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          node --version
+      - name: Syntax check
+        run: python -m py_compile experiments/perfforge/run_pro_test.py
+      - name: Run frozen real repository matrix
+        working-directory: experiments/perfforge
+        run: |
+          set -o pipefail
+          python run_pro_test.py --mode real | tee pro-real-result.json
+      - name: Confirm binding result
+        working-directory: experiments/perfforge
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('pro-real-result.json'))
+          assert d['verdict']=='PASS_REAL', d
+          assert d['summary']['exact']==3, d['summary']
+          assert d['summary']['elapsed_seconds'] < 900, d['summary']
+          PY
