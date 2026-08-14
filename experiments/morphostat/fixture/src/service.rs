@@ -1,4 +1,5 @@
-use crate::{domain, storage};
+use crate::domain;
+use crate::storage;
 
 pub fn process(value: i32) -> i32 {
     let adjusted = domain::apply_delta(value, 1);
