@@ -80,6 +80,14 @@ skillquarry install rangate</code></pre></div>
 
 # In Claude Code, from the target Rust repository:
 /rangate Refactor this unsafe/FFI boundary so raw invariants stop leaking into callers. Prove the result with compiler and test evidence.</code></pre></div>
+    <h2>Relationships</h2>
+    <table>
+      <tr><th>works with</th><td><a href="cordon.html">cordon</a></td></tr>
+    </table>
+    <h2>Independent verification</h2>
+    <table>
+      <tr><th><time>2026-08-14</time></th><td><strong>passed with findings</strong> — Independent review (Claude Opus 5, on the maintainer&#x27;s machine)<br>Installed the pinned toolchain, ran the suite, and tried to defeat the compile-fail proofs with a typo and a wrong error code.<br>Defects D5 and D6: compile-fail tests accepted any error, and a missing toolchain produced eight confusing failures. Both fixed. · <a href='https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/rangate/TEST_REPORT.md'>evidence</a></td></tr>
+    </table>
     <h2>Version history</h2>
     <table>
       <tr><th>v1.0.0</th><td><time>2026-08-14</time></td></tr>
@@ -105,7 +113,7 @@ skillquarry install rangate</code></pre></div>
       <div><dt>Writes outside the repository</dt><dd>no</dd></div>
       <div><dt>Irreversible operations</dt><dd>rewrites Rust source files in the target project in place; review the diff before committing</dd></div>
       <div><dt>Independently reviewed</dt><dd>Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.</dd></div>
-          <div><dt>Checksum</dt><dd class="checksum">sha256:47e3ccaa76872197971023cea660999863bcc32b5d93e1c5ccc9eba70b5f444c</dd></div>
+          <div><dt>Checksum</dt><dd class="checksum">sha256:d2a17fa0ce61ea123a14b5992f979da4645e78841af90893288947c5e4d1e27e</dd></div>
         </dl>
       </div>
     </aside>

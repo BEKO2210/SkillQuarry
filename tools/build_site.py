@@ -330,7 +330,12 @@ time { color: var(--dim); }
 /* ---------- mobile: centred and symmetric ---------- */
 @media (max-width: 720px) {
   .wrap { padding-left: var(--s3); padding-right: var(--s3); }
-  .hero .wrap { padding: var(--s5) var(--s3); text-align: center; }
+  .hero .wrap { padding: var(--s6) var(--s3) var(--s5); text-align: center; }
+  .hero .shot img, .hero .shot video { object-position: center; }
+  /* The seam runs straight through the middle on a phone, so the text needs a
+     denser scrim than the wide layout, where it sits beside the bright part. */
+  .hero::before { background:
+    radial-gradient(90% 60% at 50% 45%, rgba(10,16,22,.86), rgba(10,16,22,.78) 60%, rgba(10,16,22,.92)); }
   .hero .inner { max-width: 100%; margin: 0 auto; }
   .hero h1 { font-size: clamp(30px, 9vw, 40px); }
   .hero .lede { margin-left: auto; margin-right: auto; max-width: 40ch; }
@@ -924,6 +929,35 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
             f"<pre><code>{esc(quickstart)}</code></pre></div>\n"
         )
 
+    relations = ""
+    dependencies = skill.get("dependencies") or manifest.get("dependencies") or []
+    partners = skill.get("composes_with") or manifest.get("composes_with") or []
+    if dependencies or partners:
+        rows = "".join(
+            f'      <tr><th>needs</th><td><a href="{esc(item["name"])}.html">{esc(item["name"])}</a>'
+            f'{" &ge; " + esc(item["minimum_version"]) if item.get("minimum_version") else ""}'
+            f'{" — " + esc(item["reason"]) if item.get("reason") else ""}</td></tr>'
+            for item in dependencies
+        ) + "".join(
+            f'      <tr><th>works with</th><td><a href="{esc(partner)}.html">{esc(partner)}</a></td></tr>'
+            for partner in partners
+        )
+        relations = f"    <h2>Relationships</h2>\n    <table>\n{rows}\n    </table>\n"
+
+    checks = skill.get("verifications") or manifest.get("verifications") or []
+    verified = ""
+    if checks:
+        items = "".join(
+            f"      <tr><th><time>{esc(item['date'])}</time></th><td>"
+            f"<strong>{esc(item['result'].replace('-', ' '))}</strong> — {esc(item['by'])}<br>"
+            f"{esc(item['method'])}"
+            f"{'<br>' + esc(item['findings']) if item.get('findings') else ''}"
+            f"{' · <a href=\'' + esc(item['url']) + '\'>evidence</a>' if item.get('url') else ''}"
+            "</td></tr>"
+            for item in checks
+        )
+        verified = f"    <h2>Independent verification</h2>\n    <table>\n{items}\n    </table>\n"
+
     versions = (history or {}).get("versions") or []
     history_block = ""
     if versions:
@@ -966,7 +1000,7 @@ cd SkillQuarry/cli &amp;&amp; ./install.sh
 skillquarry info {esc(name)}
 skillquarry install {esc(name)}</code></pre></div>
     <p>Installation verifies the checksum in the sidebar before running the skill's own installer.</p>
-{quickstart_block}{history_block}    <h2>Read next</h2>
+{quickstart_block}{relations}{verified}{history_block}    <h2>Read next</h2>
     <p>{' · '.join(links)}</p>
     </div>
     <aside>
@@ -1050,7 +1084,23 @@ def render() -> dict[str, str]:
     history = load_history()
     by_name = {str(skill["name"]): skill for skill in skills}
     people = maintainer_index(manifests)
+    api = {
+        "api_version": 1,
+        "documentation": f"{SOURCE_URL}/blob/main/docs/REGISTRY-API.md",
+        "archive_base": f"{SOURCE_URL}/releases/latest/download",
+        "repository": SOURCE_URL,
+        "skills": skills,
+    }
     files = {
+        # A stable, versioned endpoint an agent can read without scraping HTML.
+        "api/v1/skills.json": json.dumps(api, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        ".well-known/skillquarry.json": json.dumps({
+            "name": "SkillQuarry",
+            "registry": "https://beko2210.github.io/SkillQuarry/api/v1/skills.json",
+            "archive_base": f"{SOURCE_URL}/releases/latest/download",
+            "documentation": f"{SOURCE_URL}/blob/main/docs/REGISTRY-API.md",
+            "client": f"{SOURCE_URL}/tree/main/cli",
+        }, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         "index.html": build_index(skills, manifests, history),
         "style.css": STYLE + "\n",
         "registry.json": json.dumps({"schema_version": 2, "skills": skills}, indent=2,
@@ -1060,6 +1110,9 @@ def render() -> dict[str, str]:
     for skill in skills:
         name = str(skill["name"])
         files[f"skills/{name}.html"] = build_detail(skill, manifests[name], history.get(name))
+        files[f"api/v1/skills/{name}.json"] = json.dumps(
+            {**skill, "history": history.get(name, {})}, indent=2, ensure_ascii=False, sort_keys=True
+        ) + "\n"
     files["maintainers/index.html"] = build_maintainer_index(people)
     for handle, person in people.items():
         files[f"maintainers/{handle}.html"] = build_maintainer(handle, person, by_name, manifests)

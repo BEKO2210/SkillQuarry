@@ -39,6 +39,9 @@ EXIT_OK = 0
 EXIT_ERROR = 2
 EXIT_MISMATCH = 3
 
+# Commands a remote registry can serve on its own; the rest need local files.
+REMOTE_COMMANDS = {"search", "list", "info", "install"}
+
 IGNORED_DIRECTORIES = {"__pycache__", "target", "node_modules", ".git"}
 IGNORED_SUFFIXES = {".pyc", ".pyo"}
 
@@ -191,12 +194,13 @@ def install_remote(url: str, name: str, prefix: str | None, *, force: bool = Fal
     return state["installed"][name]
 
 
-def dependency_order(skills: list[dict[str, Any]], root: Path | None, name: str) -> list[str]:
-    """The skill and everything it needs, dependencies first."""
-    manifests: dict[str, dict[str, Any]] = {}
-    for skill in skills:
-        entry = str(skill.get("name"))
-        manifests[entry] = skill if root is None else load_manifest(root, skill)
+def dependency_order(skills: list[dict[str, Any]], name: str) -> list[str]:
+    """The skill and everything it needs, dependencies first.
+
+    The registry carries the dependencies, so this reads the same data whether the
+    quarry is a checkout or a URL — one code path, one behaviour.
+    """
+    manifests = {str(skill.get("name")): skill for skill in skills}
     order: list[str] = []
     seen: set[str] = set()
 
@@ -503,6 +507,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"skillquarry {__version__}")
     parser.add_argument("--quarry", help="path to a SkillQuarry checkout")
+    parser.add_argument("--registry", help="URL of a remote registry.json (public or private)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     search = sub.add_parser("search", help="find skills")
@@ -554,11 +559,14 @@ def command_validate(root: Path, target: Path) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    remote = getattr(args, "registry", None) or REMOTE_REGISTRY
     try:
-        root = find_quarry(args.quarry)
+        # A remote registry replaces the checkout for everything except the
+        # commands that only make sense against local files.
+        root = None if remote and args.command in REMOTE_COMMANDS else find_quarry(args.quarry)
 
         if args.command in {"search", "list"}:
-            skills = load_registry(root)
+            skills = load_remote_registry(remote)[0] if root is None else load_registry(root)
             if args.command == "list":
                 selected = skills
             else:
@@ -577,14 +585,31 @@ def main(argv: list[str] | None = None) -> int:
             return EXIT_OK
 
         if args.command == "info":
-            skill = find_skill(load_registry(root), args.name)
-            print(format_info(root, skill, load_state()["installed"].get(args.name)))
+            skills = load_remote_registry(remote)[0] if root is None else load_registry(root)
+            skill = find_skill(skills, args.name)
+            print(format_info(root or Path(remote), skill, load_state()["installed"].get(args.name)))
             return EXIT_OK
 
         if args.command == "install":
-            record = install(root, args.name, args.prefix, force=args.force)
-            print(f"installed {args.name} {record['version']}")
-            print(record["output"])
+            skills = load_remote_registry(remote)[0] if root is None else load_registry(root)
+            order = dependency_order(skills, args.name)
+            if len(order) > 1:
+                print("installing dependencies first: " + ", ".join(order[:-1]))
+            for step in order:
+                # --force applies to the skill that was asked for. A dependency is
+                # only installed when it is missing or has moved on.
+                forced = args.force and step == args.name
+                try:
+                    if root is None:
+                        record = install_remote(remote, step, args.prefix, force=forced)
+                    else:
+                        record = install(root, step, args.prefix, force=forced)
+                except QuarryError as exc:
+                    if step != args.name and "already installed" in str(exc):
+                        print(f"  {step} is already installed")
+                        continue
+                    raise
+                print(f"installed {step} {record['version']}")
             return EXIT_OK
 
         if args.command == "uninstall":

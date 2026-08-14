@@ -239,13 +239,21 @@ def render_registry(manifests: list[dict[str, Any]]) -> str:
             "platforms": manifest.get("platforms", []),
             "quality": manifest.get("quality", "experimental"),
             "security": manifest.get("security", {}),
+            "dependencies": manifest.get("dependencies", []),
+            "composes_with": manifest.get("composes_with", []),
+            "verifications": manifest.get("verifications", []),
+            "maintainers": manifest.get("maintainers", []),
             "requires": manifest.get("requires", {}),
             "workflow": _workflow(manifest),
             "tests": {"count": tests.get("count"), "coverage": tests.get("coverage")},
         })
     document = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_by": "tools/render_readme.py",
+        # Where a client can fetch the archive of any skill listed here. The
+        # `latest` release always carries one file per skill and version.
+        "archive_base": f"https://github.com/{REPO_SLUG}/releases/latest/download",
+        "repository": f"https://github.com/{REPO_SLUG}",
         "skills": entries,
     }
     return json.dumps(document, indent=2, ensure_ascii=False, sort_keys=True) + "\n"

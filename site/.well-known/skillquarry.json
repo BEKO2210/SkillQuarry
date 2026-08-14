@@ -1,0 +1,7 @@
+{
+  "archive_base": "https://github.com/BEKO2210/SkillQuarry/releases/latest/download",
+  "client": "https://github.com/BEKO2210/SkillQuarry/tree/main/cli",
+  "documentation": "https://github.com/BEKO2210/SkillQuarry/blob/main/docs/REGISTRY-API.md",
+  "name": "SkillQuarry",
+  "registry": "https://beko2210.github.io/SkillQuarry/api/v1/skills.json"
+}

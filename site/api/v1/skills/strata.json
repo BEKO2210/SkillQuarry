@@ -1,0 +1,70 @@
+{
+  "category": "autonomous",
+  "checksum": "sha256:bd34a4324e593e3bae761724beb2520c7140369fbe6fe4050af6455a75c0fbd7",
+  "compatibility": [
+    "claude-code"
+  ],
+  "composes_with": [
+    "cordon"
+  ],
+  "dependencies": [],
+  "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.",
+  "displayName": "Strata",
+  "history": {
+    "released": "2026-08-13T23:53:38Z",
+    "versions": [
+      {
+        "date": "2026-08-13T23:53:38Z",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "github": "BEKO2210",
+      "name": "Belkis Aslani",
+      "role": "maintainer"
+    }
+  ],
+  "name": "strata",
+  "path": "skills/autonomous/strata",
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "quality": "tested",
+  "requires": {
+    "binaries": [
+      "git",
+      "claude"
+    ],
+    "packages": [],
+    "python": ">=3.10"
+  },
+  "security": {
+    "destructive_operations": [],
+    "network_access": "indirect",
+    "requires_secrets": false,
+    "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.",
+    "runs_external_commands": true,
+    "threat_model": "TEST_REPORT.md",
+    "writes_outside_repository": false
+  },
+  "tests": {
+    "count": 100,
+    "coverage": "100% of runner.py executable lines"
+  },
+  "verifications": [
+    {
+      "by": "Repository owner",
+      "date": "2026-08-13",
+      "findings": "Seven defects found before release, including handoff compaction that could exceed its own byte budget.",
+      "method": "Live run against Claude Code 2.1.231, including a two-process handoff and a deliberately tampered completion claim.",
+      "result": "passed-with-findings",
+      "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/autonomous/strata/TEST_REPORT.md"
+    }
+  ],
+  "version": "1.0.0",
+  "workflow": "strata-tests.yml"
+}

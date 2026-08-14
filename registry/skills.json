@@ -1,16 +1,29 @@
 {
+  "archive_base": "https://github.com/BEKO2210/SkillQuarry/releases/latest/download",
   "generated_by": "tools/render_readme.py",
-  "schema_version": 2,
+  "repository": "https://github.com/BEKO2210/SkillQuarry",
+  "schema_version": 3,
   "skills": [
     {
       "category": "autonomous",
-      "checksum": "sha256:0ff6862babe10ccd7683dfdbe9189a448d77fa7e290204c225855d648f8b8b91",
+      "checksum": "sha256:bd34a4324e593e3bae761724beb2520c7140369fbe6fe4050af6455a75c0fbd7",
       "compatibility": [
         "claude-code"
       ],
+      "composes_with": [
+        "cordon"
+      ],
+      "dependencies": [],
       "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.",
       "displayName": "Strata",
       "license": "Apache-2.0",
+      "maintainers": [
+        {
+          "github": "BEKO2210",
+          "name": "Belkis Aslani",
+          "role": "maintainer"
+        }
+      ],
       "name": "strata",
       "path": "skills/autonomous/strata",
       "platforms": [
@@ -39,19 +52,40 @@
         "count": 100,
         "coverage": "100% of runner.py executable lines"
       },
+      "verifications": [
+        {
+          "by": "Repository owner",
+          "date": "2026-08-13",
+          "findings": "Seven defects found before release, including handoff compaction that could exceed its own byte budget.",
+          "method": "Live run against Claude Code 2.1.231, including a two-process handoff and a deliberately tampered completion claim.",
+          "result": "passed-with-findings",
+          "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/autonomous/strata/TEST_REPORT.md"
+        }
+      ],
       "version": "1.0.0",
       "workflow": "strata-tests.yml"
     },
     {
       "category": "security",
-      "checksum": "sha256:e3017ec2810f5abd57b0ff5f86ff7d4e016e9ef4660821125b88a923d6d5f8c1",
+      "checksum": "sha256:043b9054886f61682ee89414463a2fe7ebe95e86a3743505fed31bd3fa5e55cd",
       "compatibility": [
         "claude-code",
         "agent-neutral-manual-mode"
       ],
+      "composes_with": [
+        "strata"
+      ],
+      "dependencies": [],
       "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.",
       "displayName": "Cordon",
       "license": "Apache-2.0",
+      "maintainers": [
+        {
+          "github": "BEKO2210",
+          "name": "Belkis Aslani",
+          "role": "maintainer"
+        }
+      ],
       "name": "cordon",
       "path": "skills/security/cordon",
       "platforms": [
@@ -79,18 +113,39 @@
         "count": 64,
         "coverage": "100% of core.py executable lines (989/989)"
       },
+      "verifications": [
+        {
+          "by": "Independent review (Claude Opus 5, on the maintainer's machine)",
+          "date": "2026-08-14",
+          "findings": "Defect C11: assume-unchanged/skip-worktree hid a tracked change from the audit. Fixed and covered by six regression tests.",
+          "method": "Ran the full suite plus a live smoke test against Claude Code 2.1.231; attacked the audit with git index flags.",
+          "result": "passed-with-findings",
+          "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/cordon/TEST_REPORT.md"
+        }
+      ],
       "version": "1.0.0",
       "workflow": "cordon-tests.yml"
     },
     {
       "category": "security",
-      "checksum": "sha256:47e3ccaa76872197971023cea660999863bcc32b5d93e1c5ccc9eba70b5f444c",
+      "checksum": "sha256:d2a17fa0ce61ea123a14b5992f979da4645e78841af90893288947c5e4d1e27e",
       "compatibility": [
         "claude-code"
       ],
+      "composes_with": [
+        "cordon"
+      ],
+      "dependencies": [],
       "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.",
       "displayName": "RanGate",
       "license": "Apache-2.0",
+      "maintainers": [
+        {
+          "github": "BEKO2210",
+          "name": "Belkis Aslani",
+          "role": "maintainer"
+        }
+      ],
       "name": "rangate",
       "path": "skills/security/rangate",
       "platforms": [
@@ -121,6 +176,16 @@
         "count": 14,
         "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"
       },
+      "verifications": [
+        {
+          "by": "Independent review (Claude Opus 5, on the maintainer's machine)",
+          "date": "2026-08-14",
+          "findings": "Defects D5 and D6: compile-fail tests accepted any error, and a missing toolchain produced eight confusing failures. Both fixed.",
+          "method": "Installed the pinned toolchain, ran the suite, and tried to defeat the compile-fail proofs with a typo and a wrong error code.",
+          "result": "passed-with-findings",
+          "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/rangate/TEST_REPORT.md"
+        }
+      ],
       "version": "1.0.0",
       "workflow": "rangate-tests.yml"
     }

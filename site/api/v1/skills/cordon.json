@@ -1,0 +1,70 @@
+{
+  "category": "security",
+  "checksum": "sha256:043b9054886f61682ee89414463a2fe7ebe95e86a3743505fed31bd3fa5e55cd",
+  "compatibility": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "composes_with": [
+    "strata"
+  ],
+  "dependencies": [],
+  "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.",
+  "displayName": "Cordon",
+  "history": {
+    "released": "2026-08-14T01:36:25Z",
+    "versions": [
+      {
+        "date": "2026-08-14T01:36:25Z",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "github": "BEKO2210",
+      "name": "Belkis Aslani",
+      "role": "maintainer"
+    }
+  ],
+  "name": "cordon",
+  "path": "skills/security/cordon",
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "quality": "tested",
+  "requires": {
+    "binaries": [
+      "git"
+    ],
+    "packages": [],
+    "python": ">=3.10"
+  },
+  "security": {
+    "destructive_operations": [],
+    "network_access": "indirect",
+    "requires_secrets": false,
+    "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.",
+    "runs_external_commands": true,
+    "threat_model": "README.md",
+    "writes_outside_repository": false
+  },
+  "tests": {
+    "count": 64,
+    "coverage": "100% of core.py executable lines (989/989)"
+  },
+  "verifications": [
+    {
+      "by": "Independent review (Claude Opus 5, on the maintainer's machine)",
+      "date": "2026-08-14",
+      "findings": "Defect C11: assume-unchanged/skip-worktree hid a tracked change from the audit. Fixed and covered by six regression tests.",
+      "method": "Ran the full suite plus a live smoke test against Claude Code 2.1.231; attacked the audit with git index flags.",
+      "result": "passed-with-findings",
+      "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/cordon/TEST_REPORT.md"
+    }
+  ],
+  "version": "1.0.0",
+  "workflow": "cordon-tests.yml"
+}

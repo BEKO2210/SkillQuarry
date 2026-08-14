@@ -191,5 +191,64 @@ class VersionConsistencyTests(unittest.TestCase):
             self.assertEqual(vs.declared_versions(Path(tmp)), {})
 
 
+
+class RelationTests(unittest.TestCase):
+    """Dependencies decide install order, so a bad graph must never be published."""
+
+    def graph(self, **skills):
+        return {name: {"version": "1.0.0", **body} for name, body in skills.items()}
+
+    def test_the_repository_graph_is_sound(self):
+        self.assertEqual(vs.check_relations(vs.load_all_manifests()), [])
+
+    def test_a_missing_dependency_is_named(self):
+        errors = vs.check_relations(self.graph(a={"dependencies": [{"name": "ghost"}]}))
+        self.assertIn("depends on 'ghost'", " ".join(errors))
+
+    def test_a_self_dependency_is_rejected(self):
+        errors = vs.check_relations(self.graph(a={"dependencies": [{"name": "a"}]}))
+        self.assertIn("depends on itself", " ".join(errors))
+
+    def test_a_cycle_is_reported_with_its_path(self):
+        errors = vs.check_relations(self.graph(
+            a={"dependencies": [{"name": "b"}]},
+            b={"dependencies": [{"name": "a"}]},
+        ))
+        self.assertTrue(any("dependency cycle" in error for error in errors))
+
+    def test_a_minimum_version_must_be_satisfiable(self):
+        errors = vs.check_relations({
+            "a": {"version": "1.0.0", "dependencies": [{"name": "b", "minimum_version": "2.0.0"}]},
+            "b": {"version": "1.5.0"},
+        })
+        self.assertIn("needs b >= 2.0.0", " ".join(errors))
+        self.assertEqual(vs.check_relations({
+            "a": {"version": "1.0.0", "dependencies": [{"name": "b", "minimum_version": "1.0.0"}]},
+            "b": {"version": "1.5.0"},
+        }), [])
+
+    def test_composes_with_must_name_real_skills(self):
+        errors = vs.check_relations(self.graph(a={"composes_with": ["ghost"]}))
+        self.assertIn("composes_with names 'ghost'", " ".join(errors))
+        self.assertIn("itself", " ".join(vs.check_relations(self.graph(a={"composes_with": ["a"]}))))
+
+    def test_install_order_puts_dependencies_first(self):
+        graph = self.graph(
+            app={"dependencies": [{"name": "lib"}]},
+            lib={"dependencies": [{"name": "base"}]},
+            base={},
+        )
+        self.assertEqual(vs.install_order(graph, "app"), ["base", "lib", "app"])
+
+    def test_every_verification_states_who_when_how_and_what(self):
+        for path in sorted(vs.SKILLS_DIR.glob("*/*/skill.json")):
+            manifest = json.loads(path.read_text("utf-8"))
+            for entry in manifest.get("verifications", []):
+                with self.subTest(skill=path.parent.name):
+                    for field in ("by", "date", "method", "result"):
+                        self.assertTrue(entry.get(field), field)
+                    self.assertIn(entry["result"], {"passed", "passed-with-findings", "failed"})
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

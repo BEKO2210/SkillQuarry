@@ -424,5 +424,271 @@ class PackagingTests(Base):
         self.assertEqual(ctx.exception.code, 0)
 
 
+
+class RemoteRegistryTests(Base):
+    """A remote quarry is a URL; nothing is trusted until it hashes correctly."""
+
+    def registry_document(self, **overrides):
+        skills = sq.load_registry(QUARRY)
+        document = {"schema_version": 3, "archive_base": "https://example.invalid/dl", "skills": skills}
+        document.update(overrides)
+        return document
+
+    def test_plain_http_is_refused(self):
+        with self.assertRaisesRegex(sq.QuarryError, "unencrypted"):
+            sq.fetch("http://example.invalid/registry.json")
+
+    def test_a_registry_without_archives_cannot_be_installed_from(self):
+        with self.assertRaisesRegex(sq.QuarryError, "archive_base"):
+            sq.archive_url({}, {"name": "x", "version": "1.0.0"})
+
+    def test_the_archive_url_follows_name_and_version(self):
+        url = sq.archive_url(self.registry_document(), {"name": "cordon", "version": "1.0.0"})
+        self.assertEqual(url, "https://example.invalid/dl/cordon-1.0.0.tar.gz")
+
+    def test_a_remote_registry_is_read_over_https(self):
+        payload = json.dumps(self.registry_document()).encode("utf-8")
+        with mock.patch.object(sq, "fetch", return_value=payload):
+            skills, document = sq.load_remote_registry("https://example.invalid/registry.json")
+        self.assertEqual({s["name"] for s in skills}, {"strata", "cordon", "rangate"})
+        self.assertIn("archive_base", document)
+
+    def test_a_registry_that_is_not_a_registry_is_refused(self):
+        with mock.patch.object(sq, "fetch", return_value=b"{}"):
+            with self.assertRaisesRegex(sq.QuarryError, "contains no skills"):
+                sq.load_remote_registry("https://example.invalid/registry.json")
+        with mock.patch.object(sq, "fetch", return_value=b"not json"):
+            with self.assertRaisesRegex(sq.QuarryError, "not a registry document"):
+                sq.load_remote_registry("https://example.invalid/registry.json")
+
+    def _archive(self, name="cordon", version="1.0.0", extra=None):
+        import io, tarfile
+        source = QUARRY / "skills" / "security" / name
+        raw = io.BytesIO()
+        with tarfile.open(fileobj=raw, mode="w:gz") as archive:
+            for path in sorted(source.rglob("*")):
+                if not path.is_file() or "__pycache__" in path.parts or "target" in path.parts:
+                    continue
+                archive.add(path, arcname=f"{name}-{version}/{path.relative_to(source).as_posix()}")
+            if extra:
+                info = tarfile.TarInfo(extra)
+                info.size = 3
+                archive.addfile(info, io.BytesIO(b"hi\n"))
+        return raw.getvalue()
+
+    def test_a_remote_install_verifies_the_unpacked_files(self):
+        document = self.registry_document()
+        payloads = [json.dumps(document).encode("utf-8"), self._archive()]
+        with mock.patch.object(sq, "fetch", side_effect=payloads):
+            record = sq.install_remote("https://example.invalid/registry.json", "cordon", str(self.prefix))
+        self.assertEqual(record["version"], "1.0.0")
+        self.assertTrue((self.prefix / "bin" / "cordon").is_file())
+
+    def test_a_tampered_archive_is_refused_before_anything_runs(self):
+        document = self.registry_document()
+        payloads = [json.dumps(document).encode("utf-8"), self._archive(extra="cordon-1.0.0/EXTRA.md")]
+        with mock.patch.object(sq, "fetch", side_effect=payloads):
+            with self.assertRaisesRegex(sq.QuarryError, "does not match the registry checksum"):
+                sq.install_remote("https://example.invalid/registry.json", "cordon", str(self.prefix))
+        self.assertFalse((self.prefix / "bin" / "cordon").exists())
+
+    def test_an_archive_that_escapes_its_directory_is_refused(self):
+        import io, tarfile
+        raw = io.BytesIO()
+        with tarfile.open(fileobj=raw, mode="w:gz") as archive:
+            info = tarfile.TarInfo("../escape.txt")
+            info.size = 3
+            archive.addfile(info, io.BytesIO(b"hi\n"))
+        with self.assertRaises(sq.QuarryError):
+            sq.unpack_archive(raw.getvalue(), self.root, "cordon-1.0.0")
+
+    def test_an_archive_with_a_foreign_root_is_refused(self):
+        with self.assertRaisesRegex(sq.QuarryError, "unexpected root"):
+            sq.unpack_archive(self._archive(), self.root, "something-else-1.0.0")
+
+
+class FetchTests(Base):
+    """The one place the client talks to the network."""
+
+    class FakeResponse:
+        def __init__(self, payload):
+            self.payload = payload
+            self.captured = None
+
+        def read(self, size):
+            return self.payload[:size]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    def test_a_token_is_sent_only_as_a_bearer_header(self):
+        seen = {}
+
+        def fake_urlopen(request, timeout=0):
+            seen["headers"] = dict(request.header_items())
+            seen["url"] = request.full_url
+            return self.FakeResponse(b"payload")
+
+        with mock.patch.object(sq.urllib.request, "urlopen", fake_urlopen):
+            with mock.patch.object(sq, "REMOTE_TOKEN", "s3cret"):
+                data = sq.fetch("https://example.invalid/registry.json")
+        self.assertEqual(data, b"payload")
+        self.assertEqual(seen["headers"].get("Authorization"), "Bearer s3cret")
+        self.assertIn("skillquarry/", seen["headers"].get("User-agent", ""))
+
+    def test_no_token_means_no_authorization_header(self):
+        def fake_urlopen(request, timeout=0):
+            self.assertNotIn("Authorization", dict(request.header_items()))
+            return self.FakeResponse(b"ok")
+
+        with mock.patch.object(sq.urllib.request, "urlopen", fake_urlopen):
+            with mock.patch.object(sq, "REMOTE_TOKEN", None):
+                self.assertEqual(sq.fetch("https://example.invalid/x"), b"ok")
+
+    def test_an_oversized_response_is_refused(self):
+        with mock.patch.object(sq.urllib.request, "urlopen",
+                               lambda request, timeout=0: self.FakeResponse(b"x" * 50)):
+            with self.assertRaisesRegex(sq.QuarryError, "larger than"):
+                sq.fetch("https://example.invalid/big", limit=10)
+
+    def test_a_network_error_is_reported_not_raised_raw(self):
+        def boom(request, timeout=0):
+            raise sq.urllib.error.URLError("no route to host")
+
+        with mock.patch.object(sq.urllib.request, "urlopen", boom):
+            with self.assertRaisesRegex(sq.QuarryError, "cannot fetch"):
+                sq.fetch("https://example.invalid/x")
+
+
+class RemoteEdgeTests(RemoteRegistryTests):
+    def test_an_archive_containing_a_link_is_refused(self):
+        import io, tarfile
+        raw = io.BytesIO()
+        with tarfile.open(fileobj=raw, mode="w:gz") as archive:
+            info = tarfile.TarInfo("cordon-1.0.0/link")
+            info.type = tarfile.SYMTYPE
+            info.linkname = "/etc/passwd"
+            archive.addfile(info)
+        with self.assertRaisesRegex(sq.QuarryError, "contains a link"):
+            sq.unpack_archive(raw.getvalue(), self.root, "cordon-1.0.0")
+
+    def test_installing_the_same_remote_skill_twice_is_refused(self):
+        document = self.registry_document()
+        payloads = [json.dumps(document).encode("utf-8"), self._archive(),
+                    json.dumps(document).encode("utf-8")]
+        with mock.patch.object(sq, "fetch", side_effect=payloads):
+            sq.install_remote("https://example.invalid/r.json", "cordon", str(self.prefix))
+            with self.assertRaisesRegex(sq.QuarryError, "already installed"):
+                sq.install_remote("https://example.invalid/r.json", "cordon", str(self.prefix))
+
+    def test_a_failing_remote_installer_is_reported(self):
+        document = self.registry_document()
+        payloads = [json.dumps(document).encode("utf-8"), self._archive()]
+        failing = subprocess.CompletedProcess(["bash"], 1, "boom", None)
+        with mock.patch.object(sq, "fetch", side_effect=payloads):
+            with mock.patch.object(sq, "run_installer", return_value=failing):
+                with self.assertRaisesRegex(sq.QuarryError, "installer failed"):
+                    sq.install_remote("https://example.invalid/r.json", "cordon", str(self.prefix))
+
+    def test_the_cli_serves_search_info_and_install_from_a_registry(self):
+        document = self.registry_document()
+        blob = json.dumps(document).encode("utf-8")
+        out = io.StringIO()
+        with mock.patch.object(sq, "fetch", return_value=blob):
+            with redirect_stdout(out):
+                code = sq.main(["--registry", "https://example.invalid/r.json", "list"])
+        self.assertEqual(code, sq.EXIT_OK)
+        self.assertIn("cordon", out.getvalue())
+
+        out = io.StringIO()
+        with mock.patch.object(sq, "fetch", return_value=blob):
+            with redirect_stdout(out):
+                code = sq.main(["--registry", "https://example.invalid/r.json", "info", "cordon"])
+        self.assertEqual(code, sq.EXIT_OK)
+        self.assertIn("Cordon", out.getvalue())
+
+    def test_a_remote_install_pulls_its_dependency_first(self):
+        skills = [dict(item) for item in sq.load_registry(QUARRY)]
+        for skill in skills:
+            if skill["name"] == "rangate":
+                skill["dependencies"] = [{"name": "cordon"}]
+        document = self.registry_document(skills=skills)
+        blob = json.dumps(document).encode("utf-8")
+        payloads = [blob, blob, self._archive("cordon"), blob,
+                    self._archive("rangate")]
+        out = io.StringIO()
+        with mock.patch.object(sq, "fetch", side_effect=payloads):
+            with redirect_stdout(out):
+                code = sq.main(["--registry", "https://example.invalid/r.json", "install",
+                                "rangate", "--prefix", str(self.prefix)])
+        self.assertEqual(code, sq.EXIT_OK, out.getvalue())
+        self.assertIn("installing dependencies first: cordon", out.getvalue())
+        self.assertTrue((self.prefix / "bin" / "cordon").is_file())
+
+    def test_the_cli_installs_dependencies_first_and_skips_what_is_there(self):
+        skills = sq.load_registry(QUARRY)
+        for skill in skills:
+            if skill["name"] == "rangate":
+                skill["dependencies"] = [{"name": "cordon"}]
+        out = io.StringIO()
+        with mock.patch.object(sq, "load_registry", return_value=skills):
+            with redirect_stdout(out):
+                code = sq.main(["--quarry", str(QUARRY), "install", "rangate",
+                                "--prefix", str(self.prefix)])
+        self.assertEqual(code, sq.EXIT_OK)
+        printed = out.getvalue()
+        self.assertIn("installing dependencies first: cordon", printed)
+        self.assertLess(printed.index("installed cordon"), printed.index("installed rangate"))
+
+        # Second run: cordon is already there, rangate is forced.
+        out = io.StringIO()
+        with mock.patch.object(sq, "load_registry", return_value=skills):
+            with redirect_stdout(out):
+                code = sq.main(["--quarry", str(QUARRY), "install", "rangate",
+                                "--prefix", str(self.prefix), "--force"])
+        self.assertIn("cordon is already installed", out.getvalue())
+
+
+class DependencyTests(Base):
+    def test_dependencies_come_first(self):
+        skills = [
+            {"name": "app", "dependencies": [{"name": "lib"}]},
+            {"name": "lib", "dependencies": [{"name": "base"}]},
+            {"name": "base"},
+        ]
+        self.assertEqual(sq.dependency_order(skills, "app"), ["base", "lib", "app"])
+
+    def test_a_missing_dependency_stops_the_install(self):
+        skills = [{"name": "app", "dependencies": [{"name": "ghost"}]}]
+        with self.assertRaisesRegex(sq.QuarryError, "does not have"):
+            sq.dependency_order(skills, "app")
+
+    def test_a_cycle_is_reported_rather_than_looping(self):
+        skills = [
+            {"name": "a", "dependencies": [{"name": "b"}]},
+            {"name": "b", "dependencies": [{"name": "a"}]},
+        ]
+        with self.assertRaisesRegex(sq.QuarryError, "dependency cycle"):
+            sq.dependency_order(skills, "a")
+
+    def test_a_shared_dependency_is_visited_once(self):
+        skills = [
+            {"name": "app", "dependencies": [{"name": "left"}, {"name": "right"}]},
+            {"name": "left", "dependencies": [{"name": "base"}]},
+            {"name": "right", "dependencies": [{"name": "base"}]},
+            {"name": "base"},
+        ]
+        order = sq.dependency_order(skills, "app")
+        self.assertEqual(order.count("base"), 1)
+        self.assertLess(order.index("base"), order.index("left"))
+        self.assertEqual(order[-1], "app")
+
+    def test_a_skill_without_dependencies_is_just_itself(self):
+        self.assertEqual(sq.dependency_order([{"name": "solo"}], "solo"), ["solo"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

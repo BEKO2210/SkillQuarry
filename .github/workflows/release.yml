@@ -12,6 +12,9 @@ on:
 
 permissions:
   contents: write
+  # Build provenance: GitHub signs a statement about what produced these files.
+  id-token: write
+  attestations: write
 
 jobs:
   publish:
@@ -33,6 +36,11 @@ jobs:
       - name: Build reproducible skill archives
         run: python3 tools/package_skills.py
 
+      - name: Sign the archives with build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*.tar.gz"
+
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -42,7 +50,12 @@ jobs:
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" \
               --title "Skills $TAG" \
-              --notes "Reproducible skill archives. Verify with \`sha256sum -c SHA256SUMS\`.
+              --notes "Reproducible skill archives.
+
+          Verify the bytes:      sha256sum -c SHA256SUMS
+          Verify the origin:     gh attestation verify <file>.tar.gz --repo ${{ github.repository }}
+          Verify the contents:   skillquarry install <skill> --registry https://beko2210.github.io/SkillQuarry/api/v1/skills.json
+
           Each archive's download count is what the marketplace shows as installs."
           fi
           gh release upload "$TAG" dist/* --clobber

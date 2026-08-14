@@ -704,7 +704,9 @@ SkillQuarry/
 │   └── test_*.py               tests for the tooling itself
 │
 ├── docs/
-│   └── SKILL-SPEC.md           the binding skill specification
+│   ├── SKILL-SPEC.md           the binding skill specification
+│   ├── REGISTRY-API.md         the public endpoints
+│   └── SELF-HOSTING.md         running a private quarry
 │
 ├── assets/                     hand-written SVG logos and banners
 │
@@ -830,10 +832,37 @@ python3 tools/build_history.py            # version history from git
 A release is cut by pushing a `skills-*` tag; the workflow validates the registry,
 rebuilds the archives and uploads them.
 
-### Still planned
+### Install from anywhere
 
-A published package so `skillquarry` can be installed without cloning, remote
-registries and signed releases.
+The client reads any registry that answers with the same shape — this one, or your
+own:
+
+```bash
+skillquarry --registry https://beko2210.github.io/SkillQuarry/api/v1/skills.json install cordon
+export SKILLQUARRY_REGISTRY=https://skills.example.internal/api/v1/skills.json
+export SKILLQUARRY_TOKEN=…      # sent as Authorization: Bearer …
+```
+
+A remote install downloads the archive, unpacks it to a temporary directory,
+hashes it exactly as the registry hashes a skill, and only runs the installer when
+the two match. HTTPS is required — a registry decides what code lands on a
+machine.
+
+Dependencies are installed first, in order; the validator rejects a cycle or a
+missing name before anything is published.
+
+**Verify what you got:**
+
+```bash
+sha256sum -c SHA256SUMS                                   # the bytes
+gh attestation verify cordon-1.0.0.tar.gz --repo BEKO2210/SkillQuarry  # the origin
+```
+
+Every release is signed with GitHub build provenance, so an archive can be traced
+to the workflow run and commit that produced it.
+
+Running your own quarry, public or private: [docs/SELF-HOSTING.md](docs/SELF-HOSTING.md).
+The endpoints: [docs/REGISTRY-API.md](docs/REGISTRY-API.md).
 
 ---
 
@@ -896,15 +925,15 @@ registries and signed releases.
 
 ## Phase 6 — Ecosystem
 
-- [ ] Signed skill packages
-- [ ] Skill dependencies
-- [ ] Skill composition
-- [ ] Community verification
-- [ ] Automatic agent discovery
-- [ ] Remote registries
-- [ ] Private registries
-- [ ] Enterprise support
-- [ ] Public registry API
+- [x] Signed skill packages (GitHub build provenance; `gh attestation verify`)
+- [x] Skill dependencies (declared, resolved, cycle-checked, installed in order)
+- [x] Skill composition (`composes_with`, shown on the site and in the API)
+- [x] Community verification (`verifications`: who, when, how, what came out)
+- [x] Automatic agent discovery (`.well-known/skillquarry.json`)
+- [x] Remote registries (`skillquarry --registry <url>`)
+- [x] Private registries ([docs/SELF-HOSTING.md](docs/SELF-HOSTING.md), bearer token, HTTPS enforced)
+- [ ] Enterprise support — a support offering, not a feature; self-hosting is documented instead
+- [x] Public registry API ([docs/REGISTRY-API.md](docs/REGISTRY-API.md), versioned at `api/v1/`)
 
 ---
 

@@ -84,6 +84,14 @@ cordon run &quot;Fix the parser regression and touch nothing else.&quot; \
   --verify &quot;python3 -m unittest discover -s tests&quot; \
   --max-files 8 \
   --max-added-lines 400</code></pre></div>
+    <h2>Relationships</h2>
+    <table>
+      <tr><th>works with</th><td><a href="strata.html">strata</a></td></tr>
+    </table>
+    <h2>Independent verification</h2>
+    <table>
+      <tr><th><time>2026-08-14</time></th><td><strong>passed with findings</strong> — Independent review (Claude Opus 5, on the maintainer&#x27;s machine)<br>Ran the full suite plus a live smoke test against Claude Code 2.1.231; attacked the audit with git index flags.<br>Defect C11: assume-unchanged/skip-worktree hid a tracked change from the audit. Fixed and covered by six regression tests. · <a href='https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/cordon/TEST_REPORT.md'>evidence</a></td></tr>
+    </table>
     <h2>Version history</h2>
     <table>
       <tr><th>v1.0.0</th><td><time>2026-08-14</time></td></tr>
@@ -109,7 +117,7 @@ cordon run &quot;Fix the parser regression and touch nothing else.&quot; \
       <div><dt>Writes outside the repository</dt><dd>no</dd></div>
       <div><dt>Irreversible operations</dt><dd>none declared</dd></div>
       <div><dt>Independently reviewed</dt><dd>Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.</dd></div>
-          <div><dt>Checksum</dt><dd class="checksum">sha256:e3017ec2810f5abd57b0ff5f86ff7d4e016e9ef4660821125b88a923d6d5f8c1</dd></div>
+          <div><dt>Checksum</dt><dd class="checksum">sha256:043b9054886f61682ee89414463a2fe7ebe95e86a3743505fed31bd3fa5e55cd</dd></div>
         </dl>
       </div>
     </aside>
