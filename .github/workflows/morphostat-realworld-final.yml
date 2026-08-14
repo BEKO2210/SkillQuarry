@@ -1,0 +1,39 @@
+name: Morphostat real-world final evaluation
+
+on:
+  push:
+    branches:
+      - test/morphostat-pro-20260814
+    paths:
+      - 'experiments/morphostat/realworld_final_test.py'
+      - 'experiments/morphostat/compiler_native_feasibility.py'
+      - 'experiments/morphostat/lsp_semantic_feasibility.py'
+      - '.github/workflows/morphostat-realworld-final.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  final:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned Rust analysis toolchains
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component clippy
+          rustup default 1.97.1
+          rustup component add rust-analyzer rust-src --toolchain 1.97.1
+          rustup toolchain install nightly-2026-08-13 --profile minimal
+          rustc --version
+          cargo --version
+          rust-analyzer --version
+          rustc +nightly-2026-08-13 --version
+          python3 --version
+      - name: Syntax check
+        working-directory: experiments/morphostat
+        run: python3 -m py_compile realworld_final_test.py compiler_native_feasibility.py lsp_semantic_feasibility.py
+      - name: Run pinned ripgrep real-world final test
+        working-directory: experiments/morphostat
+        run: python3 realworld_final_test.py
