@@ -268,6 +268,12 @@ def evaluate_candidate(
     }
 
 
+def required_toolchain() -> list[str]:
+    """Same guard as the pro harness: a missing toolchain is not a verdict."""
+    import shutil
+    return [tool for tool in ("cargo", "rustc", "cc") if shutil.which(tool) is None]
+
+
 def main() -> int:
     failures: list[str] = []
     report_landscapes = []

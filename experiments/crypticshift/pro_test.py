@@ -320,7 +320,31 @@ pub fn prove() { let f = worker(Arc::new(Mutex::new(7))); assert_send(&f); }
     return results
 
 
+def required_toolchain() -> list[str]:
+    """Programs this benchmark cannot run without.
+
+    A missing linker made every compile-and-link probe fail, and the harness
+    reported that as FAIL_PRO — a verdict about the method, from a fact about the
+    machine. It must refuse to judge instead.
+    """
+    import shutil
+    missing = [tool for tool in ("cargo", "rustc", "cc") if shutil.which(tool) is None]
+    return missing
+
+
 def main() -> int:
+    missing = required_toolchain()
+    if missing:
+        verdict = {
+            "verdict": "NOT_RUN",
+            "reason": "missing toolchain: " + ", ".join(missing),
+            "note": "This benchmark compiles and links Rust. Without those programs it "
+                    "cannot say anything about the method; it is not a failure of CrypticShift.",
+        }
+        print(json.dumps(verdict, indent=2, sort_keys=True))
+        # 2 = could not evaluate, distinct from 1 = evaluated and failed.
+        return 2
+
     started = time.monotonic()
     failures: list[str] = []
     with tempfile.TemporaryDirectory(prefix="crypticshift-pro-") as directory:

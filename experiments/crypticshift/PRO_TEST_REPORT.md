@@ -270,6 +270,24 @@ No finite test can cover "all Rust" or all agent behavior. Specifically this pro
 - the same heuristic works when the reservoir contains dozens of variants;
 - the method beats strong modern coding agents on naturally occurring historical refactors.
 
+## Independent replication attempt (2026-08-14)
+
+Reproduced on the maintainer's Linux machine with the pinned Rust 1.97.1. The
+harness printed **FAIL_PRO** — and that verdict was wrong: the machine has `rustc`
+and `cargo` but no C linker, so every probe that must compile *and link* failed,
+including `lifetime_owned_boundary`, `async_send_positive`, `feature_matrix_positive`
+and `workspace_api_positive`. The negative probes, which only need a compile error,
+passed as expected.
+
+That is a defect in the harness, not evidence against the method: a fact about one
+machine was reported as a judgement about CrypticShift. Both harnesses now check
+for `cargo`, `rustc` and `cc` first and exit with `NOT_RUN` (exit code 2) when any
+is missing, which is distinct from an evaluated failure (exit code 1).
+
+The CI evidence stands unchanged: run `31791534801`, commit
+`0220ba728c519d5758f3b95ef1c10cda7ce48c0a`, green on both `ubuntu-24.04` and
+`macos-latest`, verified through the GitHub API rather than taken from this report.
+
 ## Final decision
 
 **GO to one final real-repository / LLM-authored validation.**
