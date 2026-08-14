@@ -235,6 +235,20 @@ touching the skill:
 | real repositories | Ubuntu 24.04 | the 17 tests against pinned commits |
 | registry and metadata | Ubuntu 24.04 | manifest, layout, README, registry, history and site are current, and nothing generated is left dirty |
 
+Green on run `31833262617` (commit `8334646`), every job:
+
+```text
+structural (ubuntu-24.04)     82 tests, 0 skipped     0.9 s
+structural (macos-15)         82 tests, 0 skipped     0.4 s
+semantic (ubuntu-24.04)      142 tests, 0 skipped    47.7 s
+semantic (macos-15)          142 tests, 0 skipped    27.2 s
+real repositories (ubuntu)    17 tests              159.2 s
+registry and metadata         clean
+```
+
+The real-repository stage took 159.2 s in CI, against the 168.267 s the frozen
+research measured and the 720 s budget it was held to.
+
 Four infrastructure defects were found by CI rather than by re-reading the file,
 and each is recorded here because "green on the second try" is only honest if
 the first try is shown:
