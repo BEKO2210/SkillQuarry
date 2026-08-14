@@ -172,6 +172,8 @@ main { padding-bottom: 20px; }
   border: 1px solid var(--edge); color: var(--muted); background: var(--raised-2);
 }
 .tag.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--edge)); }
+.tag.verified { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, var(--edge));
+  background: var(--accent-soft); font-weight: 600; }
 .tag.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, var(--edge)); }
 .tag.accent { color: var(--accent); border-color: color-mix(in srgb, var(--accent-deep) 45%, var(--edge)); }
 .card .foot {

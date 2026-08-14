@@ -13,7 +13,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-quarry.webp">
-<link rel="stylesheet" href="style.css?v=7b3770801d">
+<link rel="stylesheet" href="style.css?v=7c8ea8359c">
 <script>(function () {
   const stored = localStorage.getItem('skillquarry-theme');
   const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -53,8 +53,9 @@
     <p class="eyebrow">Open marketplace for agent skills</p>
     <h1>Build capabilities once. <span class="line">Share <i>intelligence</i> everywhere.</span></h1>
     <p class="lede">Reusable capabilities for AI coding agents — inspectable, tested,
-      versioned, checksum-verified, and installable with one command. No dependencies,
-      no telemetry, nothing hidden.</p>
+      versioned, checksum-verified, and installable with one command. The client is
+      one file with no third-party dependencies; every skill declares what it needs.
+      No telemetry, nothing hidden.</p>
     <div class="actions">
       <a class="button primary" href="#skills">Browse 4 skills</a>
       <a class="button secondary" href="#install">How to install</a>
@@ -63,7 +64,7 @@
       <li><b>4</b><span>skills</span></li>
       <li><b>3</b><span>categories</span></li>
       <li><b>320</b><span>tests passing</span></li>
-      <li><b>0</b><span>dependencies</span></li>
+      <li><b>0</b><span>client dependencies</span></li>
     </ul>
   </div></div>
 </header>
@@ -94,7 +95,7 @@
           </div>
         </div>
         <p class="body">Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.</p>
-        <div class="tags"><span class="tag accent">Autonomous agents</span><span class="tag ok">100 tests</span><span class="tag">Claude Code</span></div>
+        <div class="tags"><span class="tag accent">Autonomous agents</span><span class="tag verified" title="Repository owner — 2026-08-13">&#10003; verified</span><span class="tag ok">100 tests</span><span class="tag">Claude Code</span></div>
         <div class="foot">
           <span>v1.0.0</span>
           <span class="installs" data-installs="strata"></span>
@@ -110,7 +111,7 @@
           </div>
         </div>
         <p class="body">Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.</p>
-        <div class="tags"><span class="tag accent">Coding</span><span class="tag ok">142 tests</span><span class="tag ok">offline</span><span class="tag warn">destructive</span><span class="tag">Claude Code</span><span class="tag">Any agent (manual mode)</span></div>
+        <div class="tags"><span class="tag accent">Coding</span><span class="tag verified" title="Frozen research evaluation (LockScope v2) — 2026-08-14">&#10003; verified</span><span class="tag ok">142 tests</span><span class="tag ok">offline</span><span class="tag warn">destructive</span><span class="tag">Claude Code</span><span class="tag">Any agent (manual mode)</span></div>
         <div class="foot">
           <span>v1.0.0</span>
           <span class="installs" data-installs="lockscope"></span>
@@ -126,7 +127,7 @@
           </div>
         </div>
         <p class="body">Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.</p>
-        <div class="tags"><span class="tag accent">Security</span><span class="tag ok">64 tests</span><span class="tag">Claude Code</span><span class="tag">Any agent (manual mode)</span></div>
+        <div class="tags"><span class="tag accent">Security</span><span class="tag verified" title="Independent review (Claude Opus 5, on the maintainer&#x27;s machine) — 2026-08-14">&#10003; verified</span><span class="tag ok">64 tests</span><span class="tag">Claude Code</span><span class="tag">Any agent (manual mode)</span></div>
         <div class="foot">
           <span>v1.0.0</span>
           <span class="installs" data-installs="cordon"></span>
@@ -142,7 +143,7 @@
           </div>
         </div>
         <p class="body">Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.</p>
-        <div class="tags"><span class="tag accent">Security</span><span class="tag ok">14 tests</span><span class="tag ok">offline</span><span class="tag warn">destructive</span><span class="tag">Claude Code</span></div>
+        <div class="tags"><span class="tag accent">Security</span><span class="tag verified" title="Independent review (Claude Opus 5, on the maintainer&#x27;s machine) — 2026-08-14">&#10003; verified</span><span class="tag ok">14 tests</span><span class="tag ok">offline</span><span class="tag warn">destructive</span><span class="tag">Claude Code</span></div>
         <div class="foot">
           <span>v1.0.0</span>
           <span class="installs" data-installs="rangate"></span>

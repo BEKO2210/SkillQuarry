@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import ast
 import io
 import json
 import os
@@ -292,6 +293,35 @@ class DiscoveryTests(unittest.TestCase):
         self.assertIn(bs.REPO_SLUG, bs.CLIENT_URL)
         served = json.loads(self.files[".well-known/skillquarry.json"])
         self.assertEqual(served["registry"], bs.REGISTRY_URL)
+
+    def test_the_dependency_claim_is_about_the_client_and_is_true(self):
+        """The hero used to say "No dependencies" for the whole marketplace.
+
+        That stopped being true when a skill shipped pinned parsers. The claim
+        now names what it covers — the client — and this test checks the claim
+        against the client's own imports instead of trusting the sentence.
+        """
+        self.assertIn("client dependencies", self.index)
+        self.assertNotIn("<span>dependencies</span>", self.index)
+
+        source = (bs.REPO / "cli" / "skillquarry.py").read_text("utf-8")
+        tree = ast.parse(source)
+        imported = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imported.update(alias.name.split(".")[0] for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                imported.add(node.module.split(".")[0])
+        third_party = imported - set(sys.stdlib_module_names)
+        self.assertEqual(third_party, set(), f"the client imports {third_party}")
+
+    def test_a_skill_is_marked_verified_only_when_someone_verified_it(self):
+        for entry in bs.load_registry():
+            page_tag = f'data-name="{entry["name"]}"'
+            card = self.index.split(page_tag)[1].split("</article>")[0]
+            claimed = "&#10003; verified" in card
+            recorded = bool(bs.verified_by(entry))
+            self.assertEqual(claimed, recorded, f"{entry['name']}: badge and manifest disagree")
 
     def css_rules(self):
         """Every `selector { body }` pair of the stylesheet, at-rules aside."""
