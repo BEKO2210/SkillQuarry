@@ -26,8 +26,12 @@ if [ "$version_ok" != "1" ]; then
   exit 1
 fi
 
-if ! "$PYTHON" -c 'import venv' >/dev/null 2>&1; then
-  echo "lockscope: the python3 venv module is missing (Debian/Ubuntu: apt install python3-venv)" >&2
+# `import venv` succeeds even where creating an environment fails: Debian and
+# Ubuntu ship the module but not ensurepip, and the failure then happens halfway
+# through with a stack trace instead of a sentence. Check the part that breaks.
+if ! "$PYTHON" -c 'import ensurepip' >/dev/null 2>&1; then
+  echo "lockscope: python3 cannot create virtual environments with pip on this machine" >&2
+  echo "lockscope: Debian/Ubuntu: sudo apt install python3-venv, then run install.sh again" >&2
   exit 1
 fi
 
@@ -38,8 +42,8 @@ cp "$HERE/requirements.txt" "$SHARE/requirements.txt"
 
 # Idempotent: an existing environment is reused, and pinned versions mean a
 # second run installs nothing new.
-if [ ! -x "$VENV/bin/python" ]; then
-  "$PYTHON" -m venv "$VENV"
+if [ ! -x "$VENV/bin/pip" ] && [ ! -x "$VENV/bin/python" ]; then
+  "$PYTHON" -m venv "$VENV" || { rm -rf "$VENV"; echo "lockscope: creating the virtual environment failed" >&2; exit 1; }
 fi
 "$VENV/bin/python" -m pip install --quiet --upgrade pip >/dev/null
 "$VENV/bin/python" -m pip install --quiet --require-hashes --no-deps -r "$SHARE/requirements.txt" 2>/dev/null \
