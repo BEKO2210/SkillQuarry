@@ -1,3 +1,4 @@
+# Temporary branch-only sync; remove before opening the promotion PR.
 name: CacheClosure promotion sync
 
 on:
