@@ -91,6 +91,15 @@ def load_manifest(skill: dict[str, Any]) -> dict[str, Any]:
 
 
 STYLE = """
+/* Inter, shipped with the site. No font CDN: the page still loads nothing from a
+   third party, and the text is readable before the file arrives. */
+@font-face {
+  font-family: "InterVariable";
+  src: url("assets/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   --ground: #0a1016; --raised: #111b24; --raised-2: #16222c; --edge: #223140;
   --ink: #f2f7fa; --muted: #a8c0cf; --dim: #6f8798;
@@ -123,13 +132,14 @@ STYLE = """
 html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--ground); color: var(--ink);
-  font: 16px/1.65 "Inter", "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  font: 16px/1.65 "InterVariable", "Inter", "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "cv05" 1, "cv08" 1, "ss03" 1;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-.wrap { max-width: var(--page); margin: 0 auto; padding: 0 24px; }
+.wrap { max-width: var(--page); margin: 0 auto; padding: 0 var(--s4); }
 
 /* ---------- top bar ---------- */
 .bar {
@@ -227,9 +237,9 @@ main { padding-bottom: 20px; }
 }
 .card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent-deep) 55%, var(--edge)); box-shadow: var(--shadow); }
 .card { padding: 0; overflow: hidden; }
-.card > *:not(.art) { margin-left: var(--s3); margin-right: var(--s3); }
-.card > .top { margin-top: var(--s3); }
-.card > .foot { margin-bottom: 0; padding-bottom: var(--s3); }
+.card > *:not(.art) { margin-left: var(--s4); margin-right: var(--s4); }
+.card > .top { margin-top: var(--s4); }
+.card > .foot { margin-bottom: 0; padding-bottom: var(--s4); }
 .art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--raised-2); }
 .art img { width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform .5s cubic-bezier(.22,.75,.3,1); }
@@ -338,6 +348,10 @@ time { color: var(--dim); }
 /* ---------- mobile: centred and symmetric ---------- */
 @media (max-width: 720px) {
   .wrap { padding-left: var(--s3); padding-right: var(--s3); }
+  .card > *:not(.art) { margin-left: var(--s3); margin-right: var(--s3); }
+  .card > .top { margin-top: var(--s3); }
+  .card > .foot { padding-bottom: var(--s3); }
+  .panel { padding: var(--s3); }
   .hero .wrap { padding: var(--s6) var(--s3) var(--s5); text-align: center; }
   .hero .shot img, .hero .shot video { object-position: center; }
   /* The seam runs straight through the middle on a phone, so the text needs a
@@ -441,10 +455,15 @@ HERO_SCRIPT = r"""
     ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
   if (!motionOk || cheapData) return;
   video.src = 'assets/video/hero-4k.mp4';
-  video.addEventListener('canplay', function () {
+  const reveal = function () {
     video.hidden = false;
-    video.play().catch(function () { video.hidden = true; });
-  }, { once: true });
+    const started = video.play();
+    if (started && started.catch) started.catch(function () { video.hidden = true; });
+  };
+  video.addEventListener('loadeddata', reveal, { once: true });
+  video.addEventListener('canplay', reveal, { once: true });
+  // preload="none" means nothing is fetched until we ask, so ask.
+  video.load();
 })();
 """.strip()
 
@@ -1145,7 +1164,7 @@ def render() -> dict[str, str]:
 def binary_files() -> dict[str, bytes]:
     """Images are copied verbatim; they are not generated, only carried."""
     found: dict[str, bytes] = {}
-    for folder in ("img", "video"):
+    for folder in ("img", "video", "fonts"):
         for asset in sorted((ASSETS / folder).glob("*")):
             if asset.is_file():
                 found[f"assets/{folder}/{asset.name}"] = asset.read_bytes()

@@ -261,6 +261,23 @@ class DiscoveryTests(unittest.TestCase):
         self.assertNotIn("min-width: 900px", index)  # phones get the video too
         self.assertIn('poster="assets/img/hero-2400.webp"', index)
 
+    def test_the_typeface_is_shipped_not_borrowed(self):
+        style = self.files["style.css"]
+        self.assertIn("@font-face", style)
+        self.assertIn('url("assets/fonts/InterVariable.woff2")', style)
+        self.assertIn("font-display: swap", style)
+        self.assertIn("assets/fonts/InterVariable.woff2", bs.binary_files())
+        self.assertIn("assets/fonts/Inter-LICENSE.txt", bs.binary_files())
+        # A missing font must never leave the page blank or reach for a CDN.
+        self.assertNotIn("fonts.googleapis", style)
+        self.assertIn("Segoe UI", style)
+
+    def test_the_hero_video_is_actually_fetched(self):
+        """preload="none" fetches nothing until asked, so the script has to ask."""
+        index = self.files["index.html"]
+        self.assertIn("video.load()", index)
+        self.assertIn("loadeddata", index)
+
     def test_link_previews_have_an_image(self):
         for name in ("index.html", "skills/strata.html"):
             self.assertIn('property="og:image"', self.files[name])

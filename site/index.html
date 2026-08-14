@@ -307,10 +307,15 @@ loadInstalls();</script>
     ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
   if (!motionOk || cheapData) return;
   video.src = 'assets/video/hero-4k.mp4';
-  video.addEventListener('canplay', function () {
+  const reveal = function () {
     video.hidden = false;
-    video.play().catch(function () { video.hidden = true; });
-  }, { once: true });
+    const started = video.play();
+    if (started && started.catch) started.catch(function () { video.hidden = true; });
+  };
+  video.addEventListener('loadeddata', reveal, { once: true });
+  video.addEventListener('canplay', reveal, { once: true });
+  // preload="none" means nothing is fetched until we ask, so ask.
+  video.load();
 })();</script>
 </body>
 </html>
