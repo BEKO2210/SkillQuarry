@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 520" role="img" aria-labelledby="title desc">
+  <title id="title">RanGate</title>
+  <desc id="desc">Unsafe stays behind the membrane. Safe Rust gets typed capabilities.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111F"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="90" y1="80" x2="430" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="520" rx="36" fill="url(#bg)"/>
+  <g transform="translate(82 56)">
+    <circle cx="204" cy="204" r="158" fill="none" stroke="url(#accent)" stroke-width="34"/>
+    <circle cx="204" cy="204" r="98" fill="none" stroke="#475569" stroke-width="12" stroke-dasharray="28 20"/>
+    <path d="M176 82v94h-62v56h62v94h56v-94h62v-56h-62V82z" fill="#0F172A" stroke="#E2E8F0" stroke-width="8" stroke-linejoin="round"/>
+    <circle cx="204" cy="204" r="22" fill="#14B8A6"/>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <text x="520" y="214" fill="#F8FAFC" font-size="92" font-weight="760" letter-spacing="-3">RanGate</text>
+    <text x="522" y="282" fill="#A78BFA" font-size="30" font-weight="650">RUST UNSAFE / FFI BOUNDARY PROTOCOL</text>
+    <text x="522" y="348" fill="#CBD5E1" font-size="28">Unsafe stays behind the membrane.</text>
+    <text x="522" y="388" fill="#CBD5E1" font-size="28">Safe Rust gets typed capabilities.</text>
+  </g>
+  <path d="M520 432h720" stroke="#1E293B" stroke-width="2"/>
+  <circle cx="1234" cy="432" r="7" fill="#14B8A6"/>
+</svg>
