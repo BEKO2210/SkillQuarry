@@ -373,6 +373,92 @@
         }
       }
     },
+    "dependencies": {
+      "type": "array",
+      "description": "Other skills in this quarry that must be installed for this one to work. Each entry is a name and a minimum version; the client installs them first.",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            "maxLength": 40
+          },
+          "minimum_version": {
+            "type": "string",
+            "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "composes_with": {
+      "type": "array",
+      "description": "Skills this one is designed to be used alongside, without needing them installed. Documentation, not a requirement.",
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+        "maxLength": 40
+      }
+    },
+    "verifications": {
+      "type": "array",
+      "description": "Independent verifications by someone other than the author. Each states who, when, how, and what came out.",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "by",
+          "date",
+          "method",
+          "result"
+        ],
+        "properties": {
+          "by": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "method": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "passed-with-findings",
+              "failed"
+            ]
+          },
+          "findings": {
+            "type": "string",
+            "maxLength": 400
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
     "extensions": {
       "type": "object",
       "description": "Namespace for metadata this schema does not define yet."

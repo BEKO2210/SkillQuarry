@@ -411,18 +411,17 @@ HERO_MEDIA = (
 )
 
 HERO_SCRIPT = r"""
-// The 4K hero loop is a bonus, never a cost: it loads only on a wide screen, only
-// when motion is welcome, and never on a metered or slow connection. Everyone else
-// keeps the still, which is the video's own first frame.
+// The 4K hero loop plays on every screen, phones included. It is still skipped
+// when motion is unwelcome or the connection is metered or slow — in those cases
+// the still remains, which is the video's own first frame.
 (function () {
   const video = document.getElementById('hero-video');
   if (!video) return;
-  const wide = window.matchMedia('(min-width: 900px)').matches;
   const motionOk = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const connection = navigator.connection || {};
   const cheapData = connection.saveData === true ||
     ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
-  if (!wide || !motionOk || cheapData) return;
+  if (!motionOk || cheapData) return;
   video.src = 'assets/video/hero-4k.mp4';
   video.addEventListener('canplay', function () {
     video.hidden = false;

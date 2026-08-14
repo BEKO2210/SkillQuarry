@@ -251,7 +251,7 @@ class DiscoveryTests(unittest.TestCase):
         self.assertIn('preload="none"', index)
         self.assertIn("prefers-reduced-motion", index)
         self.assertIn("saveData", index)
-        self.assertIn("min-width: 900px", index)
+        self.assertNotIn("min-width: 900px", index)  # phones get the video too
         self.assertIn('poster="assets/img/hero-2400.webp"', index)
 
     def test_link_previews_have_an_image(self):

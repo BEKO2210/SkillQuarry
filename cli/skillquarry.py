@@ -26,7 +26,10 @@ import os
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +45,12 @@ IGNORED_SUFFIXES = {".pyc", ".pyo"}
 STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
 STATE_FILE = Path(os.environ.get("SKILLQUARRY_STATE", STATE_HOME / "skillquarry" / "installed.json"))
 STATE_VERSION = 1
+
+# A remote quarry is just a registry.json reachable over HTTPS — GitHub Pages,
+# a company server on a private network, anything that can serve a file.
+REMOTE_REGISTRY = os.environ.get("SKILLQUARRY_REGISTRY")
+REMOTE_TOKEN = os.environ.get("SKILLQUARRY_TOKEN")
+DOWNLOAD_LIMIT = 64 * 1024 * 1024
 
 
 class QuarryError(RuntimeError):
@@ -84,6 +93,128 @@ def skill_checksum(directory: Path) -> str:
 
 
 # ----------------------------------------------------------------------- quarry
+
+
+def fetch(url: str, *, limit: int = DOWNLOAD_LIMIT) -> bytes:
+    """Read a URL, with the token a private registry may require.
+
+    Refuses anything but HTTPS: a registry is executable content by the time it
+    reaches a machine, and plain HTTP would let anyone on the path choose it.
+    """
+    if not url.startswith("https://"):
+        raise QuarryError(f"refusing to fetch over an unencrypted connection: {url}")
+    request = urllib.request.Request(url, headers={"User-Agent": f"skillquarry/{__version__}"})
+    if REMOTE_TOKEN:
+        request.add_header("Authorization", f"Bearer {REMOTE_TOKEN}")
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            data = response.read(limit + 1)
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        raise QuarryError(f"cannot fetch {url}: {exc}") from exc
+    if len(data) > limit:
+        raise QuarryError(f"{url} is larger than the {limit // 1024 // 1024} MB limit")
+    return data
+
+
+def load_remote_registry(url: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """The skills in a remote registry, plus the document they came from."""
+    try:
+        document = json.loads(fetch(url).decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise QuarryError(f"{url} is not a registry document: {exc}") from exc
+    skills = document.get("skills")
+    if not isinstance(skills, list) or not skills:
+        raise QuarryError(f"{url} contains no skills")
+    return skills, document
+
+
+def archive_url(document: dict[str, Any], skill: dict[str, Any]) -> str:
+    base = document.get("archive_base")
+    if not base:
+        raise QuarryError(
+            "this registry publishes no archive_base, so its skills cannot be installed remotely"
+        )
+    return f"{str(base).rstrip('/')}/{skill['name']}-{skill['version']}.tar.gz"
+
+
+def unpack_archive(blob: bytes, destination: Path, expected_root: str) -> Path:
+    """Unpack a skill archive, refusing anything that reaches outside its own directory."""
+    with tarfile.open(fileobj=__import__("io").BytesIO(blob), mode="r:gz") as archive:
+        for member in archive.getmembers():
+            if member.issym() or member.islnk():
+                raise QuarryError(f"archive contains a link ({member.name}); refusing to unpack")
+            target = (destination / member.name).resolve()
+            if not str(target).startswith(str(destination.resolve()) + os.sep):
+                raise QuarryError(f"archive escapes its directory ({member.name}); refusing to unpack")
+            if not member.name.split("/")[0] == expected_root:
+                raise QuarryError(f"archive contains an unexpected root ({member.name})")
+        archive.extractall(destination)
+    return destination / expected_root
+
+
+def install_remote(url: str, name: str, prefix: str | None, *, force: bool = False) -> dict[str, Any]:
+    """Fetch, verify against the registry checksum, then run the skill's own installer.
+
+    The archive is only trusted once the unpacked directory hashes to exactly what
+    the registry says — the same checksum a local install verifies.
+    """
+    skills, document = load_remote_registry(url)
+    skill = find_skill(skills, name)
+    state = load_state()
+    record = state["installed"].get(name)
+    if record and not force and record.get("checksum") == skill.get("checksum"):
+        raise QuarryError(f"{name} {record.get('version')} is already installed; pass --force to reinstall")
+
+    source = archive_url(document, skill)
+    blob = fetch(source)
+    with tempfile.TemporaryDirectory(prefix="skillquarry-") as tmp:
+        root = unpack_archive(blob, Path(tmp), f"{skill['name']}-{skill['version']}")
+        actual = skill_checksum(root)
+        if actual != skill.get("checksum"):
+            raise QuarryError(
+                f"{name}: the downloaded archive does not match the registry checksum.\n"
+                f"  registry: {skill.get('checksum')}\n  archive:  {actual}\nRefusing to install."
+            )
+        manifest = json.loads((root / "skill.json").read_text("utf-8"))
+        result = run_installer(root.parent, {"name": name, "path": root.name}, manifest, "install", prefix)
+    if result.returncode != 0:
+        raise QuarryError(f"{name}: installer failed with exit {result.returncode}:\n{result.stdout.strip()}")
+
+    state["installed"][name] = {
+        "version": skill.get("version"),
+        "checksum": skill.get("checksum"),
+        "quarry": url,
+        "prefix": str(Path(prefix).expanduser()) if prefix else None,
+        "output": result.stdout.strip()[-2000:],
+    }
+    save_state(state)
+    return state["installed"][name]
+
+
+def dependency_order(skills: list[dict[str, Any]], root: Path | None, name: str) -> list[str]:
+    """The skill and everything it needs, dependencies first."""
+    manifests: dict[str, dict[str, Any]] = {}
+    for skill in skills:
+        entry = str(skill.get("name"))
+        manifests[entry] = skill if root is None else load_manifest(root, skill)
+    order: list[str] = []
+    seen: set[str] = set()
+
+    def walk(current: str, trail: tuple[str, ...]) -> None:
+        if current in seen:
+            return
+        if current in trail:
+            raise QuarryError("dependency cycle: " + " -> ".join(trail + (current,)))
+        for entry in manifests.get(current, {}).get("dependencies") or []:
+            target = str(entry.get("name"))
+            if target not in manifests:
+                raise QuarryError(f"{current} needs {target}, which this quarry does not have")
+            walk(target, trail + (current,))
+        seen.add(current)
+        order.append(current)
+
+    walk(name, ())
+    return order
 
 
 def find_quarry(explicit: str | None = None) -> Path:

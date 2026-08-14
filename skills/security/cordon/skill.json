@@ -77,6 +77,19 @@
     "threat_model": "README.md",
     "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231."
   },
+  "composes_with": [
+    "strata"
+  ],
+  "verifications": [
+    {
+      "by": "Independent review (Claude Opus 5, on the maintainer's machine)",
+      "date": "2026-08-14",
+      "method": "Ran the full suite plus a live smoke test against Claude Code 2.1.231; attacked the audit with git index flags.",
+      "result": "passed-with-findings",
+      "findings": "Defect C11: assume-unchanged/skip-worktree hid a tracked change from the audit. Fixed and covered by six regression tests.",
+      "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/cordon/TEST_REPORT.md"
+    }
+  ],
   "keywords": [
     "agent-safety",
     "git",

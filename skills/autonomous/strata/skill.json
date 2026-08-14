@@ -75,6 +75,19 @@
     "threat_model": "TEST_REPORT.md",
     "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release."
   },
+  "composes_with": [
+    "cordon"
+  ],
+  "verifications": [
+    {
+      "by": "Repository owner",
+      "date": "2026-08-13",
+      "method": "Live run against Claude Code 2.1.231, including a two-process handoff and a deliberately tampered completion claim.",
+      "result": "passed-with-findings",
+      "findings": "Seven defects found before release, including handoff compaction that could exceed its own byte budget.",
+      "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/autonomous/strata/TEST_REPORT.md"
+    }
+  ],
   "keywords": [
     "autonomous",
     "agent-loop",

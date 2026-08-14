@@ -168,6 +168,87 @@ def check_security(manifest: dict[str, Any], relative: str) -> list[str]:
     return errors
 
 
+def load_all_manifests() -> dict[str, dict[str, Any]]:
+    found = {}
+    for path in sorted(SKILLS_DIR.glob("*/*/skill.json")):
+        try:
+            found[path.parent.name] = json.loads(path.read_text("utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            continue
+    return found
+
+
+def _version_tuple(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split("-")[0].split(".")[:3])
+
+
+def check_relations(manifests: dict[str, dict[str, Any]]) -> list[str]:
+    """Dependencies must resolve, satisfy their minimum, and form no cycle.
+
+    A dependency graph that only works by accident is worse than none: the client
+    installs in this order, so a cycle would loop and a missing name would fail
+    halfway through someone's machine.
+    """
+    errors: list[str] = []
+    for name, manifest in sorted(manifests.items()):
+        for entry in manifest.get("dependencies") or []:
+            target = str(entry.get("name"))
+            if target == name:
+                errors.append(f"{name}: depends on itself")
+                continue
+            if target not in manifests:
+                errors.append(f"{name}: depends on {target!r}, which is not in this quarry")
+                continue
+            minimum = entry.get("minimum_version")
+            if minimum and _version_tuple(str(manifests[target]["version"])) < _version_tuple(minimum):
+                errors.append(
+                    f"{name}: needs {target} >= {minimum}, but the quarry has {manifests[target]['version']}"
+                )
+        for partner in manifest.get("composes_with") or []:
+            if partner not in manifests:
+                errors.append(f"{name}: composes_with names {partner!r}, which is not in this quarry")
+            elif partner == name:
+                errors.append(f"{name}: composes_with names itself")
+
+    # Cycle detection over the dependency edges.
+    colour: dict[str, int] = {}
+
+    def visit(node: str, trail: list[str]) -> None:
+        colour[node] = 1
+        for entry in manifests.get(node, {}).get("dependencies") or []:
+            target = str(entry.get("name"))
+            if target not in manifests:
+                continue
+            if colour.get(target) == 1:
+                cycle = " -> ".join(trail + [node, target])
+                errors.append(f"dependency cycle: {cycle}")
+            elif colour.get(target, 0) == 0:
+                visit(target, trail + [node])
+        colour[node] = 2
+
+    for name in sorted(manifests):
+        if colour.get(name, 0) == 0:
+            visit(name, [])
+    return errors
+
+
+def install_order(manifests: dict[str, dict[str, Any]], name: str) -> list[str]:
+    """Dependencies first, then the skill itself. Assumes the graph is valid."""
+    order: list[str] = []
+    seen: set[str] = set()
+
+    def walk(current: str) -> None:
+        if current in seen or current not in manifests:
+            return
+        seen.add(current)
+        for entry in manifests[current].get("dependencies") or []:
+            walk(str(entry.get("name")))
+        order.append(current)
+
+    walk(name)
+    return order
+
+
 def check_layout(manifest: dict[str, Any], path: Path) -> list[str]:
     """Rules about the world outside the JSON document itself."""
     directory = path.parent
@@ -201,7 +282,11 @@ def main(argv: list[str] | None = None) -> int:
         print("validate_skills: no manifests found under skills/*/*/skill.json", file=sys.stderr)
         return 2
 
-    failures = 0
+    relation_errors = check_relations(load_all_manifests())
+    for error in relation_errors:
+        print(f"FAIL relations: {error}", file=sys.stderr)
+
+    failures = 1 if relation_errors else 0
     for path in manifests:
         relative = path.relative_to(REPO).as_posix()
         try:

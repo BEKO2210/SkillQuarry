@@ -73,6 +73,19 @@
     "threat_model": "TEST_REPORT.md",
     "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed."
   },
+  "composes_with": [
+    "cordon"
+  ],
+  "verifications": [
+    {
+      "by": "Independent review (Claude Opus 5, on the maintainer's machine)",
+      "date": "2026-08-14",
+      "method": "Installed the pinned toolchain, ran the suite, and tried to defeat the compile-fail proofs with a typo and a wrong error code.",
+      "result": "passed-with-findings",
+      "findings": "Defects D5 and D6: compile-fail tests accepted any error, and a missing toolchain produced eight confusing failures. Both fixed.",
+      "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/security/rangate/TEST_REPORT.md"
+    }
+  ],
   "keywords": [
     "rust",
     "unsafe",
