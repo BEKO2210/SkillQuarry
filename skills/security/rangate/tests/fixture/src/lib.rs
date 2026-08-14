@@ -1,3 +1,5 @@
+#![deny(unsafe_op_in_unsafe_fn)]
+
 use std::marker::PhantomData;
 use std::ptr::NonNull;
 use std::rc::Rc;
@@ -25,19 +27,19 @@ mod ffi {
     }
 
     pub unsafe fn read(ptr: *const RawDevice) -> i32 {
-        // SAFETY: caller guarantees `ptr` points to a live RawDevice.
+        // SAFETY: the caller guarantees `ptr` points to a live RawDevice.
         unsafe { (*ptr).value }
     }
 
     pub unsafe fn write(ptr: *mut RawDevice, value: i32) {
-        // SAFETY: caller guarantees exclusive access to a live RawDevice.
+        // SAFETY: the caller guarantees exclusive access to a live RawDevice.
         unsafe {
             (*ptr).value = value;
         }
     }
 
     pub unsafe fn destroy(ptr: *mut RawDevice) {
-        // SAFETY: caller guarantees `ptr` came from `create`, is still live,
+        // SAFETY: the caller guarantees `ptr` came from `create`, is still live,
         // and is destroyed exactly once.
         unsafe {
             drop(Box::from_raw(ptr));
@@ -53,13 +55,13 @@ mod ffi {
 
 /// Safe boundary around a private raw FFI-like handle.
 ///
-/// `Device` intentionally does not implement `Send` or `Sync`: the simulated
-/// foreign API has no cross-thread contract.
+/// `Device` deliberately remains `!Send` and `!Sync` because the simulated
+/// foreign API has no documented cross-thread contract.
 ///
-/// Double ownership is rejected by Rust's move semantics:
+/// Double ownership/use-after-move is rejected by Rust's move semantics:
 ///
 /// ```compile_fail
-/// use rangate_eval::Device;
+/// use rangate_fixture::Device;
 /// let device = Device::open(1).unwrap();
 /// let moved = device;
 /// drop(device);
@@ -69,7 +71,7 @@ mod ffi {
 /// Mutable aliasing is rejected before an unsafe operation is reached:
 ///
 /// ```compile_fail
-/// use rangate_eval::Device;
+/// use rangate_fixture::Device;
 /// let mut device = Device::open(1).unwrap();
 /// let first = &mut device;
 /// let second = &mut device;
@@ -77,11 +79,11 @@ mod ffi {
 /// second.set(3);
 /// ```
 ///
-/// Cross-thread transport is rejected because the external concurrency
-/// contract is deliberately unknown:
+/// Cross-thread transport is rejected while the external concurrency contract
+/// is deliberately unknown:
 ///
 /// ```compile_fail
-/// use rangate_eval::Device;
+/// use rangate_fixture::Device;
 /// let device = Device::open(1).unwrap();
 /// std::thread::spawn(move || drop(device));
 /// ```
@@ -101,7 +103,7 @@ impl Device {
 
     pub fn get(&self) -> i32 {
         // SAFETY: `open` accepts only a non-null handle returned by `ffi::create`.
-        // The handle remains owned by `self` until Drop and shared access does
+        // The handle remains owned by `self` until Drop, and shared access does
         // not mutate the foreign object.
         unsafe { ffi::read(self.raw.as_ptr()) }
     }
@@ -116,7 +118,7 @@ impl Device {
 impl Drop for Device {
     fn drop(&mut self) {
         // SAFETY: `Device` is the unique owner of the handle returned by
-        // `ffi::create`; the type is not Clone and Drop runs once per owner.
+        // `ffi::create`; the type is not Clone, and Drop runs once per owner.
         unsafe {
             ffi::destroy(self.raw.as_ptr());
         }
@@ -126,7 +128,7 @@ impl Drop for Device {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::panic::{catch_unwind, AssertUnwindSafe};
+    use std::panic::{AssertUnwindSafe, catch_unwind};
     use std::sync::Mutex;
 
     static RESOURCE_TEST_LOCK: Mutex<()> = Mutex::new(());
@@ -169,7 +171,7 @@ mod tests {
             let device = Device::open(77).unwrap();
             assert_eq!(ffi::active_count(), before + 1);
             assert_eq!(device.get(), 77);
-            panic!("intentional pro-test panic");
+            panic!("intentional RanGate pro-test panic");
         }));
         assert!(result.is_err());
         assert_eq!(ffi::active_count(), before);

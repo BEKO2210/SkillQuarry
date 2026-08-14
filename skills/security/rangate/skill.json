@@ -1,0 +1,68 @@
+{
+  "name": "rangate",
+  "displayName": "RanGate",
+  "version": "1.0.0",
+  "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.",
+  "category": "security",
+  "license": "Apache-2.0",
+  "tagline": "Unsafe stays behind the membrane. Safe Rust gets typed capabilities.",
+  "banner": "assets/rangate-banner.svg",
+  "agents": [
+    "claude-code"
+  ],
+  "highlights": [
+    "Maps the unsafe blast radius before editing, so the refactor has a measurable baseline.",
+    "Converts raw representation at one boundary instead of exporting pointer validity and ownership obligations to callers.",
+    "Uses compile-fail proofs for ownership, aliasing and thread-transport constraints — invalid safe programs must fail to compile.",
+    "Adds independent stable, release and pinned-nightly Miri verification without installing toolchains at skill runtime."
+  ],
+  "quickstart": "cd skills/security/rangate && ./install.sh\n\n# In Claude Code, from the target Rust repository:\n/rangate Refactor this unsafe/FFI boundary so raw invariants stop leaking into callers. Prove the result with compiler and test evidence.",
+  "homepage": "https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate",
+  "icon": "../../../assets/rangate-logo.svg",
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh"
+  },
+  "compatibility": [
+    "claude-code"
+  ],
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "requires": {
+    "python": ">=3.10 (test harness only)",
+    "binaries": [
+      "cargo",
+      "rustc"
+    ],
+    "packages": []
+  },
+  "permissions": {
+    "filesystem": "reads and refactors Rust source files in the target project when the user asks",
+    "shell": "runs the target project's Cargo/compiler/test commands",
+    "network": "none required by the skill protocol",
+    "environment": "none required"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py",
+    "count": 13,
+    "coverage": "N/A — protocol skill; Rust fixture is compiled and exercised in debug, compile-fail, release and Miri jobs",
+    "report": "TEST_REPORT.md"
+  },
+  "workflow": "rangate-tests.yml",
+  "quality": "tested",
+  "keywords": [
+    "rust",
+    "unsafe",
+    "ffi",
+    "raw-pointers",
+    "ownership",
+    "lifetimes",
+    "send-sync",
+    "miri",
+    "memory-safety",
+    "compiler-driven"
+  ]
+}
