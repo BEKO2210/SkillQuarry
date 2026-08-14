@@ -26,6 +26,6 @@ jobs:
           cargo --version
           python3 --version
       - name: Syntax check
-        run: python3 -m py_compile experiments/crypticshift/small_test.py experiments/crypticshift/small_test_v2.py
+        run: python3 -m py_compile experiments/crypticshift/small_test.py experiments/crypticshift/small_test_v3.py
       - name: Run CrypticShift small test
-        run: python3 experiments/crypticshift/small_test_v2.py
+        run: python3 experiments/crypticshift/small_test_v3.py
