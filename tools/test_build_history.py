@@ -37,7 +37,8 @@ class HistoryTests(unittest.TestCase):
         for entry in self.document["skills"].values():
             for item in entry["versions"]:
                 self.assertRegex(item["version"], r"^\d+\.\d+\.\d+")
-                self.assertRegex(item["date"], r"^\d{4}-\d{2}-\d{2}T")
+                self.assertRegex(item["date"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
+                                 "dates must have one spelling, independent of the git version")
 
     def test_the_history_only_moves_when_a_version_moves(self):
         """It is committed, so it must not change on every unrelated commit."""
@@ -75,6 +76,10 @@ class HistoryTests(unittest.TestCase):
         with mock.patch.object(bh, "git", return_value="true\n"):
             with self.assertRaisesRegex(bh.HistoryError, "shallow"):
                 bh.ensure_full_history()
+
+    def test_timestamps_are_normalised_to_utc_z(self):
+        self.assertEqual(bh.utc_iso("0"), "1970-01-01T00:00:00Z")
+        self.assertEqual(bh.utc_iso("1770000000"), "2026-02-02T02:40:00Z")
 
     def test_a_failing_git_call_is_reported(self):
         with self.assertRaises(bh.HistoryError):

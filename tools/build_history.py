@@ -18,6 +18,7 @@ version does, which is what "history" should mean here anyway.
 from __future__ import annotations
 
 import argparse
+import datetime
 import difflib
 import json
 import subprocess
@@ -77,15 +78,26 @@ def version_at(sha: str, path: str) -> str | None:
         return None
 
 
+def utc_iso(unix_seconds: str) -> str:
+    """One spelling for one instant.
+
+    Git renders %cI for UTC as `+00:00` on some versions and `Z` on others, which
+    made the committed file "stale" on a machine with a different git. The commit
+    timestamp is read as Unix seconds and formatted here instead.
+    """
+    moment = datetime.datetime.fromtimestamp(int(unix_seconds), datetime.timezone.utc)
+    return moment.isoformat().replace("+00:00", "Z")
+
+
 def manifest_commits(path: str) -> list[tuple[str, str]]:
     """(sha, date) for every commit that touched the skill's manifest, newest first."""
-    raw = git("log", f"--max-count={MAX_COMMITS}", f"--pretty=format:%h{SEPARATOR}%cI",
+    raw = git("log", f"--max-count={MAX_COMMITS}", f"--pretty=format:%h{SEPARATOR}%ct",
               "--", f"{path}/skill.json")
     entries = []
     for line in raw.splitlines():
         if line.strip():
-            sha, date = line.split(SEPARATOR, 1)
-            entries.append((sha, date))
+            sha, stamp = line.split(SEPARATOR, 1)
+            entries.append((sha, utc_iso(stamp)))
     return entries
 
 
