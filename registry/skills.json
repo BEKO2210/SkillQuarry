@@ -67,63 +67,6 @@
     },
     {
       "category": "coding",
-      "checksum": "sha256:9fe2c3d51f800a86f33915be04a849fb5fbcde42c888fdfd100ce2f37de4348d",
-      "compatibility": [
-        "claude-code",
-        "agent-neutral-manual-mode"
-      ],
-      "composes_with": [],
-      "dependencies": [],
-      "description": "Detect GitHub Actions cache identities that are mechanically invariant to repository inputs which can change cached state, using file resolution and shell control-flow witnesses.",
-      "displayName": "CacheClosure",
-      "license": "Apache-2.0",
-      "maintainers": [
-        {
-          "github": "BEKO2210",
-          "name": "Belkis Aslani",
-          "role": "maintainer"
-        }
-      ],
-      "name": "cacheclosure",
-      "path": "skills/coding/cacheclosure",
-      "platforms": [
-        "linux",
-        "macos"
-      ],
-      "quality": "tested",
-      "requires": {
-        "binaries": [],
-        "packages": [],
-        "python": ">=3.10"
-      },
-      "security": {
-        "destructive_operations": [],
-        "network_access": "none",
-        "requires_secrets": false,
-        "reviewed_by": "Frozen CacheClosure v0 protocol; GitHub Actions run 31850105648 passed Ubuntu and macOS on 2026-08-15.",
-        "runs_external_commands": false,
-        "threat_model": "TEST_REPORT.md",
-        "writes_outside_repository": false
-      },
-      "tests": {
-        "count": 16,
-        "coverage": "95.7% of cacheclosure/core.py executable lines in the frozen suite; 2/3 pinned historical defects recovered and both recovered witnesses cleared by their historical repairs"
-      },
-      "verifications": [
-        {
-          "by": "Frozen CacheClosure v0 historical evaluation",
-          "date": "2026-08-15",
-          "findings": "Recovered 2/3 historical defects; the two recovered witnesses disappear on the exact human repair commits; Yapboard remains the preregistered runtime-metadata miss; verify/find median ratio 7.9%.",
-          "method": "Three preregistered historical repositories, repaired-counterpart controls, 95% coverage gate, asymmetry death threshold at 25%, and a four-job Ubuntu/macOS Python matrix.",
-          "result": "passed",
-          "url": "https://github.com/BEKO2210/SkillQuarry/actions/runs/31850105648"
-        }
-      ],
-      "version": "1.0.0",
-      "workflow": "cacheclosure-tests.yml"
-    },
-    {
-      "category": "coding",
       "checksum": "sha256:8357eb80fed24f36ee485d2278ac8dc95b7cf99a4bb1febff169ebd53b66e895",
       "compatibility": [
         "claude-code",

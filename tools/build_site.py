@@ -270,6 +270,8 @@ main { padding-bottom: 20px; }
   border: 1px solid var(--edge); color: var(--muted); background: var(--raised-2);
 }
 .tag.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--edge)); }
+.tag.verified { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, var(--edge));
+  background: var(--accent-soft); font-weight: 600; }
 .tag.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, var(--edge)); }
 .tag.accent { color: var(--accent); border-color: color-mix(in srgb, var(--accent-deep) 45%, var(--edge)); }
 .card .foot {
@@ -791,10 +793,27 @@ def artwork_for(manifest: dict[str, Any], skill: dict[str, Any], depth: int = 0)
     return f'<div class="art" style="background:{gradient_for(name)}"></div>' 
 
 
+def verified_by(skill: dict[str, Any]) -> str:
+    """Who verified this skill independently, if anyone did.
+
+    Reads the manifest's own record rather than a judgement made here: a skill
+    is verified because someone ran its protocol and said so, with a date.
+    """
+    for entry in skill.get("verifications") or []:
+        if str(entry.get("result", "")).startswith("passed"):
+            return f"{entry.get('by')} — {entry.get('date')}"
+    return ""
+
+
 def card(skill: dict[str, Any], manifest: dict[str, Any]) -> str:
     security = skill.get("security") or {}
     tests = skill.get("tests") or {}
     tags = [f'<span class="tag accent">{esc(CATEGORY_LABELS.get(skill.get("category"), skill.get("category")))}</span>']
+    # A test count can be inflated by anyone; an independent verification cannot.
+    # The badge appears only where a manifest records one, and it says who.
+    if verified_by(skill):
+        tags.append('<span class="tag verified" title="'
+                    f'{esc(verified_by(skill))}">&#10003; verified</span>')
     if tests.get("count"):
         tags.append(f'<span class="tag ok">{esc(tests["count"])} tests</span>')
     if security.get("network_access") == "none":
@@ -897,8 +916,9 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
     <p class="eyebrow">Open marketplace for agent skills</p>
     <h1>Build capabilities once. <span class="line">Share <i>intelligence</i> everywhere.</span></h1>
     <p class="lede">Reusable capabilities for AI coding agents — inspectable, tested,
-      versioned, checksum-verified, and installable with one command. No dependencies,
-      no telemetry, nothing hidden.</p>
+      versioned, checksum-verified, and installable with one command. The client is
+      one file with no third-party dependencies; every skill declares what it needs.
+      No telemetry, nothing hidden.</p>
     <div class="actions">
       <a class="button primary" href="#skills">Browse {len(skills)} skills</a>
       <a class="button secondary" href="#install">How to install</a>
@@ -907,7 +927,7 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
       <li><b>{len(skills)}</b><span>skills</span></li>
       <li><b>{len(categories)}</b><span>categories</span></li>
       <li><b>{total_tests}</b><span>tests passing</span></li>
-      <li><b>0</b><span>dependencies</span></li>
+      <li><b>0</b><span>client dependencies</span></li>
     </ul>
   </div></div>
 </header>
