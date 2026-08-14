@@ -57,6 +57,15 @@
     "report": "TEST_REPORT.md"
   },
   "quality": "tested",
+  "security": {
+    "network_access": "indirect",
+    "runs_external_commands": true,
+    "writes_outside_repository": false,
+    "requires_secrets": false,
+    "destructive_operations": [],
+    "threat_model": "TEST_REPORT.md",
+    "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release."
+  },
   "keywords": [
     "autonomous",
     "agent-loop",

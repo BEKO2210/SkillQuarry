@@ -5,7 +5,14 @@
   "description": "Schema for skills/<category>/<name>/skill.json. See docs/SKILL-SPEC.md for the normative wording.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "displayName", "version", "description", "category", "license"],
+  "required": [
+    "name",
+    "displayName",
+    "version",
+    "description",
+    "category",
+    "license"
+  ],
   "properties": {
     "name": {
       "type": "string",
@@ -88,28 +95,47 @@
     "agents": {
       "type": "array",
       "description": "Agents the skill is used with, as shown in the README.",
-      "items": {"type": "string", "minLength": 2, "maxLength": 60},
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 60
+      },
       "maxItems": 12,
       "uniqueItems": true
     },
     "compatibility": {
       "type": "array",
       "description": "Machine-readable compatibility targets for the registry.",
-      "items": {"type": "string", "minLength": 2, "maxLength": 60},
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 60
+      },
       "maxItems": 12,
       "uniqueItems": true
     },
     "platforms": {
       "type": "array",
       "description": "Operating systems the skill is tested on.",
-      "items": {"type": "string", "enum": ["linux", "macos", "windows"]},
+      "items": {
+        "type": "string",
+        "enum": [
+          "linux",
+          "macos",
+          "windows"
+        ]
+      },
       "maxItems": 3,
       "uniqueItems": true
     },
     "highlights": {
       "type": "array",
       "description": "Short factual bullet points rendered on the skill card.",
-      "items": {"type": "string", "minLength": 10, "maxLength": 240},
+      "items": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 240
+      },
       "maxItems": 8
     },
     "quickstart": {
@@ -119,7 +145,11 @@
     },
     "keywords": {
       "type": "array",
-      "items": {"type": "string", "minLength": 2, "maxLength": 40},
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 40
+      },
       "maxItems": 20,
       "uniqueItems": true
     },
@@ -128,10 +158,22 @@
       "description": "How the skill is invoked and installed.",
       "additionalProperties": false,
       "properties": {
-        "skill": {"type": "string", "maxLength": 200},
-        "cli": {"type": "string", "maxLength": 100},
-        "install": {"type": "string", "maxLength": 200},
-        "uninstall": {"type": "string", "maxLength": 200}
+        "skill": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "cli": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "install": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "uninstall": {
+          "type": "string",
+          "maxLength": 200
+        }
       }
     },
     "requires": {
@@ -139,9 +181,26 @@
       "description": "What must already exist on the machine.",
       "additionalProperties": false,
       "properties": {
-        "python": {"type": "string", "maxLength": 40},
-        "binaries": {"type": "array", "items": {"type": "string", "maxLength": 60}, "maxItems": 20},
-        "packages": {"type": "array", "items": {"type": "string", "maxLength": 100}, "maxItems": 50}
+        "python": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "binaries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "maxItems": 20
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxItems": 50
+        }
       }
     },
     "permissions": {
@@ -149,10 +208,22 @@
       "description": "Plain-language statement of what the skill may touch. Required for any skill that runs commands.",
       "additionalProperties": false,
       "properties": {
-        "filesystem": {"type": "string", "maxLength": 600},
-        "shell": {"type": "string", "maxLength": 600},
-        "network": {"type": "string", "maxLength": 600},
-        "environment": {"type": "string", "maxLength": 600}
+        "filesystem": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "shell": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "network": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "environment": {
+          "type": "string",
+          "maxLength": 600
+        }
       }
     },
     "state": {
@@ -160,26 +231,107 @@
       "description": "Where the skill keeps state inside a user's repository.",
       "additionalProperties": false,
       "properties": {
-        "directory": {"type": "string", "maxLength": 100},
-        "git": {"type": "string", "maxLength": 300}
+        "directory": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "git": {
+          "type": "string",
+          "maxLength": 300
+        }
       }
     },
     "tests": {
       "type": "object",
       "description": "How a reviewer reproduces the skill's test result.",
       "additionalProperties": false,
-      "required": ["command"],
+      "required": [
+        "command"
+      ],
       "properties": {
-        "command": {"type": "string", "minLength": 3, "maxLength": 300},
-        "count": {"type": "integer", "minimum": 0},
-        "coverage": {"type": "string", "maxLength": 200},
-        "report": {"type": "string", "maxLength": 200}
+        "command": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 300
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coverage": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "report": {
+          "type": "string",
+          "maxLength": 200
+        }
       }
     },
     "quality": {
       "type": "string",
       "description": "Validation level. See docs/SKILL-SPEC.md; only the repository owner raises a level.",
-      "enum": ["experimental", "verified", "tested", "trusted", "certified"]
+      "enum": [
+        "experimental",
+        "verified",
+        "tested",
+        "trusted",
+        "certified"
+      ]
+    },
+    "security": {
+      "type": "object",
+      "description": "Machine-readable risk surface. Required for any skill whose permissions.shell is not 'none'.",
+      "additionalProperties": false,
+      "required": [
+        "network_access",
+        "runs_external_commands",
+        "writes_outside_repository",
+        "requires_secrets"
+      ],
+      "properties": {
+        "network_access": {
+          "type": "string",
+          "description": "none | indirect (only through a wrapped agent) | direct",
+          "enum": [
+            "none",
+            "indirect",
+            "direct"
+          ]
+        },
+        "runs_external_commands": {
+          "type": "boolean",
+          "description": "Whether the skill spawns programs other than itself."
+        },
+        "writes_outside_repository": {
+          "type": "boolean",
+          "description": "Whether it writes anywhere other than the target repository and its own state directory."
+        },
+        "requires_secrets": {
+          "type": "boolean",
+          "description": "Whether it needs a token, key or credential to work."
+        },
+        "destructive_operations": {
+          "type": "array",
+          "description": "Irreversible actions the skill can perform, in plain language. Empty means none.",
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 200
+          },
+          "maxItems": 12
+        },
+        "threat_model": {
+          "type": "string",
+          "description": "File in the skill directory stating what it does not protect against.",
+          "maxLength": 200
+        },
+        "reviewed_by": {
+          "type": "string",
+          "description": "Who reviewed the skill independently of its author, and when.",
+          "maxLength": 200
+        }
+      }
     },
     "extensions": {
       "type": "object",

@@ -59,6 +59,15 @@
     "report": "TEST_REPORT.md"
   },
   "quality": "tested",
+  "security": {
+    "network_access": "indirect",
+    "runs_external_commands": true,
+    "writes_outside_repository": false,
+    "requires_secrets": false,
+    "destructive_operations": [],
+    "threat_model": "README.md",
+    "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231."
+  },
   "keywords": [
     "agent-safety",
     "git",

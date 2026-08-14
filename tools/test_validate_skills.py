@@ -132,5 +132,64 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(vs.main([]), 0)
 
 
+
+class SecurityMetadataTests(unittest.TestCase):
+    def test_a_skill_that_runs_commands_needs_a_security_block(self):
+        manifest = valid_manifest(permissions={"shell": "spawns git"})
+        errors = " ".join(vs.check_security(manifest, "skills/utilities/example/skill.json"))
+        self.assertIn("`security` block is required", errors)
+
+    def test_a_skill_without_a_shell_needs_nothing(self):
+        self.assertEqual(vs.check_security(valid_manifest(permissions={"shell": "none"}), "x"), [])
+        self.assertEqual(vs.check_security(valid_manifest(), "x"), [])
+
+    def test_the_security_block_must_agree_with_the_permissions(self):
+        manifest = valid_manifest(
+            permissions={"shell": "spawns git"},
+            security={"network_access": "none", "runs_external_commands": False,
+                      "writes_outside_repository": False, "requires_secrets": False},
+        )
+        errors = " ".join(vs.check_security(manifest, "x"))
+        self.assertIn("runs_external_commands is false", errors)
+
+    def test_a_threat_model_file_that_does_not_exist_is_reported(self):
+        manifest = valid_manifest(security={
+            "network_access": "none", "runs_external_commands": False,
+            "writes_outside_repository": False, "requires_secrets": False,
+            "threat_model": "NOPE.md",
+        })
+        errors = " ".join(vs.check_security(manifest, "skills/utilities/example/skill.json"))
+        self.assertIn("security.threat_model NOPE.md does not exist", errors)
+
+    def test_every_repository_skill_declares_its_security_surface(self):
+        for path in sorted(vs.SKILLS_DIR.glob("*/*/skill.json")):
+            manifest = json.loads(path.read_text("utf-8"))
+            with self.subTest(skill=path.parent.name):
+                self.assertIn("security", manifest)
+                self.assertEqual(vs.check_security(manifest, path.relative_to(vs.REPO).as_posix()), [])
+
+
+class VersionConsistencyTests(unittest.TestCase):
+    def test_repository_skills_agree_with_their_own_packaging(self):
+        for path in sorted(vs.SKILLS_DIR.glob("*/*/skill.json")):
+            manifest = json.loads(path.read_text("utf-8"))
+            declared = vs.declared_versions(path.parent)
+            for source, version in declared.items():
+                with self.subTest(skill=path.parent.name, source=source):
+                    self.assertEqual(version, manifest["version"])
+
+    def test_a_disagreeing_version_is_reported(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "pyproject.toml").write_text('[project]\nversion = "9.9.9"\n', encoding="utf-8")
+            self.assertEqual(vs.declared_versions(directory), {"pyproject.toml": "9.9.9"})
+
+    def test_a_skill_without_packaging_declares_nothing(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(vs.declared_versions(Path(tmp)), {})
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

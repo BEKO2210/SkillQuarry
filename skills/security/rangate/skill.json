@@ -53,6 +53,17 @@
   },
   "workflow": "rangate-tests.yml",
   "quality": "tested",
+  "security": {
+    "network_access": "none",
+    "runs_external_commands": true,
+    "writes_outside_repository": false,
+    "requires_secrets": false,
+    "destructive_operations": [
+      "rewrites Rust source files in the target project in place; review the diff before committing"
+    ],
+    "threat_model": "TEST_REPORT.md",
+    "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed."
+  },
   "keywords": [
     "rust",
     "unsafe",

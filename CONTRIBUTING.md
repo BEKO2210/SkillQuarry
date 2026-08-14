@@ -19,6 +19,8 @@ python3 tools/render_readme.py --check  # README and registry in sync
 python3 tools/test_render_readme.py     # tests for the generator
 python3 tools/test_validate_skills.py   # tests for the validator
 python3 tools/test_new_skill.py         # tests for the scaffolder and the template
+python3 tools/test_registry.py          # tests for the registry query/verify tool
+python3 tools/registry.py verify        # registry checksums match the files on disk
 
 cd skills/autonomous/strata && python3 tests/run_tests.py --min 100
 cd ../../security/cordon   && python3 tests/run_tests.py --min 100
@@ -71,6 +73,8 @@ through.
   than through `.git/info/exclude`.
 - Weakening a test, a verifier or a coverage gate to make a run pass.
 - Generated README blocks edited by hand.
+- A `security` block that disagrees with the prose in `permissions`.
+- A manifest version that disagrees with the skill's own packaging metadata.
 
 ## Reporting problems
 

@@ -40,6 +40,7 @@ jobs:
           python3 tools/test_render_readme.py
           python3 tools/test_validate_skills.py
           python3 tools/test_new_skill.py
+          python3 tools/test_registry.py
 
       # The template is the example every contribution is copied from, so its own
       # suite runs here; a rotten example would be inherited by every new skill.
@@ -49,6 +50,9 @@ jobs:
 
       - name: Validate skill manifests against registry/schema.json
         run: python3 tools/validate_skills.py
+
+      - name: Verify registry checksums match the files on disk
+        run: python3 tools/registry.py verify
 
       # On a pull request the generated files must already be current, because the
       # workflow cannot push to a fork.

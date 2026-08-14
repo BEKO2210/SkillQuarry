@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -81,6 +82,32 @@ def discover_manifests() -> list[dict[str, Any]]:
         raise ManifestError("no skill manifests found under skills/*/*/skill.json")
     manifests.sort(key=lambda item: (str(item["category"]), str(item["name"])))
     return manifests
+
+
+IGNORED_DIRECTORIES = {"__pycache__", "target", "node_modules", ".git"}
+IGNORED_SUFFIXES = {".pyc", ".pyo"}
+
+
+def skill_checksum(directory: Path) -> str:
+    """A content hash over everything a user would install.
+
+    Every tracked file is hashed with its repository-relative path and its
+    executable bit, so a renamed file, a changed byte or a lost `chmod +x` all
+    change the result. Build output and caches are excluded — they are not part of
+    the skill and differ per machine.
+    """
+    digest = hashlib.sha256()
+    for path in sorted(directory.rglob("*")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        if IGNORED_DIRECTORIES & set(path.parts) or path.suffix in IGNORED_SUFFIXES:
+            continue
+        relative = path.relative_to(directory).as_posix()
+        executable = "x" if path.stat().st_mode & 0o111 else "-"
+        digest.update(f"{relative}\0{executable}\0".encode("utf-8"))
+        digest.update(hashlib.sha256(path.read_bytes()).hexdigest().encode("ascii"))
+        digest.update(b"\0")
+    return "sha256:" + digest.hexdigest()
 
 
 def _tests(manifest: dict[str, Any]) -> dict[str, Any]:
@@ -200,6 +227,7 @@ def render_registry(manifests: list[dict[str, Any]]) -> str:
     for manifest in manifests:
         tests = _tests(manifest)
         entries.append({
+            "checksum": skill_checksum(REPO / manifest["_dir"]),
             "name": manifest["name"],
             "displayName": manifest["displayName"],
             "version": manifest["version"],
@@ -210,10 +238,13 @@ def render_registry(manifests: list[dict[str, Any]]) -> str:
             "compatibility": manifest.get("compatibility", []),
             "platforms": manifest.get("platforms", []),
             "quality": manifest.get("quality", "experimental"),
+            "security": manifest.get("security", {}),
+            "requires": manifest.get("requires", {}),
+            "workflow": _workflow(manifest),
             "tests": {"count": tests.get("count"), "coverage": tests.get("coverage")},
         })
     document = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_by": "tools/render_readme.py",
         "skills": entries,
     }

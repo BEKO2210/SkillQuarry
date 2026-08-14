@@ -6,9 +6,16 @@
   "category": "utilities",
   "license": "Apache-2.0",
   "tagline": "Copy this shape, replace the logic.",
-  "agents": ["claude-code"],
-  "compatibility": ["claude-code"],
-  "platforms": ["linux", "macos"],
+  "agents": [
+    "claude-code"
+  ],
+  "compatibility": [
+    "claude-code"
+  ],
+  "platforms": [
+    "linux",
+    "macos"
+  ],
   "entrypoints": {
     "skill": "SKILL.md",
     "cli": "example-skill",
@@ -33,5 +40,18 @@
     "report": "TEST_REPORT.md"
   },
   "quality": "experimental",
-  "keywords": ["template", "example", "scaffold", "reference"]
+  "security": {
+    "network_access": "none",
+    "runs_external_commands": false,
+    "writes_outside_repository": false,
+    "requires_secrets": false,
+    "destructive_operations": [],
+    "threat_model": "TEST_REPORT.md"
+  },
+  "keywords": [
+    "template",
+    "example",
+    "scaffold",
+    "reference"
+  ]
 }

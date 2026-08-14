@@ -1,9 +1,10 @@
 {
   "generated_by": "tools/render_readme.py",
-  "schema_version": 1,
+  "schema_version": 2,
   "skills": [
     {
       "category": "autonomous",
+      "checksum": "sha256:cff6c39aa9a92c879c609ab1f0af5e7f7c3281c4636b46dd66b29d39a9b93608",
       "compatibility": [
         "claude-code"
       ],
@@ -17,14 +18,33 @@
         "macos"
       ],
       "quality": "tested",
+      "requires": {
+        "binaries": [
+          "git",
+          "claude"
+        ],
+        "packages": [],
+        "python": ">=3.10"
+      },
+      "security": {
+        "destructive_operations": [],
+        "network_access": "indirect",
+        "requires_secrets": false,
+        "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.",
+        "runs_external_commands": true,
+        "threat_model": "TEST_REPORT.md",
+        "writes_outside_repository": false
+      },
       "tests": {
         "count": 100,
         "coverage": "100% of runner.py executable lines"
       },
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "workflow": "strata-tests.yml"
     },
     {
       "category": "security",
+      "checksum": "sha256:6173ea39e7ac92b46b27f2da8d2d74229fed0e26e0380747c88ee7f3fcd076f5",
       "compatibility": [
         "claude-code",
         "agent-neutral-manual-mode"
@@ -39,14 +59,32 @@
         "macos"
       ],
       "quality": "tested",
+      "requires": {
+        "binaries": [
+          "git"
+        ],
+        "packages": [],
+        "python": ">=3.10"
+      },
+      "security": {
+        "destructive_operations": [],
+        "network_access": "indirect",
+        "requires_secrets": false,
+        "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.",
+        "runs_external_commands": true,
+        "threat_model": "README.md",
+        "writes_outside_repository": false
+      },
       "tests": {
         "count": 64,
         "coverage": "100% of core.py executable lines (989/989)"
       },
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "workflow": "cordon-tests.yml"
     },
     {
       "category": "security",
+      "checksum": "sha256:b055ea68b20f8682f0ca1fb8dd728b21cb5a9d1605464d008619e542074e6039",
       "compatibility": [
         "claude-code"
       ],
@@ -60,11 +98,31 @@
         "macos"
       ],
       "quality": "tested",
+      "requires": {
+        "binaries": [
+          "cargo",
+          "rustc"
+        ],
+        "packages": [],
+        "python": ">=3.10 (test harness only)"
+      },
+      "security": {
+        "destructive_operations": [
+          "rewrites Rust source files in the target project in place; review the diff before committing"
+        ],
+        "network_access": "none",
+        "requires_secrets": false,
+        "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.",
+        "runs_external_commands": true,
+        "threat_model": "TEST_REPORT.md",
+        "writes_outside_repository": false
+      },
       "tests": {
         "count": 14,
         "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"
       },
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "workflow": "rangate-tests.yml"
     }
   ]
 }

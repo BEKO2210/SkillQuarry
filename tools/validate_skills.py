@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 REPO = Path(__file__).resolve().parents[1]
+VERSION_PATTERN = re.compile(r"""^\s*(?:__version__|version)\s*[:=]\s*["'](?P<version>[^"']+)["']""", re.MULTILINE)
 SCHEMA_PATH = REPO / "registry" / "schema.json"
 SKILLS_DIR = REPO / "skills"
 WORKFLOW_DIR = REPO / ".github" / "workflows"
@@ -131,6 +132,42 @@ def _referenced_files(manifest: dict[str, Any], directory: Path) -> list[tuple[s
     return references
 
 
+def declared_versions(directory: Path) -> dict[str, str]:
+    """Versions the skill states about itself outside the manifest.
+
+    A skill that says 1.0.0 in its manifest and 0.9.0 in its package metadata has
+    already lied to somebody; the registry must not have to guess which is true.
+    """
+    found: dict[str, str] = {}
+    candidates = [directory / "pyproject.toml", *sorted(directory.glob("src/*/core.py")),
+                  *sorted(directory.glob("src/*/runner.py"))]
+    for candidate in candidates:
+        if not candidate.is_file():
+            continue
+        match = VERSION_PATTERN.search(candidate.read_text("utf-8"))
+        if match:
+            found[candidate.relative_to(directory).as_posix()] = match.group("version")
+    return found
+
+
+def check_security(manifest: dict[str, Any], relative: str) -> list[str]:
+    """A skill that can run commands must say so in machine-readable form."""
+    shell = (manifest.get("permissions") or {}).get("shell", "none")
+    runs_commands = shell.strip().lower() not in {"", "none"}
+    security = manifest.get("security")
+    if runs_commands and not security:
+        return [f"{relative}: permissions.shell is {shell!r}, so a `security` block is required"]
+    if not security:
+        return []
+    errors: list[str] = []
+    if runs_commands and security.get("runs_external_commands") is not True:
+        errors.append(f"{relative}: permissions.shell describes commands, but security.runs_external_commands is false")
+    threat_model = security.get("threat_model")
+    if threat_model and not (REPO / relative).parent.joinpath(threat_model).exists():
+        errors.append(f"{relative}: security.threat_model {threat_model} does not exist")
+    return errors
+
+
 def check_layout(manifest: dict[str, Any], path: Path) -> list[str]:
     """Rules about the world outside the JSON document itself."""
     directory = path.parent
@@ -149,6 +186,11 @@ def check_layout(manifest: dict[str, Any], path: Path) -> list[str]:
     for required_doc in ("README.md", "SKILL.md"):
         if not (directory / required_doc).exists():
             errors.append(f"{relative}: {required_doc} is required by the skill specification")
+    for source, version in declared_versions(directory).items():
+        if version != manifest.get("version"):
+            errors.append(
+                f"{relative}: {source} declares version {version!r}, manifest says {manifest.get('version')!r}"
+            )
     return errors
 
 
@@ -168,7 +210,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FAIL {relative}: unreadable: {exc}", file=sys.stderr)
             failures += 1
             continue
-        errors = validate(manifest, schema, relative) + check_layout(manifest, path)
+        errors = (
+            validate(manifest, schema, relative)
+            + check_layout(manifest, path)
+            + check_security(manifest, relative)
+        )
         if errors:
             failures += 1
             print(f"FAIL {relative}", file=sys.stderr)

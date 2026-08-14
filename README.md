@@ -679,7 +679,7 @@ SkillQuarry/
 │
 ├── registry/
 │   ├── schema.json             manifest schema, enforced in CI
-│   └── skills.json             generated index of every skill
+│   └── skills.json             generated index: versions, checksums, security
 │
 ├── templates/
 │   └── example-skill/          the reference skill; scaffold from it
@@ -688,6 +688,7 @@ SkillQuarry/
 │   ├── render_readme.py        writes the generated README blocks + registry
 │   ├── validate_skills.py      validates manifests and their layout
 │   ├── new_skill.py            scaffolds a new skill from the template
+│   ├── registry.py             query and verify the registry
 │   └── test_*.py               tests for the tooling itself
 │
 ├── docs/
@@ -709,47 +710,50 @@ SkillQuarry/
 
 ---
 
-# Planned CLI
+# Registry and CLI
 
-The long-term SkillQuarry experience is intended to resemble a package manager.
+The registry is generated from the manifests and carries what a marketplace needs
+to answer questions without downloading anything: version, category, agents,
+platforms, quality, test numbers, the declared security surface, and a content
+checksum per skill.
 
-### Search
+### Search and filter — works today
 
 ```bash
-skillquarry search testing
+python3 tools/registry.py list
+python3 tools/registry.py list --agent claude-code --platform linux --quality tested
+python3 tools/registry.py list --offline --no-secrets      # nothing of its own to phone home with
+python3 tools/registry.py list --keyword unsafe --json     # machine-readable
+```
+
+```text
+strata     1.0.0    autonomous   tested        100 tests  runs-commands
+cordon     1.0.0    security     tested         64 tests  runs-commands
+rangate    1.0.0    security     tested         14 tests  offline, runs-commands, destructive
 ```
 
 ### Inspect
 
 ```bash
-skillquarry info strata
+python3 tools/registry.py show cordon
 ```
 
-### Install
+### Verify integrity
 
 ```bash
-skillquarry install strata
+python3 tools/registry.py verify
 ```
 
-### Validate
+Recomputes every checksum — SHA-256 over each file's path, executable bit and
+contents, excluding build output — and fails if the registry describes files that
+are no longer there. This runs in CI on every change.
 
-```bash
-skillquarry validate ./my-skill
-```
+### Still planned
 
-### Update
+A published `skillquarry` command that installs across repositories
+(`skillquarry install cordon`), remote registries, and signed releases. The local
+tools above are the working subset.
 
-```bash
-skillquarry update
-```
-
-### Diagnose
-
-```bash
-skillquarry doctor
-```
-
-These commands describe the intended interface and may not yet be implemented.
 
 ---
 
@@ -782,12 +786,12 @@ These commands describe the intended interface and may not yet be implemented.
 ## Phase 3 — Registry
 
 - [x] Build skill registry (generated: `registry/skills.json`)
-- [ ] Add semantic versioning
+- [x] Add semantic versioning (manifest, packaging and module versions must agree)
 - [x] Add category system
-- [ ] Add checksums
-- [ ] Add compatibility filtering
-- [ ] Add automated validation
-- [ ] Add security metadata
+- [x] Add checksums (`tools/registry.py verify`)
+- [x] Add compatibility filtering (`tools/registry.py list --agent … --platform …`)
+- [x] Add automated validation (schema, layout, security, versions, checksums — all in CI)
+- [x] Add security metadata (required for any skill that runs commands)
 
 ## Phase 4 — CLI
 

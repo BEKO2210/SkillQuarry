@@ -25,6 +25,8 @@ SKILLS = REPO / "skills"
 SCHEMA = REPO / "registry" / "schema.json"
 
 NAME_PATTERN = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
+VERSION_ASSIGNMENT = re.compile(r"""(^\s*(?:__version__|version)\s*[:=]\s*)(["'])[^"']+\2""", re.MULTILINE)
+INITIAL_VERSION = "0.1.0"
 EXIT_ERROR = 2
 
 
@@ -80,11 +82,22 @@ def scaffold(name: str, display: str, category: str, *, force: bool = False) -> 
             shutil.copyfile(source, destination)
         destination.chmod(source.stat().st_mode)
 
+    # A new skill starts at 0.1.0 everywhere. Leaving the template's version in the
+    # module while resetting it in the manifest is exactly the disagreement the
+    # validator rejects.
+    for source in [target / "pyproject.toml", *sorted(target.glob("src/*/*.py"))]:
+        if not source.is_file():
+            continue
+        text = source.read_text("utf-8")
+        replaced = VERSION_ASSIGNMENT.sub(rf"\g<1>\g<2>{INITIAL_VERSION}\g<2>", text)
+        if replaced != text:
+            source.write_text(replaced, encoding="utf-8")
+
     manifest_path = target / "skill.json"
     manifest = json.loads(manifest_path.read_text("utf-8"))
     manifest["name"] = name
     manifest["displayName"] = display
-    manifest["version"] = "0.1.0"
+    manifest["version"] = INITIAL_VERSION
     manifest["category"] = category
     manifest["description"] = f"TODO: describe {display} in plain sentences a reviewer can check."
     manifest["tagline"] = "TODO: one line."

@@ -152,6 +152,43 @@ Claims without a reproducible command do not belong in a test report.
 Authors may claim up to `tested` and must be able to prove it. `trusted` and
 above are set by the repository owner, never self-declared.
 
+## 7.1 Security metadata
+
+Any skill whose `permissions.shell` is not `none` must carry a machine-readable
+`security` block, and CI rejects it otherwise:
+
+```json
+"security": {
+  "network_access": "none | indirect | direct",
+  "runs_external_commands": true,
+  "writes_outside_repository": false,
+  "requires_secrets": false,
+  "destructive_operations": ["rewrites source files in place"],
+  "threat_model": "TEST_REPORT.md",
+  "reviewed_by": "who reviewed it independently of the author, and when"
+}
+```
+
+The block must agree with the prose in `permissions` — a skill that describes
+spawning commands and then declares `runs_external_commands: false` is rejected.
+`destructive_operations` lists irreversible actions in plain language; an empty
+list means none. `threat_model` points at the file stating what the skill does
+**not** protect against.
+
+## 7.2 Checksums
+
+`registry/skills.json` records a `checksum` per skill: SHA-256 over every file a
+user would install, including its repository-relative path and executable bit, and
+excluding build output and caches. A changed byte, a rename or a lost `chmod +x`
+changes it.
+
+```bash
+python3 tools/registry.py verify   # recompute and compare
+```
+
+CI runs that check, so a registry entry can never describe files that are no
+longer there.
+
 ## 8. Versioning
 
 Skill versions follow semantic versioning and move independently of the
@@ -165,6 +202,10 @@ repository:
 Persisted state must carry a schema version and must refuse to load state written
 by an incompatible version, rather than guessing.
 
+A skill must state one version, not several: where a skill also declares a version
+in `pyproject.toml` or in its module (`__version__`), CI checks that all of them
+match the manifest.
+
 ## 9. Naming and user-facing text
 
 - `name` is lowercase kebab-case, stable for the life of the skill; renaming is a
@@ -176,6 +217,7 @@ by an incompatible version, rather than guessing.
 ## 10. Checklist before opening a pull request
 
 - [ ] `python3 tools/validate_skills.py` passes.
+- [ ] `python3 tools/registry.py verify` passes.
 - [ ] `python3 tools/render_readme.py --check` passes.
 - [ ] The skill's own test command passes at its coverage gate.
 - [ ] `TEST_REPORT.md` names environment, evidence, defects and limits.
