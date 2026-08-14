@@ -1,29 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 520" role="img" aria-labelledby="title desc">
-  <title id="title">RanGate</title>
-  <desc id="desc">Unsafe stays behind the membrane. Safe Rust gets typed capabilities.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" width="960" height="260" role="img" aria-label="RanGate — Rust unsafe and FFI boundary protocol">
+  <title>RanGate — Rust unsafe and FFI boundary protocol</title>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="520" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#07111F"/>
-      <stop offset="1" stop-color="#111827"/>
+    <linearGradient id="rgb-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#131c25"/>
+      <stop offset="1" stop-color="#0a1015"/>
     </linearGradient>
-    <linearGradient id="accent" x1="90" y1="80" x2="430" y2="420" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#8B5CF6"/>
-      <stop offset="1" stop-color="#14B8A6"/>
+    <linearGradient id="rgb-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
     </linearGradient>
+    <linearGradient id="rgb-token" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="rgb-frame">
+      <rect x="64" y="66" width="128" height="128" rx="28"/>
+    </clipPath>
   </defs>
-  <rect width="1440" height="520" rx="36" fill="url(#bg)"/>
-  <g transform="translate(82 56)">
-    <circle cx="204" cy="204" r="158" fill="none" stroke="url(#accent)" stroke-width="34"/>
-    <circle cx="204" cy="204" r="98" fill="none" stroke="#475569" stroke-width="12" stroke-dasharray="28 20"/>
-    <path d="M176 82v94h-62v56h62v94h56v-94h62v-56h-62V82z" fill="#0F172A" stroke="#E2E8F0" stroke-width="8" stroke-linejoin="round"/>
-    <circle cx="204" cy="204" r="22" fill="#14B8A6"/>
+
+  <rect width="960" height="260" fill="url(#rgb-bg)"/>
+
+  <!-- A faint membrane line running the width of the banner. -->
+  <g opacity="0.15">
+    <rect x="0" y="206" width="960" height="4" fill="#5b8298"/>
+    <rect x="360" y="206" width="70" height="4" fill="#ffd479"/>
   </g>
-  <g font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
-    <text x="520" y="214" fill="#F8FAFC" font-size="92" font-weight="760" letter-spacing="-3">RanGate</text>
-    <text x="522" y="282" fill="#A78BFA" font-size="30" font-weight="650">RUST UNSAFE / FFI BOUNDARY PROTOCOL</text>
-    <text x="522" y="348" fill="#CBD5E1" font-size="28">Unsafe stays behind the membrane.</text>
-    <text x="522" y="388" fill="#CBD5E1" font-size="28">Safe Rust gets typed capabilities.</text>
+
+  <g>
+    <rect x="64" y="66" width="128" height="128" rx="28" fill="url(#rgb-ground)"/>
+    <g clip-path="url(#rgb-frame)">
+      <rect x="136" y="66" width="56" height="128" fill="#5b8298"/>
+      <g fill="#6e9bb0">
+        <rect x="146" y="88" width="30" height="6" rx="3"/>
+        <rect x="146" y="152" width="30" height="6" rx="3"/>
+      </g>
+      <rect x="64" y="66" width="48" height="128" fill="#233140"/>
+      <g fill="#3d5568">
+        <rect x="74" y="86" width="22" height="6" rx="3"/>
+        <rect x="80" y="102" width="16" height="6" rx="3"/>
+        <rect x="72" y="148" width="18" height="6" rx="3"/>
+        <rect x="82" y="162" width="14" height="6" rx="3"/>
+      </g>
+      <rect x="112" y="66" width="24" height="46" fill="#4a6a80" stroke="#0b1219" stroke-width="2"/>
+      <rect x="112" y="140" width="24" height="54" fill="#4a6a80" stroke="#0b1219" stroke-width="2"/>
+      <rect x="100" y="118" width="56" height="16" rx="8" fill="url(#rgb-token)"/>
+      <circle cx="148" cy="126" r="4" fill="#0d141b" opacity="0.35"/>
+    </g>
+    <rect x="64.75" y="66.75" width="126.5" height="126.5" rx="27.25" fill="none" stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
   </g>
-  <path d="M520 432h720" stroke="#1E293B" stroke-width="2"/>
-  <circle cx="1234" cy="432" r="7" fill="#14B8A6"/>
+
+  <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+    <text x="236" y="126" fill="#f4f8fb" font-size="62" font-weight="700" letter-spacing="6">RANGATE</text>
+    <text x="240" y="162" fill="#9fb8c9" font-size="21" letter-spacing="2.4">Rust unsafe and FFI boundary protocol</text>
+    <g font-size="16" fill="#ffd479" letter-spacing="1.4">
+      <text x="240" y="196">Smallest membrane</text>
+      <text x="404" y="196" fill="#5b8298">·</text>
+      <text x="422" y="196">Typed capabilities</text>
+      <text x="576" y="196" fill="#5b8298">·</text>
+      <text x="594" y="196">Compiler-proved</text>
+    </g>
+  </g>
 </svg>

@@ -1,127 +1,161 @@
-# RanGate
+<div align="center">
 
-> **Unsafe stays behind the membrane. Safe Rust gets typed capabilities.**
+<img src="../../../assets/rangate-banner.svg" alt="RanGate — Rust unsafe and FFI boundary protocol" width="820">
 
-RanGate is a compiler-driven SkillQuarry protocol for refactoring Rust `unsafe`, FFI, raw pointers, manual ownership, and low-level memory boundaries.
+<br>
 
-It is intentionally narrower than a generic Rust review skill. RanGate activates when the difficult part of the task is proving where dangerous invariants live and preventing those invariants from leaking through the rest of the codebase.
+**Unsafe stays behind the membrane. Safe Rust gets typed capabilities.**
 
-## What it changes
+[![Tests](https://img.shields.io/badge/tests-14%20passing-2ea043?style=for-the-badge)](TEST_REPORT.md)
+[![Toolchain](https://img.shields.io/badge/rust-1.97.1%20pinned-2ea043?style=for-the-badge&logo=rust&logoColor=white)](TEST_REPORT.md)
+[![Miri](https://img.shields.io/badge/miri-pinned%20nightly-5b8298?style=for-the-badge)](TEST_REPORT.md)
+[![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)](#install)
+[![License](https://img.shields.io/badge/license-Apache--2.0-f0932b?style=for-the-badge)](../../../LICENSE)
 
-A weak boundary often looks like this:
+[**Install**](#install) ·
+[**Use**](#use) ·
+[**How it works**](#how-it-works) ·
+[**Safety posture**](#safety-posture) ·
+[**Tests**](#tests) ·
+[**Evidence**](TEST_REPORT.md)
+
+</div>
+
+---
+
+## What it is
+
+RanGate is a **protocol**, not a program: a set of instructions that makes a coding
+agent refactor Rust `unsafe`, FFI, raw pointers and manual ownership the same way
+every time, and prove the result with the compiler instead of asserting it.
+
+Its model is the nuclear pore complex. Dangerous low-level representation stays on
+one side of a narrow boundary; only validated, typed capabilities cross into the
+safe domain. The goal is not to make `unsafe` disappear at any cost — it is to
+shrink how much code has to understand its invariants.
+
+A weak boundary leaks raw knowledge outward:
 
 ```text
-application
-   ↓ raw pointer
-helper
-   ↓ raw pointer + caller safety note
-service
-   ↓ unsafe call
-FFI
+application  ──raw pointer──▶  helper  ──raw pointer + safety note──▶  service  ──unsafe──▶  FFI
 ```
 
-RanGate drives toward:
+RanGate drives toward one crossing:
 
 ```text
-foreign/raw domain
-       ↓
-private unsafe primitive
-       ↓
-validated ownership/lifetime boundary
-       ↓
-safe Rust capability
-       ↓
-application/domain code
+foreign / raw domain
+        │
+        ▼   private unsafe primitive
+        │
+        ▼   validated ownership + lifetime boundary   ◀── the membrane
+        │
+        ▼   safe Rust capability
+        │
+        ▼   application code, which needs to know nothing
 ```
 
-The important result is not merely a lower `unsafe` count. The important result is that fewer modules need to know the raw validity, ownership, aliasing, lifetime, destruction, or threading contract.
+## Install
 
-## When to use it
-
-Use RanGate for work involving:
-
-- FFI handles and `extern "C"` / `extern "system"`
-- `*const T` / `*mut T`
-- `NonNull<T>` wrappers
-- `Box::into_raw` / `Box::from_raw`
-- manual initialization
-- `MaybeUninit`
-- `UnsafeCell`
-- unsafe performance primitives
-- uncertain `Send` / `Sync` boundaries
-- lifetime problems caused by foreign ownership
-- refactors where unsafe knowledge has spread into safe callers
-
-Do not use it as a generic replacement for `cargo clippy` or ordinary idiomatic-Rust review.
-
-## Install for Claude Code
-
-Claude Code officially discovers personal skills from `~/.claude/skills/<skill-name>/SKILL.md`.
+The skill is a document an agent reads; installing it means putting that document
+where Claude Code looks for personal skills, `~/.claude/skills/<name>/SKILL.md`.
 
 ```bash
 cd skills/security/rangate
-./install.sh
+./install.sh          # installs SKILL.md and REFERENCE.md
+./uninstall.sh        # removes exactly those two files
 ```
 
-Then start Claude Code in a Rust repository and invoke:
+`RANGATE_SKILLS_DIR=/somewhere/else ./install.sh` changes the target. The
+installer writes atomically and leaves unrelated files in the target directory
+untouched — there is a test for that.
+
+Nothing else is installed. RanGate never adds a toolchain, a crate or a lint
+configuration to your project.
+
+## Use
+
+From a Rust repository, in Claude Code:
 
 ```text
-/rangate Refactor this FFI ownership boundary so callers no longer need raw-pointer knowledge. Prove the result with the compiler and tests.
+/rangate Refactor this FFI ownership boundary so callers no longer need
+         raw-pointer knowledge. Prove the result with the compiler and tests.
 ```
 
-The installer accepts an alternate skills root for testing or custom setups:
+**Use it when** the hard part is proving where dangerous invariants live: FFI
+handles and `extern "C"`, `*const T` / `*mut T`, `NonNull<T>` wrappers,
+`Box::into_raw` / `from_raw`, `MaybeUninit`, `UnsafeCell`, uncertain `Send`/`Sync`
+boundaries, lifetimes dictated by foreign ownership, or unsafe knowledge that has
+already spread into safe callers.
 
-```bash
-RANGATE_SKILLS_DIR=/path/to/skills ./install.sh
-```
+**Do not use it** as a general Rust review or as a replacement for `cargo clippy`.
 
-Uninstall:
+## How it works
 
-```bash
-./uninstall.sh
-```
+Four phases, in order. The full protocol is in [SKILL.md](SKILL.md); the
+biological model and the compiler-error interpretation table are in
+[REFERENCE.md](REFERENCE.md).
 
-## Protocol
+| Phase | What the agent does |
+|---|---|
+| 1 — Map the membrane | Establish a baseline that already passes, inventory every unsafe surface, record the blast radius as numbers |
+| 2 — Build the pore | Move raw invariants into the smallest typed ownership and lifetime boundary |
+| 3 — Establish directionality | Use compiler feedback to stop raw representation from leaking back outward |
+| 4 — Attack the membrane | Challenge null handling, duplicate ownership, aliasing, thread movement, panic cleanup, repetition, optimized builds and Miri paths |
 
-The complete agent protocol is in [SKILL.md](SKILL.md).
+The agent reports through a fixed structure — `MEMBRANE`, `PROOF_OBLIGATIONS`,
+`COMPILER_EVIDENCE`, `REFACTORED_CODE`, `REMAINING_RISK` — so a reviewer reads the
+same sections every time, and anything unproven is marked `UNVERIFIED` rather than
+quietly asserted.
 
-The detailed systems-biology model and Rust boundary notes are in [REFERENCE.md](REFERENCE.md).
+## Safety posture
 
-RanGate has four phases:
+RanGate refuses the shortcuts that make a diff look safe without being safe:
 
-1. **Map the membrane** — establish baseline verification, inventory unsafe surfaces, and record blast-radius metrics.
-2. **Build the pore** — move raw invariants into the smallest typed ownership/lifetime boundary.
-3. **Establish directionality** — use compiler feedback loops to prevent raw representation from leaking back outward.
-4. **Attack the membrane** — deliberately challenge null handling, duplicate ownership, aliasing, thread movement, panic cleanup, repetition, optimized builds, and Miri-compatible paths.
+- no invented FFI lifetime guarantees;
+- no automatic `unsafe impl Send` or `Sync`;
+- no `transmute` added to silence a type error;
+- no lint suppression to turn CI green;
+- no claim of mathematical memory safety;
+- no claim that fewer `unsafe` blocks alone mean safer code.
 
-## Test fixture
+Every remaining unsafe operation needs a local proof obligation tied to code,
+types, or a real external contract.
 
-`tests/fixture/` is a dependency-free Rust crate that simulates a small foreign resource with a raw pointer API. The safe `Device` wrapper demonstrates the exact properties RanGate is intended to create.
+## The fixture
 
-The fixture proves:
+`tests/fixture/` is a dependency-free crate simulating a small foreign resource
+with a raw-pointer API. Its safe `Device` wrapper is what a finished RanGate
+refactor should look like, and the suite proves it:
 
-- null-like creation failure is rejected at the boundary;
-- callers use a safe API after construction;
-- `Drop` releases exactly one raw allocation;
-- panic unwinding still executes RAII cleanup;
-- 10,000 deterministic create/mutate/read/drop cycles return the allocation counter to baseline;
-- a moved owner cannot be used again;
-- two simultaneous mutable borrows are rejected;
-- cross-thread movement is rejected while the external thread contract is deliberately unknown.
+| Property | How it is proved |
+|---|---|
+| Null-like creation failure is rejected at the boundary | runtime test |
+| Callers use a safe API after construction | runtime test |
+| `Drop` releases exactly one raw allocation | allocation counter returns to baseline |
+| Panic unwinding still runs RAII cleanup | runtime test |
+| 10,000 create/mutate/read/drop cycles leak nothing | deterministic stress test |
+| A moved owner cannot be used again | `compile_fail` proof, **E0382** |
+| Two simultaneous mutable borrows are rejected | `compile_fail` proof, **E0499** |
+| Cross-thread movement is rejected | `compile_fail` proof, **E0277** |
 
-The last three are `compile_fail` doctests: the expected result is that Rust refuses to compile the invalid program.
+The three compile-fail proofs are checked by **reason**, not just by failure: each
+snippet is compiled with `rustc --error-format=json` and must emit the pinned error
+code. On stable, rustdoc ignores the code in the fence — a snippet with a typo, or
+one annotated `E0999`, still counts as a pass, which would make the proof
+worthless. See defect D5 in [TEST_REPORT.md](TEST_REPORT.md).
 
-## Reproduce the stable suite
-
-From this directory:
+## Tests
 
 ```bash
 python3 tests/run_tests.py
 ```
 
-The harness uses only the Python standard library and the Rust tools already installed on the machine. It does not install packages or toolchains.
+14 checks, standard library only, no packages and no toolchain installs. Checks
+whose tool is missing skip with a message naming what to install; CI sets
+`RANGATE_REQUIRE_TOOLCHAIN=1`, which turns the same condition into a failure so a
+skip can never hide a broken skill.
 
-For the fixture directly:
+Directly against the fixture:
 
 ```bash
 cd tests/fixture
@@ -134,40 +168,21 @@ cargo test --doc
 cargo test --release --all-targets
 ```
 
-## Miri
-
-Miri is an additional dynamic checker for supported Rust code. RanGate never installs it automatically.
-
-If Miri is already installed:
+**Miri** is additional dynamic evidence and is never installed automatically. CI
+runs it on a pinned nightly, so stable users do not need nightly to use the skill:
 
 ```bash
-cd tests/fixture
-cargo miri test
+cd tests/fixture && cargo miri test
 ```
 
-The SkillQuarry CI has a separate pinned-nightly Miri job so ordinary stable-toolchain users do not need nightly merely to use the skill.
+A green Miri run is evidence about the fixture, not proof about the undocumented
+semantics of an arbitrary C or C++ library.
 
-A green Miri run is additional evidence, not proof of undocumented semantics in an arbitrary C or C++ library.
+## Evidence
 
-## Safety posture
+Exact commands, toolchain versions, scenario mapping, the six documented defects
+and the known limits: [TEST_REPORT.md](TEST_REPORT.md). The short independent
+verification card a reviewer should work through:
+[REVIEW.md](REVIEW.md). Sources behind the design: [REFERENCE.md](REFERENCE.md).
 
-RanGate deliberately refuses several common shortcuts:
-
-- no invented FFI lifetime guarantees;
-- no automatic `unsafe impl Send` or `Sync`;
-- no `transmute` added just to silence type errors;
-- no lint suppression merely to turn CI green;
-- no claim of mathematical memory safety;
-- no claim that fewer unsafe blocks alone means safer code.
-
-Every remaining unsafe operation needs a local proof obligation tied to code, types, or an actual external contract.
-
-## Test evidence
-
-See [TEST_REPORT.md](TEST_REPORT.md) for exact commands, toolchain versions, scenario mapping, and known limits.
-
-See [REVIEW.md](REVIEW.md) for the short independent verification card.
-
-## License
-
-Apache-2.0, matching SkillQuarry.
+Apache-2.0, matching [SkillQuarry](../../../README.md).
