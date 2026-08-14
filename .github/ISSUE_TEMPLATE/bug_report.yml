@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in a skill or in the repository tooling behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security problems do not belong here — follow [SECURITY.md](https://github.com/BEKO2210/SkillQuarry/blob/main/SECURITY.md) instead.
+  - type: input
+    id: skill
+    attributes:
+      label: Skill or tool
+      placeholder: "skills/security/cordon, or tools/render_readme.py"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version and commit
+      placeholder: "cordon 1.0.0, commit a6c4045"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Python version, and the versions of any external programs involved.
+      placeholder: |
+        Ubuntu 24.04, Python 3.12.3, git 2.43.0, Claude Code 2.1.231
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Exact commands
+      description: The commands you ran, in order. A throwaway repository that shows the problem is ideal.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Observed versus expected
+      description: Paste the output. The shortest decisive lines beat a full log.
+    validations:
+      required: true

@@ -1,20 +1,22 @@
-name: readme
+name: checks
 
 on:
   push:
     branches: [main]
     paths:
       - "skills/**/skill.json"
-      - "tools/render_readme.py"
+      - "tools/**"
       - "README.md"
       - "registry/**"
+      - "docs/**"
       - ".github/workflows/readme.yml"
   pull_request:
     paths:
       - "skills/**/skill.json"
-      - "tools/render_readme.py"
+      - "tools/**"
       - "README.md"
       - "registry/**"
+      - "docs/**"
       - ".github/workflows/readme.yml"
   workflow_dispatch:
 
@@ -31,8 +33,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Test the generator
-        run: python3 tools/test_render_readme.py
+      - name: Test the repository tooling
+        run: |
+          python3 tools/test_render_readme.py
+          python3 tools/test_validate_skills.py
+
+      - name: Validate skill manifests against registry/schema.json
+        run: python3 tools/validate_skills.py
 
       # On a pull request the generated files must already be current, because the
       # workflow cannot push to a fork.

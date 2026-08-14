@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/BEKO2210/SkillQuarry/blob/main/registry/schema.json",
+  "title": "SkillQuarry skill manifest",
+  "description": "Schema for skills/<category>/<name>/skill.json. See docs/SKILL-SPEC.md for the normative wording.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "displayName", "version", "description", "category", "license"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Registry identifier. Must equal the skill's directory name.",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 40
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Human-facing name used in the README and registry.",
+      "minLength": 2,
+      "maxLength": 60
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the skill.",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "description": {
+      "type": "string",
+      "description": "One paragraph, plain sentences, no marketing. Rendered in the skill table.",
+      "minLength": 20,
+      "maxLength": 600
+    },
+    "category": {
+      "type": "string",
+      "description": "Must equal the parent directory under skills/.",
+      "enum": [
+        "autonomous",
+        "coding",
+        "testing",
+        "security",
+        "ui-ux",
+        "devops",
+        "mobile",
+        "web",
+        "documentation",
+        "integrations",
+        "utilities"
+      ]
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX identifier. Must be compatible with the repository's Apache-2.0 license.",
+      "minLength": 3,
+      "maxLength": 40
+    },
+    "tagline": {
+      "type": "string",
+      "description": "One line shown above the description on the skill card.",
+      "maxLength": 140
+    },
+    "banner": {
+      "type": "string",
+      "description": "Repository-relative path to an SVG banner, usually under assets/.",
+      "maxLength": 200
+    },
+    "icon": {
+      "type": "string",
+      "description": "Path to an SVG icon, relative to the skill directory.",
+      "maxLength": 200
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Canonical URL for the skill.",
+      "maxLength": 300
+    },
+    "research": {
+      "type": "string",
+      "description": "File in the skill directory documenting the sources behind the design.",
+      "maxLength": 200
+    },
+    "workflow": {
+      "type": "string",
+      "description": "CI workflow file name. Defaults to <name>-tests.yml.",
+      "pattern": "^[A-Za-z0-9._-]+\\.ya?ml$",
+      "maxLength": 100
+    },
+    "agents": {
+      "type": "array",
+      "description": "Agents the skill is used with, as shown in the README.",
+      "items": {"type": "string", "minLength": 2, "maxLength": 60},
+      "maxItems": 12,
+      "uniqueItems": true
+    },
+    "compatibility": {
+      "type": "array",
+      "description": "Machine-readable compatibility targets for the registry.",
+      "items": {"type": "string", "minLength": 2, "maxLength": 60},
+      "maxItems": 12,
+      "uniqueItems": true
+    },
+    "platforms": {
+      "type": "array",
+      "description": "Operating systems the skill is tested on.",
+      "items": {"type": "string", "enum": ["linux", "macos", "windows"]},
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "highlights": {
+      "type": "array",
+      "description": "Short factual bullet points rendered on the skill card.",
+      "items": {"type": "string", "minLength": 10, "maxLength": 240},
+      "maxItems": 8
+    },
+    "quickstart": {
+      "type": "string",
+      "description": "Shell snippet rendered as the card's code block.",
+      "maxLength": 1200
+    },
+    "keywords": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 2, "maxLength": 40},
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "entrypoints": {
+      "type": "object",
+      "description": "How the skill is invoked and installed.",
+      "additionalProperties": false,
+      "properties": {
+        "skill": {"type": "string", "maxLength": 200},
+        "cli": {"type": "string", "maxLength": 100},
+        "install": {"type": "string", "maxLength": 200},
+        "uninstall": {"type": "string", "maxLength": 200}
+      }
+    },
+    "requires": {
+      "type": "object",
+      "description": "What must already exist on the machine.",
+      "additionalProperties": false,
+      "properties": {
+        "python": {"type": "string", "maxLength": 40},
+        "binaries": {"type": "array", "items": {"type": "string", "maxLength": 60}, "maxItems": 20},
+        "packages": {"type": "array", "items": {"type": "string", "maxLength": 100}, "maxItems": 50}
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Plain-language statement of what the skill may touch. Required for any skill that runs commands.",
+      "additionalProperties": false,
+      "properties": {
+        "filesystem": {"type": "string", "maxLength": 600},
+        "shell": {"type": "string", "maxLength": 600},
+        "network": {"type": "string", "maxLength": 600},
+        "environment": {"type": "string", "maxLength": 600}
+      }
+    },
+    "state": {
+      "type": "object",
+      "description": "Where the skill keeps state inside a user's repository.",
+      "additionalProperties": false,
+      "properties": {
+        "directory": {"type": "string", "maxLength": 100},
+        "git": {"type": "string", "maxLength": 300}
+      }
+    },
+    "tests": {
+      "type": "object",
+      "description": "How a reviewer reproduces the skill's test result.",
+      "additionalProperties": false,
+      "required": ["command"],
+      "properties": {
+        "command": {"type": "string", "minLength": 3, "maxLength": 300},
+        "count": {"type": "integer", "minimum": 0},
+        "coverage": {"type": "string", "maxLength": 200},
+        "report": {"type": "string", "maxLength": 200}
+      }
+    },
+    "quality": {
+      "type": "string",
+      "description": "Validation level. See docs/SKILL-SPEC.md; only the repository owner raises a level.",
+      "enum": ["experimental", "verified", "tested", "trusted", "certified"]
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Namespace for metadata this schema does not define yet."
+    }
+  }
+}

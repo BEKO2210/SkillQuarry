@@ -18,6 +18,7 @@
 [![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Strata)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
 [![Cordon tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cordon-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Cordon)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cordon-tests.yml)
 <!-- SKILLS:CI:END -->
+[![Checks](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/readme.yml?style=flat-square&logo=githubactions&logoColor=white&label=checks)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/readme.yml)
 [![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/BEKO2210/SkillQuarry?style=flat-square&logo=github)](https://github.com/BEKO2210/SkillQuarry/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/BEKO2210/SkillQuarry?style=flat-square&logo=git)](https://github.com/BEKO2210/SkillQuarry/commits/main)
@@ -26,9 +27,9 @@
 
 [**Skills**](#skills) ·
 [**Overview**](#overview) ·
-[**Skill Standard**](#skill-standard) ·
+[**Skill Standard**](docs/SKILL-SPEC.md) ·
 [**Security**](#security) ·
-[**Contributing**](#contributing) ·
+[**Contributing**](CONTRIBUTING.md) ·
 [**Roadmap**](#roadmap)
 
 <br>
@@ -209,57 +210,76 @@ A future marketplace listing could expose information such as:
 
 # Skill Standard
 
-A SkillQuarry package should be understandable without requiring users to reverse-engineer it.
+The specification is finalized and enforced. The normative text is
+**[docs/SKILL-SPEC.md](docs/SKILL-SPEC.md)**; the machine-readable form is
+**[registry/schema.json](registry/schema.json)**, checked in CI by
+`tools/validate_skills.py`.
 
-A mature skill may eventually look like this:
+A skill lives at `skills/<category>/<name>/`:
 
 ```text
-my-skill/
-├── SKILL.md
-├── skill.json
-├── README.md
-├── tests/
-├── examples/
-├── hooks/
-└── scripts/
+skills/<category>/<name>/
+├── skill.json        must   manifest; single source of truth for metadata
+├── SKILL.md          must   instructions for the agent
+├── README.md         must   documentation for a human
+├── TEST_REPORT.md    should evidence: environment, results, defects, limits
+├── install.sh        should dependency-free installer
+├── uninstall.sh      should removes exactly what the installer created
+├── src/              should implementation
+└── tests/            should automated tests, runnable offline
 ```
 
-Not every skill needs every file or directory.
+Six manifest fields are required — `name`, `displayName`, `version`,
+`description`, `category`, `license` — and everything else is validated when
+present. `name` must equal the directory name, `category` must equal the parent
+directory, and every file the manifest points at must exist.
 
-The SkillQuarry specification is still being developed.
+The rules that matter most:
 
----
+- **No third-party runtime dependencies**, and no installer that downloads
+  anything. A reviewer must be able to read every line a skill will execute.
+- **Declare what you touch.** Any skill that runs commands states its filesystem,
+  shell, network and environment reach in `permissions`.
+- **Never write to a user's `.gitignore`.** Repository state is hidden through
+  `.git/info/exclude`.
+- **Tests run offline with one command**, external programs are replaced by a fake
+  binary with the same command-line contract, and coverage is gated by a number.
+- **Worst cases are calculated, not fuzzed at.** That distinction has already
+  caught a real defect here.
 
-## Example Manifest
-
-A future manifest could look similar to this:
+## Example manifest
 
 ```json
 {
   "name": "example-skill",
+  "displayName": "Example Skill",
   "version": "1.0.0",
-  "description": "A reusable capability for AI coding agents.",
+  "description": "A reusable capability that does one clearly described thing.",
   "category": "coding",
   "license": "Apache-2.0",
-  "compatibility": [
-    "claude-code",
-    "codex"
-  ]
+  "compatibility": ["claude-code"],
+  "platforms": ["linux", "macos"],
+  "permissions": {
+    "filesystem": "reads the repository; writes only its own state directory",
+    "shell": "spawns git and the configured verifier commands",
+    "network": "none",
+    "environment": "none"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py --min 100",
+    "count": 42,
+    "coverage": "100% of core.py executable lines",
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "tested"
 }
 ```
 
-Additional metadata may eventually describe:
+Validate a manifest before opening a pull request:
 
-- filesystem access
-- network access
-- shell access
-- external APIs
-- required binaries
-- supported platforms
-- dependency requirements
-- permission scopes
-- maintainer information
-- integrity checks
+```bash
+python3 tools/validate_skills.py
+```
 
 ---
 
@@ -538,9 +558,23 @@ Depending on their design, a skill may cause an agent to:
 
 Users should inspect third-party skills before execution.
 
-SkillQuarry's planned security model includes:
+Reporting a vulnerability, the supported scope and the response times are in
+**[SECURITY.md](SECURITY.md)**. Never report a security problem in a public issue.
 
-- explicit permission manifests
+Already in place:
+
+- **explicit permission manifests** — every skill declares its filesystem, shell,
+  network and environment reach in `skill.json`, validated against the schema;
+- **no third-party runtime dependencies** — the code a skill runs is the code you
+  can read;
+- **no network access during installation**;
+- **documented threat models** — each skill's test report states what it does not
+  protect against;
+- **private vulnerability reporting** through GitHub Security Advisories.
+
+Still planned:
+
+- source checksums
 - source checksums
 - dependency inspection
 - secret scanning
@@ -602,49 +636,42 @@ Test malformed state, infinite loops, interrupted processes, pathological input,
 
 ---
 
-# Planned Repository Structure
+# Repository Structure
 
-As the project grows, SkillQuarry may evolve toward a structure similar to:
+What exists today, and what is still planned:
 
 ```text
 SkillQuarry/
 │
-├── skills/
-│   ├── autonomous/
-│   ├── coding/
-│   ├── testing/
-│   ├── security/
-│   ├── ui-ux/
-│   ├── devops/
-│   ├── mobile/
-│   └── utilities/
+├── skills/                     one directory per category
+│   ├── autonomous/strata/      generational handoff runner
+│   └── security/cordon/        Git change envelopes
 │
 ├── registry/
-│   ├── skills.json
-│   └── schema.json
+│   ├── schema.json             manifest schema, enforced in CI
+│   └── skills.json             generated index of every skill
 │
-├── adapters/
-│   ├── claude-code/
-│   ├── codex/
-│   └── generic/
+├── tools/
+│   ├── render_readme.py        writes the generated README blocks + registry
+│   ├── validate_skills.py      validates manifests and their layout
+│   └── test_*.py               tests for the tooling itself
 │
-├── cli/
-├── tests/
 ├── docs/
+│   └── SKILL-SPEC.md           the binding skill specification
+│
+├── assets/                     hand-written SVG logos and banners
 │
 ├── .github/
-│   ├── workflows/
+│   ├── workflows/              one per skill, plus repository checks
 │   ├── ISSUE_TEMPLATE/
 │   └── PULL_REQUEST_TEMPLATE.md
 │
-├── CONTRIBUTING.md
-├── SECURITY.md
-├── CODE_OF_CONDUCT.md
-├── LICENSE
-└── README.md
+├── CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · LICENSE · README.md
+│
+└── (planned) adapters/ · cli/
 ```
 
-This is a target architecture and does not imply that every directory currently exists.
+`adapters/` and `cli/` do not exist yet; everything else above does.
 
 ---
 
@@ -701,11 +728,11 @@ These commands describe the intended interface and may not yet be implemented.
 - [x] Choose Apache License 2.0
 - [x] Define initial marketplace concept
 - [x] Design the generational handoff concept
-- [ ] Finalize the SkillQuarry skill specification
-- [ ] Add machine-readable schema
-- [ ] Add contribution guidelines
-- [ ] Add security policy
-- [ ] Add code of conduct
+- [x] Finalize the SkillQuarry skill specification ([docs/SKILL-SPEC.md](docs/SKILL-SPEC.md))
+- [x] Add machine-readable schema ([registry/schema.json](registry/schema.json))
+- [x] Add contribution guidelines ([CONTRIBUTING.md](CONTRIBUTING.md))
+- [x] Add security policy ([SECURITY.md](SECURITY.md))
+- [x] Add code of conduct ([CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md))
 - [x] Add CI validation
 
 ## Phase 2 — First Skills
@@ -716,7 +743,7 @@ These commands describe the intended interface and may not yet be implemented.
 - [ ] Add example skills
 - [x] Add compatibility metadata
 - [x] Add permission metadata
-- [ ] Add skill validation
+- [x] Add skill validation (`tools/validate_skills.py`)
 
 ## Phase 3 — Registry
 
@@ -781,7 +808,10 @@ Contributions may include:
 - bug fixes
 - feature proposals
 
-Until a dedicated `CONTRIBUTING.md` exists, contributions can be proposed through GitHub Issues and Pull Requests.
+The rules live in **[CONTRIBUTING.md](CONTRIBUTING.md)** and, for anything under
+`skills/`, in **[docs/SKILL-SPEC.md](docs/SKILL-SPEC.md)**. Community expectations
+are in the **[Code of Conduct](CODE_OF_CONDUCT.md)**, and security problems follow
+**[SECURITY.md](SECURITY.md)** instead of a public issue.
 
 ---
 

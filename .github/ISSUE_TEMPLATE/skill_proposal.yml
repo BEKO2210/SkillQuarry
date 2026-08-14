@@ -1,0 +1,43 @@
+name: Skill proposal
+description: Propose a new skill for the quarry
+labels: ["skill-proposal"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What recurring problem does this solve when working with coding agents?
+    validations:
+      required: true
+  - type: textarea
+    id: existing
+    attributes:
+      label: What already exists
+      description: Which tools or skills come close, and why do they not suffice? Link the sources you checked.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: How "done" is proven
+      description: Which commands would show the skill works? A skill that cannot be verified does not belong here.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - autonomous
+        - coding
+        - testing
+        - security
+        - ui-ux
+        - devops
+        - mobile
+        - web
+        - documentation
+        - integrations
+        - utilities
+    validations:
+      required: true
