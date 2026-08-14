@@ -228,6 +228,8 @@ input, select {
 
 /* ---------- sections ---------- */
 main { padding-bottom: 20px; }
+/* Anything an anchor jumps to keeps clear of the sticky bar. */
+[id] { scroll-margin-top: 88px; }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 46px 0 2px; }
 .section-head h2 { margin: 0; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
 .section-head a, .section-head span { font-size: 13px; color: var(--dim); }
@@ -297,6 +299,36 @@ main { padding-bottom: 20px; }
   background: var(--raised); color: var(--muted); border: 1px solid var(--edge); transition: all .12s ease;
 }
 .cloud button:hover { color: var(--accent); border-color: var(--accent-deep); background: var(--accent-soft); }
+/* The wall of published skills: one mark each, laid out on a grid that fills
+   itself as skills are added — three across on a phone, six on a desktop. */
+/* Centred rather than packed left: four skills or forty, the wall stays
+   symmetric, which is what makes a logo wall read as deliberate. */
+.wall { display: flex; flex-wrap: wrap; justify-content: center;
+  gap: var(--s2); margin-top: var(--s3); }
+.wall-tile { flex: 0 0 108px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: var(--s2) 8px; border: 1px solid var(--edge); border-radius: var(--radius-sm);
+  background: var(--raised); color: var(--muted); text-align: center;
+  transition: transform .14s ease, border-color .14s ease, color .14s ease; }
+.wall-tile:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 45%, var(--edge));
+  color: var(--ink); }
+.wall-tile img { width: 44px; height: 44px; border-radius: 12px; }
+.wall-tile span { font-size: 12.5px; letter-spacing: .01em; }
+.wall-tile .letter { display: grid; place-items: center; width: 44px; height: 44px;
+  border-radius: 12px; background: var(--raised-2); color: var(--accent); font-size: 20px; font-weight: 700; }
+
+/* Built with: the marks of the tools underneath, quiet by default. */
+.built { margin: 46px 0 10px; }
+.built-row { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s3);
+  align-items: center; }
+.built-tile { display: flex; align-items: center; gap: 10px; color: var(--dim);
+  padding: 10px var(--s2); border: 1px solid var(--edge); border-radius: 999px;
+  background: var(--raised); transition: color .16s ease, border-color .16s ease; }
+.built-tile:hover { color: var(--ink); border-color: color-mix(in srgb, var(--accent) 45%, var(--edge)); }
+.built-tile .mark { display: inline-flex; }
+.built-tile svg { width: 20px; height: 20px; display: block; }
+.built-name { font-size: 14px; letter-spacing: .01em; }
+.built-note { margin: var(--s2) 0 0; color: var(--dim); font-size: 12.5px; max-width: 62ch; }
+
 .cta {
   display: grid; gap: 18px; grid-template-columns: 1.4fr 1fr; align-items: center;
   border: 1px solid var(--edge); border-radius: var(--radius); background:
@@ -413,6 +445,9 @@ time { color: var(--dim); }
   .card .foot { justify-content: center; gap: var(--s3); }
   .install .steps > div { text-align: center; align-items: stretch; }
   .install .steps .code, .install .note { text-align: left; }
+  .wall-tile { flex: 0 0 calc((100% - var(--s2) * 2) / 3); }
+  .built-row { justify-content: center; }
+  .built-note { text-align: center; margin-left: auto; margin-right: auto; }
   .cta { text-align: center; padding: var(--s4) var(--s3); }
   .cta .links { justify-content: center; }
   .cta .links .button { width: 100%; justify-content: center; }
@@ -853,6 +888,62 @@ def humanise(date: str | None) -> str:
     return date[:10] if date else "—"
 
 
+def skill_wall(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any]]) -> str:
+    """Every published skill as a mark, in one wall.
+
+    Built from the registry, so a skill published tomorrow appears here without
+    anyone editing a page. The mark is the skill's own 3D tile where one exists
+    and its flat SVG otherwise — the same rule the cards follow.
+    """
+    tiles = []
+    for skill in skills:
+        name = str(skill["name"])
+        mark = icon_for(manifests.get(name, {}), name=name)
+        label = esc(skill.get("displayName") or name)
+        inner = (f'<img src="{esc(mark)}" alt="{label}" loading="lazy" decoding="async">'
+                 if mark else f'<span class="letter">{label[:1]}</span>')
+        tiles.append(
+            f'<a class="wall-tile" href="skills/{esc(name)}.html" title="{label}">'
+            f'{inner}<span>{label}</span></a>'
+        )
+    return '<div class="wall">' + "".join(tiles) + "</div>"
+
+
+# The tools this marketplace is built on. Named, not endorsed: none of these
+# projects sponsors SkillQuarry, and their trademark policies rightly forbid
+# implying otherwise. Marks are the CC0 outlines from simple-icons, drawn in the
+# page's own colour so nothing is recoloured or distorted.
+BUILT_WITH = (
+    ("GitHub", "github", "Actions run every test; releases carry build provenance.",
+     "https://github.com/BEKO2210/SkillQuarry"),
+    ("Rust", "rust", "Two skills analyse and repair Rust; the compiler is their oracle.",
+     "https://www.rust-lang.org"),
+    ("Python", "python", "The client and every skill's tooling — standard library first.",
+     "https://www.python.org"),
+)
+
+
+def built_with(depth: int = 0) -> str:
+    up = "../" * depth
+    items = []
+    for label, slug, note, url in BUILT_WITH:
+        mark = (ASSETS / "brand" / f"{slug}.svg")
+        inline = mark.read_text("utf-8").strip() if mark.is_file() else ""
+        items.append(
+            f'<a class="built-tile" href="{esc(url)}" rel="noopener noreferrer" '
+            f'title="{esc(note)}"><span class="mark">{inline}</span>'
+            f'<span class="built-name">{esc(label)}</span></a>'
+        )
+    return (
+        f'<section class="built" id="built-with">'
+        f'<div class="section-head"><h2>Built with</h2><span>and grateful for it</span></div>'
+        f'<div class="built-row">{"".join(items)}</div>'
+        f'<p class="built-note">Marks belong to their owners and are shown to name the tools '
+        f'this project runs on — not to suggest any endorsement or sponsorship.</p>'
+        f'</section>'
+    )
+
+
 def recently_updated(skills: list[dict[str, Any]], history: dict[str, Any], limit: int = 5) -> str:
     rows = sorted(
         ((str(s["name"]), str(s.get("displayName")), str(s.get("version")),
@@ -952,6 +1043,9 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
   </div>
   <p class="empty" id="empty" hidden>No skill matches those filters.</p>
 
+  <div class="section-head"><h2>Every skill</h2><span>{len(skills)} published</span></div>
+  {skill_wall(skills, manifests)}
+
   <div class="section-head"><h2>Recently updated</h2><span>by version date</span></div>
   {recently_updated(skills, history)}
 
@@ -960,6 +1054,8 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
 
   <div class="section-head"><h2>Maintainers</h2><a href="maintainers/index.html">All maintainers &rarr;</a></div>
   {maintainer_strip}
+
+  {built_with()}
 
   <section class="install" id="install">
     <div class="section-head"><h2>Install a skill</h2><span>no checkout needed</span></div>

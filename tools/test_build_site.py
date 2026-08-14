@@ -86,13 +86,29 @@ class ContentTests(unittest.TestCase):
                 with self.subTest(page=name, reference=reference):
                     self.assertIn(resolved, available)
 
+    # Sites a link may point at. Linking loads nothing; it is a citation, and
+    # naming the tools this project runs on requires being able to point at them.
+    LINKABLE = ("https://github.com/", "https://www.rust-lang.org", "https://www.python.org")
+
     def test_nothing_is_loaded_from_a_third_party(self):
+        """No byte on this page may come from a host other than its own.
+
+        Loading and linking are different risks and are checked differently: a
+        `src` fetches code or an image at render time, a `href` is a citation
+        the reader chooses to follow.
+        """
         for name, content in self.files.items():
             if not name.endswith((".html", ".css")):
                 continue
-            for url in re.findall(r'(?:href|src)="(https?://[^"]+)"', content):
+            for url in re.findall(r'(?:src|poster)="(https?://[^"]+)"', content):
+                with self.subTest(page=name, loaded=url):
+                    self.fail(f"{name} loads {url} from another host")
+            for url in re.findall(r'<link[^>]+href="(https?://[^"]+)"', content):
+                with self.subTest(page=name, linked_stylesheet=url):
+                    self.fail(f"{name} pulls {url} into the page")
+            for url in re.findall(r'<a[^>]+href="(https?://[^"]+)"', content):
                 with self.subTest(page=name, url=url):
-                    self.assertTrue(url.startswith("https://github.com/"), url)
+                    self.assertTrue(url.startswith(self.LINKABLE), url)
             self.assertNotIn("@import", content)
 
     def test_the_site_is_deterministic(self):
@@ -322,6 +338,27 @@ class DiscoveryTests(unittest.TestCase):
             claimed = "&#10003; verified" in card
             recorded = bool(bs.verified_by(entry))
             self.assertEqual(claimed, recorded, f"{entry['name']}: badge and manifest disagree")
+
+    def test_the_wall_shows_every_published_skill(self):
+        """The point of the wall: publish a skill, it appears. No page edited."""
+        for entry in bs.load_registry():
+            with self.subTest(skill=entry["name"]):
+                self.assertIn(f'class="wall-tile" href="skills/{entry["name"]}.html"', self.index)
+        self.assertEqual(self.index.count('class="wall-tile"'), len(bs.load_registry()))
+
+    def test_the_built_with_marks_are_embedded_not_fetched(self):
+        for _, slug, _, _ in bs.BUILT_WITH:
+            mark = (bs.ASSETS / "brand" / f"{slug}.svg").read_text("utf-8")
+            path = mark.split('<path d="')[1].split('"')[0][:40]
+            with self.subTest(mark=slug):
+                self.assertIn(path, self.index, f"{slug} is not inlined")
+
+    def test_the_built_with_row_claims_no_endorsement(self):
+        """These projects do not sponsor this one, and their trademark policies
+        forbid implying they do. The page has to say so, in the page."""
+        self.assertIn("not to suggest any endorsement or sponsorship", self.index)
+        for word in ("sponsored by", "in partnership with", "supported by"):
+            self.assertNotIn(word, self.index.lower())
 
     def css_rules(self):
         """Every `selector { body }` pair of the stylesheet, at-rules aside."""
