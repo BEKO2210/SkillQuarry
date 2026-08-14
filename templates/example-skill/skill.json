@@ -1,0 +1,37 @@
+{
+  "name": "example-skill",
+  "displayName": "Example Skill",
+  "version": "1.0.0",
+  "description": "The reference skill every SkillQuarry contribution is copied from: a small, fully tested capability that shows the required layout, manifest, installer, tests and coverage gate.",
+  "category": "utilities",
+  "license": "Apache-2.0",
+  "tagline": "Copy this shape, replace the logic.",
+  "agents": ["claude-code"],
+  "compatibility": ["claude-code"],
+  "platforms": ["linux", "macos"],
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "cli": "example-skill",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh"
+  },
+  "requires": {
+    "python": ">=3.10",
+    "binaries": [],
+    "packages": []
+  },
+  "permissions": {
+    "filesystem": "reads the files named on the command line; writes only the report file when --out is given",
+    "shell": "none",
+    "network": "none",
+    "environment": "EXAMPLE_SKILL_PREFIX is read by install/uninstall"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py --min 100",
+    "count": 16,
+    "coverage": "100% of core.py executable lines",
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "experimental",
+  "keywords": ["template", "example", "scaffold", "reference"]
+}

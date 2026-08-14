@@ -681,9 +681,13 @@ SkillQuarry/
 │   ├── schema.json             manifest schema, enforced in CI
 │   └── skills.json             generated index of every skill
 │
+├── templates/
+│   └── example-skill/          the reference skill; scaffold from it
+│
 ├── tools/
 │   ├── render_readme.py        writes the generated README blocks + registry
 │   ├── validate_skills.py      validates manifests and their layout
+│   ├── new_skill.py            scaffolds a new skill from the template
 │   └── test_*.py               tests for the tooling itself
 │
 ├── docs/
@@ -770,7 +774,7 @@ These commands describe the intended interface and may not yet be implemented.
 - [x] Add the first skill: Strata
 - [x] Add the second skill: Cordon
 - [x] Add automated skill tests
-- [ ] Add example skills
+- [x] Add an example skill (`templates/example-skill` + `tools/new_skill.py`)
 - [x] Add compatibility metadata
 - [x] Add permission metadata
 - [x] Add skill validation (`tools/validate_skills.py`)
@@ -849,8 +853,9 @@ are in the **[Code of Conduct](CODE_OF_CONDUCT.md)**, and security problems foll
 
 The README is generated from the manifests. There is no skill list to maintain by hand.
 
-1. Create `skills/<category>/<name>/` with `skill.json`, `SKILL.md`, `README.md`,
-   tests and a test report.
+1. Scaffold it: `python3 tools/new_skill.py --name my-skill --display "My Skill"
+   --category testing`. That copies [`templates/example-skill`](templates/example-skill),
+   which already passes a 100% coverage gate.
 2. Fill in the manifest. `name`, `displayName`, `version`, `description`,
    `category` and `license` are required; `tagline`, `banner`, `highlights`,
    `quickstart`, `agents`, `tests` and `quality` shape how the skill is presented.

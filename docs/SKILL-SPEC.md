@@ -36,6 +36,13 @@ skills/<category>/<name>/
 
 Anything the manifest points at must exist. CI checks this.
 
+The reference implementation of this layout is
+[`templates/example-skill`](../templates/example-skill) — a small working skill
+with its own tests and coverage gate. `python3 tools/new_skill.py` copies it into
+place with the module, CLI and manifest renamed. The template lives outside
+`skills/`, so it never appears in the registry, but its manifest is validated and
+its suite runs in CI.
+
 ## 2. The manifest
 
 `skill.json` must validate against the schema. Required fields:

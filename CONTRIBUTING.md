@@ -18,6 +18,7 @@ python3 tools/validate_skills.py        # manifests against registry/schema.json
 python3 tools/render_readme.py --check  # README and registry in sync
 python3 tools/test_render_readme.py     # tests for the generator
 python3 tools/test_validate_skills.py   # tests for the validator
+python3 tools/test_new_skill.py         # tests for the scaffolder and the template
 
 cd skills/autonomous/strata && python3 tests/run_tests.py --min 100
 cd ../../security/cordon   && python3 tests/run_tests.py --min 100
@@ -29,7 +30,16 @@ just for skills.
 
 ## Adding a skill
 
-1. Create `skills/<category>/<name>/` following the layout in the specification.
+1. Scaffold it from the reference skill — that is the fastest correct start:
+
+   ```bash
+   python3 tools/new_skill.py --name my-skill --display "My Skill" --category testing
+   ```
+
+   The result already validates and passes a 100% coverage gate. Replace
+   `src/<module>/core.py` with your logic and rewrite the tests around it. The
+   template itself lives in [`templates/example-skill`](templates/example-skill)
+   and is worth reading once before you start.
 2. Write `skill.json`. It is the single source of truth: the README table, the
    skill cards, the badge counters and `registry/skills.json` are generated from
    it. Never edit anything between the `SKILLS:*` markers in the root README.
