@@ -78,7 +78,7 @@ class ContentTests(unittest.TestCase):
                 continue
             base = Path(name).parent
             for reference in re.findall(r'(?:href|src)="(?!https?:|#|mailto:)([^"]+)"', content):
-                target = reference.split("#")[0]
+                target = reference.split("#")[0].split("?")[0]
                 if not target:
                     continue  # a link to a fragment on the same page
                 resolved = os.path.normpath(os.path.join(str(base), target)).replace(os.sep, "/")
