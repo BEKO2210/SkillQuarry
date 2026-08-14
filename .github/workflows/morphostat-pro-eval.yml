@@ -8,6 +8,7 @@ on:
       - 'experiments/morphostat/pro_test.py'
       - 'experiments/morphostat/pro_test_v2.py'
       - 'experiments/morphostat/redteam.py'
+      - 'experiments/morphostat/compiler_native_feasibility.py'
       - '.github/workflows/morphostat-pro-eval.yml'
   workflow_dispatch:
 
@@ -19,19 +20,24 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - name: Pin Rust toolchain
+      - name: Pin Rust toolchains
         run: |
           rustup toolchain install 1.97.1 --profile minimal --component clippy
           rustup default 1.97.1
+          rustup toolchain install nightly-2026-08-13 --profile minimal
           rustc --version
           cargo --version
+          rustc +nightly-2026-08-13 --version
           python3 --version
       - name: Syntax check
         working-directory: experiments/morphostat
-        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py
+        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py compiler_native_feasibility.py
       - name: Run 22-case A/B pro test
         working-directory: experiments/morphostat
         run: python3 pro_test_v2.py
       - name: Evaluate Rust syntax edge cases
         working-directory: experiments/morphostat
         run: python3 redteam.py
+      - name: Evaluate compiler-native morphology sources
+        working-directory: experiments/morphostat
+        run: python3 compiler_native_feasibility.py
