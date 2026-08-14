@@ -27,19 +27,23 @@ class HistoryTests(unittest.TestCase):
         registry = {str(item["name"]) for item in bh.load_registry()}
         self.assertEqual(set(self.document["skills"]), registry)
 
-    def test_commits_are_newest_first_and_bounded(self):
+    def test_versions_are_newest_first(self):
         for name, entry in self.document["skills"].items():
-            dates = [commit["date"] for commit in entry["commits"]]
+            dates = [item["date"] for item in entry["versions"]]
             with self.subTest(skill=name):
                 self.assertEqual(dates, sorted(dates, reverse=True))
-                self.assertLessEqual(len(dates), bh.MAX_COMMITS)
 
-    def test_each_commit_carries_a_sha_date_and_subject(self):
+    def test_each_version_carries_a_number_and_a_date(self):
         for entry in self.document["skills"].values():
-            for commit in entry["commits"]:
-                self.assertTrue(commit["sha"])
-                self.assertRegex(commit["date"], r"^\d{4}-\d{2}-\d{2}T")
-                self.assertTrue(commit["subject"])
+            for item in entry["versions"]:
+                self.assertRegex(item["version"], r"^\d+\.\d+\.\d+")
+                self.assertRegex(item["date"], r"^\d{4}-\d{2}-\d{2}T")
+
+    def test_the_history_only_moves_when_a_version_moves(self):
+        """It is committed, so it must not change on every unrelated commit."""
+        first = bh.render()
+        self.assertEqual(first, bh.render())
+        self.assertNotIn('"commits"', first)
 
     def test_the_version_timeline_matches_the_manifests(self):
         for skill in bh.load_registry():
@@ -48,10 +52,10 @@ class HistoryTests(unittest.TestCase):
                 self.assertTrue(entry["versions"])
                 self.assertEqual(entry["versions"][0]["version"], skill["version"])
 
-    def test_last_changed_is_the_newest_commit(self):
+    def test_released_is_the_newest_version_date(self):
         for entry in self.document["skills"].values():
-            if entry["commits"]:
-                self.assertEqual(entry["last_changed"], entry["commits"][0]["date"])
+            if entry["versions"]:
+                self.assertEqual(entry["released"], entry["versions"][0]["date"])
 
     def test_the_committed_file_is_current(self):
         out, err = io.StringIO(), io.StringIO()
