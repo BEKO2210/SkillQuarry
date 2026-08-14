@@ -1,0 +1,35 @@
+name: PerfForge small falsification
+
+on:
+  push:
+    branches:
+      - test/perfforge-small-20260815
+    paths:
+      - 'experiments/perfforge/**'
+      - '.github/workflows/perfforge-small-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  small-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Syntax check
+        run: python -m py_compile experiments/perfforge/fixtures.py experiments/perfforge/run_small_test.py
+      - name: Run frozen PerfForge small test
+        working-directory: experiments/perfforge
+        run: python run_small_test.py | tee result.json
+      - name: Confirm verdict
+        working-directory: experiments/perfforge
+        run: python -c "import json; d=json.load(open('result.json')); assert d['verdict']=='PASS_SMALL'; assert d['summary']['exact']==8; assert not d['summary']['false_accepts']; assert not d['summary']['false_rejects']"
