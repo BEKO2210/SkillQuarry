@@ -1,0 +1,101 @@
+name: LockScope v2 evaluation
+
+on:
+  push:
+    branches:
+      - test/lockscope-v2-20260814
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: never
+  RUST_BACKTRACE: 1
+
+jobs:
+  semantic:
+    name: semantic-v2 / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust + rust-analyzer
+        shell: bash
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup component add clippy --toolchain 1.97.1
+          rustup component add rust-analyzer --toolchain 1.97.1
+          rustup component add rust-src --toolchain 1.97.1
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          rust-analyzer --version
+          python3 --version
+      - name: Pin structured syntax parser
+        shell: bash
+        run: |
+          python3 -m pip install --disable-pip-version-check 'tree-sitter==0.25.2' 'tree-sitter-rust==0.24.0'
+          python3 - <<'PY'
+          import importlib.metadata
+          print('tree-sitter', importlib.metadata.version('tree-sitter'))
+          print('tree-sitter-rust', importlib.metadata.version('tree-sitter-rust'))
+          PY
+      - name: Syntax check harness
+        run: |
+          python3 -m py_compile \
+            experiments/lockscope/semantic_probe.py \
+            experiments/lockscope/syntax_ast.py \
+            experiments/lockscope/semantic_probe_v3.py \
+            experiments/lockscope/repair_defer_lock.py \
+            experiments/lockscope/run_pro_fixture.py \
+            experiments/lockscope/run_pro_fixture_v2.py \
+            experiments/lockscope/run_v2_fixture.py
+          ! grep -q 'base.ACQUIRE' experiments/lockscope/semantic_probe_v3.py
+          ! grep -q 'base.MACRO_CALL' experiments/lockscope/semantic_probe_v3.py
+      - name: Run frozen v2 fixture matrix
+        working-directory: experiments/lockscope
+        run: |
+          set -o pipefail
+          python3 run_v2_fixture.py | tee lockscope-v2-fixture-result.json
+
+  real:
+    name: real-v2 repositories + repair
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust + rust-analyzer
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup component add clippy --toolchain 1.97.1
+          rustup component add rust-analyzer --toolchain 1.97.1
+          rustup component add rust-src --toolchain 1.97.1
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          rust-analyzer --version
+          python3 --version
+          git --version
+          cc --version | head -n 1
+      - name: Pin structured syntax parser
+        run: |
+          python3 -m pip install --disable-pip-version-check 'tree-sitter==0.25.2' 'tree-sitter-rust==0.24.0'
+      - name: Syntax check harness
+        run: |
+          python3 -m py_compile \
+            experiments/lockscope/semantic_probe.py \
+            experiments/lockscope/syntax_ast.py \
+            experiments/lockscope/semantic_probe_v3.py \
+            experiments/lockscope/repair_defer_lock.py \
+            experiments/lockscope/run_pro_real.py \
+            experiments/lockscope/run_v2_real.py
+      - name: Run frozen v2 historical + real repair matrix
+        working-directory: experiments/lockscope
+        run: |
+          set -o pipefail
+          python3 run_v2_real.py | tee lockscope-v2-real-result.json

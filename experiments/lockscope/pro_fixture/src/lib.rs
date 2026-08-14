@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+pub mod v2_cases;
+
 use parking_lot::Mutex as ParkingGate;
 use std::hint::black_box;
 use std::sync::{Arc, Mutex as StdGate};
