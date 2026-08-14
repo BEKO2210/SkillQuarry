@@ -1,0 +1,32 @@
+name: Morphostat pro evaluation
+
+on:
+  push:
+    branches:
+      - test/morphostat-pro-20260814
+    paths:
+      - 'experiments/morphostat/pro_test.py'
+      - '.github/workflows/morphostat-pro-eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pro:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust toolchain
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component clippy
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          python3 --version
+      - name: Syntax check
+        working-directory: experiments/morphostat
+        run: python3 -m py_compile pro_test.py
+      - name: Run 21-case A/B pro test
+        working-directory: experiments/morphostat
+        run: python3 pro_test.py
