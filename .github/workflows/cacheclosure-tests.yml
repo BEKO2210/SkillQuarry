@@ -1,0 +1,38 @@
+name: CacheClosure tests
+
+on:
+  push:
+    paths:
+      - "skills/coding/cacheclosure/**"
+      - ".github/workflows/cacheclosure-tests.yml"
+  pull_request:
+    paths:
+      - "skills/coding/cacheclosure/**"
+      - ".github/workflows/cacheclosure-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Frozen protocol
+        working-directory: skills/coding/cacheclosure
+        run: PYTHONPATH=src python3 tests/run_tests.py --min 95
+      - name: Install and uninstall cycle
+        working-directory: skills/coding/cacheclosure
+        run: |
+          prefix="$RUNNER_TEMP/cacheclosure-prefix"
+          CACHECLOSURE_PREFIX="$prefix" ./install.sh
+          "$prefix/bin/cacheclosure" --help >/dev/null
+          CACHECLOSURE_PREFIX="$prefix" ./uninstall.sh
+          test ! -e "$prefix/bin/cacheclosure"

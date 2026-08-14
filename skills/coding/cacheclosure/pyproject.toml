@@ -1,0 +1,8 @@
+[project]
+name = "cacheclosure"
+version = "1.0.0"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+cacheclosure = "cacheclosure.cli:main"

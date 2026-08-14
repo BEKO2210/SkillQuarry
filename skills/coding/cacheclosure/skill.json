@@ -1,0 +1,91 @@
+{
+  "name": "cacheclosure",
+  "displayName": "CacheClosure",
+  "version": "1.0.0",
+  "description": "Detect GitHub Actions cache identities that are mechanically invariant to repository inputs which can change cached state, using file resolution and shell control-flow witnesses.",
+  "category": "coding",
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
+  "tagline": "Prove when cached state can change without changing its key.",
+  "agents": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "compatibility": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "cli": "cacheclosure",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh",
+    "prefix_env": "CACHECLOSURE_PREFIX"
+  },
+  "requires": {
+    "python": ">=3.10",
+    "binaries": [],
+    "packages": []
+  },
+  "permissions": {
+    "filesystem": "reads GitHub Actions workflow files and repository-local scripts and inputs; writes nothing to the analysed repository",
+    "shell": "none",
+    "network": "none",
+    "environment": "CACHECLOSURE_PREFIX is read only by install.sh and uninstall.sh"
+  },
+  "tests": {
+    "command": "PYTHONPATH=src python3 tests/run_tests.py --min 95",
+    "count": 16,
+    "coverage": "95.7% of cacheclosure/core.py executable lines in the frozen suite; 2/3 pinned historical defects recovered and both recovered witnesses cleared by their historical repairs",
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "tested",
+  "security": {
+    "network_access": "none",
+    "runs_external_commands": false,
+    "writes_outside_repository": false,
+    "requires_secrets": false,
+    "destructive_operations": [],
+    "threat_model": "TEST_REPORT.md",
+    "reviewed_by": "Frozen CacheClosure v0 protocol; GitHub Actions run 31850105648 passed Ubuntu and macOS on 2026-08-15."
+  },
+  "research": "RESEARCH.md",
+  "workflow": ".github/workflows/cacheclosure-tests.yml",
+  "quickstart": "cd skills/coding/cacheclosure && ./install.sh\n\ncacheclosure .\ncacheclosure . --json",
+  "homepage": "https://github.com/BEKO2210/SkillQuarry/tree/main/skills/coding/cacheclosure",
+  "highlights": [
+    "Proves when a literal hashFiles contribution resolves to zero repository files.",
+    "Tracks cached file sentinels into later shell steps and requires a real unkeyed repository input before reporting.",
+    "Uses historical human repairs as external oracles; a language model is not part of the decision.",
+    "Keeps a known runtime-only defect as a frozen miss instead of broadening the heuristic after seeing the result."
+  ],
+  "keywords": [
+    "github-actions",
+    "cache",
+    "ci",
+    "build-cache",
+    "hashfiles",
+    "stale-cache",
+    "static-analysis"
+  ],
+  "verifications": [
+    {
+      "by": "Frozen CacheClosure v0 historical evaluation",
+      "date": "2026-08-15",
+      "method": "Three preregistered historical repositories, repaired-counterpart controls, 95% coverage gate, asymmetry death threshold at 25%, and a four-job Ubuntu/macOS Python matrix.",
+      "result": "passed",
+      "findings": "Recovered 2/3 historical defects; the two recovered witnesses disappear on the exact human repair commits; Yapboard remains the preregistered runtime-metadata miss; verify/find median ratio 7.9%.",
+      "url": "https://github.com/BEKO2210/SkillQuarry/actions/runs/31850105648"
+    }
+  ]
+}
