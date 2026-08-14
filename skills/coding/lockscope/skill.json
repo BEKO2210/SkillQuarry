@@ -14,6 +14,7 @@
   ],
   "tagline": "Hold the lock for as long as you must, and no longer.",
   "banner": "assets/lockscope-banner.svg",
+  "image": "assets/img/lockscope-card.webp",
   "agents": [
     "claude-code",
     "agent-neutral-manual-mode"

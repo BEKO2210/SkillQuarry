@@ -1,6 +1,6 @@
 {
   "category": "coding",
-  "checksum": "sha256:4321f43e322b3c78c955d6d4ee70f8cd5db4ae52ed1dd23f93f21c31447ad6c4",
+  "checksum": "sha256:31b5a498219fa75bb6df9dbf61be5df2287db2f39e8101fca8b5eb69bf43a37a",
   "compatibility": [
     "claude-code",
     "agent-neutral-manual-mode"
