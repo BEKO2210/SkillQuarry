@@ -1,0 +1,34 @@
+name: Morphostat concept evaluation
+
+on:
+  push:
+    branches:
+      - test/morphostat-concept-20260814
+    paths:
+      - 'experiments/morphostat/**'
+      - '.github/workflows/morphostat-eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  concept:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust toolchain
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component rustfmt
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          python3 --version
+      - name: Static checks
+        working-directory: experiments/morphostat
+        run: |
+          python3 -m py_compile morphostat.py run_experiment.py
+          cargo fmt --manifest-path fixture/Cargo.toml --check
+      - name: Run falsifiable scenario matrix
+        working-directory: experiments/morphostat
+        run: python3 run_experiment.py
