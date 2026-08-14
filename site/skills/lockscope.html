@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LockScope — SkillQuarry</title>
+<meta name="description" content="Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.">
+<meta name="color-scheme" content="dark light">
+<meta property="og:title" content="LockScope — SkillQuarry">
+<meta property="og:description" content="Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://beko2210.github.io/SkillQuarry/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-quarry.webp">
+<link rel="stylesheet" href="../style.css?v=afe50da7f2">
+<script>(function () {
+  const stored = localStorage.getItem('skillquarry-theme');
+  const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const root = document.documentElement;
+  root.dataset.theme = stored || system;
+  window.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('theme');
+    if (!button) return;
+    const label = () => { button.textContent = root.dataset.theme === 'light' ? 'Dark' : 'Light'; };
+    label();
+    button.addEventListener('click', function () {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('skillquarry-theme', root.dataset.theme);
+      label();
+    });
+  });
+})();</script>
+</head>
+<body>
+<div class="bar"><div class="wrap">
+  <a class="mark" href="../index.html">
+    <img src="../assets/img/icon-quarry.webp" alt="">
+    <span>Skill<i>Quarry</i></span>
+  </a>
+  <nav>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../maintainers/index.html">Maintainers</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/docs/SKILL-SPEC.md">Spec</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry">GitHub</a>
+    <button class="ghost" id="theme" type="button">Light</button>
+  </nav>
+</div></div>
+<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / LockScope</p>
+  <div class="top">
+    <img class="icon" src="../assets/lockscope-logo.svg" alt="">
+    <div>
+      <h1>LockScope</h1>
+      <p class="subtitle">Hold the lock for as long as you must, and no longer.</p>
+    </div>
+  </div>
+  <p class="who">Maintained by <a href="../maintainers/BEKO2210.html">Belkis Aslani</a> · <span class="installs" data-installs="lockscope"></span></p>
+</div></header>
+<main class="wrap">
+  <div class="layout">
+    <div class="content">
+      <img class="banner" src="../assets/lockscope-banner.svg" alt="LockScope" style="width:100%;border-radius:14px;border:1px solid var(--edge);margin:0 0 26px">
+      <h2>Overview</h2>
+      <p>Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.</p>
+    <h2>What it does</h2>
+    <ul>
+      <li>Reads lock acquisitions from a Rust syntax tree, so a multiline or macro-generated acquisition is not missed.</li>
+      <li>Asks rust-analyzer what a value really is: a method named lock() on a plain struct is not a lock.</li>
+      <li>Builds a lock-order graph from acquisitions that genuinely nest, and reports its cycles.</li>
+      <li>Applies exactly one repair — take the lock after the independent await — and lets the compiler and the tests overrule it.</li>
+    </ul>
+    <h2>Install</h2>
+    <p>From this quarry, without a checkout:</p>
+    <div class="code"><div class="head">shell</div><pre><code>mkdir -p ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/BEKO2210/SkillQuarry/main/cli/skillquarry.py -o ~/.local/bin/skillquarry
+chmod +x ~/.local/bin/skillquarry
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;   # if it is not already
+export SKILLQUARRY_REGISTRY=https://beko2210.github.io/SkillQuarry/api/v1/skills.json
+
+skillquarry info lockscope
+skillquarry install lockscope --prefix ~/.local</code></pre></div>
+    <p>Installation verifies the checksum in the sidebar before running the skill's own
+       installer. <code>skillquarry uninstall lockscope</code> runs that skill's own
+       uninstaller and needs no checkout either.</p>
+    <details class="alt"><summary>From a checkout instead</summary>
+    <div class="code"><div class="head">shell</div><pre><code>git clone https://github.com/BEKO2210/SkillQuarry.git
+cd SkillQuarry/cli &amp;&amp; ./install.sh
+skillquarry install lockscope</code></pre></div></details>
+    <h2>Quickstart</h2>
+    <div class="code"><div class="head">shell</div><pre><code>cd skills/coding/lockscope &amp;&amp; ./install.sh
+
+lockscope scan .                 # what is held across an await
+lockscope repair . --json out.json
+lockscope doctor                 # is this machine able to run it</code></pre></div>
+    <h2>Relationships</h2>
+    <table>
+      <tr><th>works with</th><td><a href="cordon.html">cordon</a></td></tr>
+    </table>
+    <h2>Independent verification</h2>
+    <table>
+      <tr><th><time>2026-08-14</time></th><td><strong>passed</strong> — Frozen research evaluation (LockScope v2)<br>Preregistered protocol: 20 inherited semantic cases plus 5 structured-syntax cases on Ubuntu and macOS, 4 compiler Send probes, lock-order cycles, deterministic replay, a Tokio contention repair proof, and three pinned real repositories.<br>PASS_V2. One infrastructure-only amendment: macOS system Python refused a global pip install under PEP 668, so the pinned packages moved into a virtual environment. No expectation, threshold or repository commit changed. · <a href='https://github.com/BEKO2210/SkillQuarry/blob/main/skills/coding/lockscope/TEST_REPORT.md'>evidence</a></td></tr>
+    </table>
+    <h2>Read next</h2>
+    <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/coding/lockscope">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/coding/lockscope/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/coding/lockscope/SKILL.md">SKILL.md</a></p>
+    </div>
+    <aside>
+      <div class="box">
+        <h2>Facts</h2>
+        <dl>
+      <div><dt>Version</dt><dd>1.0.0</dd></div>
+      <div><dt>Category</dt><dd>Coding</dd></div>
+      <div><dt>Quality</dt><dd>tested</dd></div>
+      <div><dt>License</dt><dd>Apache-2.0</dd></div>
+      <div><dt>Agents</dt><dd>Claude Code, Any agent (manual mode)</dd></div>
+      <div><dt>Platforms</dt><dd>linux, macos</dd></div>
+      <div><dt>Tests</dt><dd>142 — 142 tests: 82 structural, 45 semantic against rust-analyzer, 5 compiler Send probes and 10 runtime repair proofs; 17 more against three pinned real repositories</dd></div>
+      <div><dt>Needs installed</dt><dd>cargo, rustc, rust-analyzer</dd></div>
+      <div><dt>Network access</dt><dd>none</dd></div>
+      <div><dt>Credentials</dt><dd>none</dd></div>
+      <div><dt>Writes outside the repository</dt><dd>no</dd></div>
+      <div><dt>Irreversible operations</dt><dd>rewrites one Rust source file in repair mode, moving a single lock acquisition</dd></div>
+      <div><dt>Independently reviewed</dt><dd>Frozen production-strength evaluation on Ubuntu and macOS (PASS_V2, workflow run 31823072283), reproduced locally on rustc 1.97.1 before release.</dd></div>
+          <div><dt>Checksum</dt><dd class="checksum">sha256:f18c71863ce41a566090ec3a150bad4a9cab5a0f9895eb640cd03fc7ec487ed0</dd></div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</main>
+<footer><div class="wrap cols">
+  <p class="note">Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+  Download counts come from GitHub's public release API — no cookies, no identifiers,
+  nothing recorded about you.</p>
+  <div class="links">
+    <a href="https://github.com/BEKO2210/SkillQuarry">Source</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/CONTRIBUTING.md">Contributing</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/SECURITY.md">Security</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/discussions">Discussions</a>
+    <a href="../registry.json">registry.json</a>
+  </div>
+</div></footer>
+<script>// Entrance animation and stat count-up. Both are progressive: without JavaScript,
+// or with reduced motion requested, everything is simply visible immediately.
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.card, .section-head, .strip, .cloud, .cta, .panel, .content h2, aside .box');
+  if (reduced || !('IntersectionObserver' in window)) {
+    targets.forEach((element) => element.classList.add('in'));
+    return;
+  }
+  document.querySelectorAll('.grid').forEach((grid) => {
+    [...grid.children].forEach((card, index) => card.style.setProperty('--i', index));
+  });
+  targets.forEach((element) => element.classList.add('reveal'));
+  // Failsafe: whatever happens to the observer, nothing stays invisible.
+  const showEverything = () => targets.forEach((element) => element.classList.add('in'));
+  setTimeout(showEverything, 1500);
+  window.addEventListener('beforeprint', showEverything);
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  targets.forEach((element) => observer.observe(element));
+
+  for (const number of document.querySelectorAll('.stats b')) {
+    const final = parseInt(number.textContent, 10);
+    if (!Number.isFinite(final) || final === 0) continue;
+    const started = performance.now();
+    const duration = 900;
+    const step = (now) => {
+      const progress = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      number.textContent = Math.round(final * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    number.textContent = '0';
+    requestAnimationFrame(step);
+  }
+})();</script>
+<script>// Same public source as the overview: GitHub's own per-asset download counter.
+fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
+  .then((response) => (response.ok ? response.json() : []))
+  .then((releases) => {
+    const counts = new Map();
+    for (const release of releases) {
+      for (const asset of release.assets || []) {
+        const match = /^([a-z0-9-]+)-\d+\.\d+\.\d+\.tar\.gz$/.exec(asset.name);
+        if (match) counts.set(match[1], (counts.get(match[1]) || 0) + (asset.download_count || 0));
+      }
+    }
+    for (const element of document.querySelectorAll('[data-installs]')) {
+      const value = counts.get(element.dataset.installs);
+      if (value !== undefined) {
+        element.innerHTML = '<b>' + value.toLocaleString() + '</b> download' + (value === 1 ? '' : 's');
+      }
+    }
+  })
+  .catch(() => {});</script>
+</body>
+</html>

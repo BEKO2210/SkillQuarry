@@ -1,0 +1,5 @@
+# The parser versions the frozen evaluation ran with. Pinned, because a grammar
+# update can change which shapes are recognised, and this skill's evidence is
+# tied to a specific grammar.
+tree-sitter==0.25.2
+tree-sitter-rust==0.24.0

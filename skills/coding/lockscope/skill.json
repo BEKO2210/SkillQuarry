@@ -1,0 +1,106 @@
+{
+  "name": "lockscope",
+  "displayName": "LockScope",
+  "version": "1.0.0",
+  "description": "Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.",
+  "category": "coding",
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
+  "tagline": "Hold the lock for as long as you must, and no longer.",
+  "banner": "assets/lockscope-banner.svg",
+  "agents": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "research": "RESEARCH.md",
+  "highlights": [
+    "Reads lock acquisitions from a Rust syntax tree, so a multiline or macro-generated acquisition is not missed.",
+    "Asks rust-analyzer what a value really is: a method named lock() on a plain struct is not a lock.",
+    "Builds a lock-order graph from acquisitions that genuinely nest, and reports its cycles.",
+    "Applies exactly one repair — take the lock after the independent await — and lets the compiler and the tests overrule it."
+  ],
+  "quickstart": "cd skills/coding/lockscope && ./install.sh\n\nlockscope scan .                 # what is held across an await\nlockscope repair . --json out.json\nlockscope doctor                 # is this machine able to run it",
+  "homepage": "https://github.com/BEKO2210/SkillQuarry/tree/main/skills/coding/lockscope",
+  "icon": "../../../assets/lockscope-logo.svg",
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "cli": "lockscope",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh",
+    "prefix_env": "LOCKSCOPE_PREFIX"
+  },
+  "compatibility": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "requires": {
+    "python": ">=3.10",
+    "binaries": [
+      "cargo",
+      "rustc",
+      "rust-analyzer"
+    ],
+    "packages": [
+      "tree-sitter==0.25.2",
+      "tree-sitter-rust==0.24.0"
+    ]
+  },
+  "permissions": {
+    "filesystem": "reads the analysed crate; writes only the report file it is given and, in repair mode, the one source file whose acquisition moves",
+    "shell": "spawns rust-analyzer, cargo and rustc in the analysed repository",
+    "network": "none at runtime; install.sh downloads the two pinned parser packages",
+    "environment": "LOCKSCOPE_PREFIX is read by the install and uninstall wrappers"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py --min 140",
+    "count": 142,
+    "coverage": "142 tests: 82 structural, 45 semantic against rust-analyzer, 5 compiler Send probes and 10 runtime repair proofs; 17 more against three pinned real repositories",
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "tested",
+  "security": {
+    "network_access": "none",
+    "runs_external_commands": true,
+    "writes_outside_repository": false,
+    "requires_secrets": false,
+    "destructive_operations": [
+      "rewrites one Rust source file in repair mode, moving a single lock acquisition"
+    ],
+    "threat_model": "README.md",
+    "reviewed_by": "Frozen production-strength evaluation on Ubuntu and macOS (PASS_V2, workflow run 31823072283), reproduced locally on rustc 1.97.1 before release."
+  },
+  "composes_with": [
+    "cordon"
+  ],
+  "verifications": [
+    {
+      "by": "Frozen research evaluation (LockScope v2)",
+      "date": "2026-08-14",
+      "method": "Preregistered protocol: 20 inherited semantic cases plus 5 structured-syntax cases on Ubuntu and macOS, 4 compiler Send probes, lock-order cycles, deterministic replay, a Tokio contention repair proof, and three pinned real repositories.",
+      "result": "passed",
+      "findings": "PASS_V2. One infrastructure-only amendment: macOS system Python refused a global pip install under PEP 668, so the pinned packages moved into a virtual environment. No expectation, threshold or repository commit changed.",
+      "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/coding/lockscope/TEST_REPORT.md"
+    }
+  ],
+  "keywords": [
+    "rust",
+    "concurrency",
+    "async",
+    "tokio",
+    "mutex",
+    "deadlock",
+    "lock-order",
+    "static-analysis",
+    "rust-analyzer"
+  ]
+}

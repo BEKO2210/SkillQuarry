@@ -1,0 +1,11 @@
+[package]
+name = "lockscope-cases"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Pinned: the fixture is evidence, and evidence that drifts with a dependency
+# update is not evidence.
+[dependencies]
+tokio = { version = "=1.47.1", features = ["rt-multi-thread", "macros", "sync", "time"] }
+parking_lot = "=0.12.4"

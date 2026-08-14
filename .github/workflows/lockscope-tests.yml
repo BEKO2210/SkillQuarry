@@ -1,0 +1,131 @@
+name: LockScope tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/coding/lockscope/**"
+      - ".github/workflows/lockscope-tests.yml"
+  pull_request:
+    paths:
+      - "skills/coding/lockscope/**"
+      - ".github/workflows/lockscope-tests.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: lockscope-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: skills/coding/lockscope
+
+jobs:
+  # The suites that need no Rust at all. They run first and on every platform
+  # the skill claims, because a failure here is a failure everywhere.
+  structural:
+    name: structural (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the pinned parsers
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --quiet -r requirements.txt
+      - name: Suites that need no Rust toolchain
+        run: PYTHONPATH="$PWD/src" .venv/bin/python tests/run_tests.py --structural --min 60
+
+  # Semantic resolution, the compiler probes and the runtime repair proof, on
+  # both platforms the skill claims support for.
+  semantic:
+    name: semantic (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Rust with rust-analyzer
+        run: |
+          rustup toolchain install stable --profile minimal --component rust-analyzer
+          rustup default stable
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "$(rustc --print sysroot)/bin" >> "$GITHUB_PATH"
+      - name: Record the toolchain this evidence belongs to
+        run: |
+          rustc --version
+          cargo --version
+          rust-analyzer --version
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            skills/coding/lockscope/fixtures/cases
+            skills/coding/lockscope/fixtures/contention
+      - name: Install the pinned parsers
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --quiet -r requirements.txt
+      - name: Full suite, with skips treated as failures
+        env:
+          # This machine has the toolchain, so a skipped suite means something
+          # broke rather than something was unavailable.
+          LOCKSCOPE_REQUIRE_TOOLCHAIN: "1"
+        run: PYTHONPATH="$PWD/src" .venv/bin/python tests/run_tests.py --min 140
+
+  # Slow, network-bound, and pinned to specific commits of three repositories.
+  real-repositories:
+    name: real repositories (ubuntu)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Rust with rust-analyzer
+        run: |
+          rustup toolchain install stable --profile minimal --component rust-analyzer clippy
+          rustup default stable
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "$(rustc --print sysroot)/bin" >> "$GITHUB_PATH"
+      - name: Install the pinned parsers
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --quiet -r requirements.txt
+      - name: Historical oracles and the injected fault
+        env:
+          LOCKSCOPE_REAL_REPOS: "1"
+          LOCKSCOPE_REQUIRE_TOOLCHAIN: "1"
+        run: PYTHONPATH="$PWD/src" .venv/bin/python -m unittest -v tests.test_real_repos
+
+  # The skill has to satisfy the marketplace it is published in.
+  registry:
+    name: registry and metadata
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Manifest and layout
+        run: python3 tools/validate_skills.py
+      - name: Generated files are current
+        run: |
+          python3 tools/render_readme.py --check
+          python3 tools/build_site.py --check
+      - name: Nothing generated was left dirty
+        run: git diff --exit-code
