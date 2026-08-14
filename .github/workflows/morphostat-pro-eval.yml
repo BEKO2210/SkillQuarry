@@ -7,6 +7,7 @@ on:
     paths:
       - 'experiments/morphostat/pro_test.py'
       - 'experiments/morphostat/pro_test_v2.py'
+      - 'experiments/morphostat/redteam.py'
       - '.github/workflows/morphostat-pro-eval.yml'
   workflow_dispatch:
 
@@ -27,7 +28,10 @@ jobs:
           python3 --version
       - name: Syntax check
         working-directory: experiments/morphostat
-        run: python3 -m py_compile pro_test.py pro_test_v2.py
+        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py
       - name: Run 22-case A/B pro test
         working-directory: experiments/morphostat
         run: python3 pro_test_v2.py
+      - name: Evaluate Rust syntax edge cases
+        working-directory: experiments/morphostat
+        run: python3 redteam.py
