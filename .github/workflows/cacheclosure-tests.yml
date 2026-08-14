@@ -1,3 +1,4 @@
+# Final PR gate: this workflow intentionally replays the frozen protocol on both supported operating systems.
 name: CacheClosure tests
 
 on:
