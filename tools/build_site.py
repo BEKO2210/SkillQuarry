@@ -348,11 +348,11 @@ time { color: var(--dim); }
 /* ---------- mobile: centred and symmetric ---------- */
 @media (max-width: 720px) {
   .wrap { padding-left: var(--s3); padding-right: var(--s3); }
-  .card > *:not(.art) { margin-left: var(--s3); margin-right: var(--s3); }
-  .card > .top { margin-top: var(--s3); }
-  .card > .foot { padding-bottom: var(--s3); }
+  .content, .detail-hero .wrap { padding-left: var(--s3); padding-right: var(--s3); }
+  /* Cards keep the wide padding on a phone: the text was reading as if it were
+     glued to its own border. */
   .panel { padding: var(--s3); }
-  .hero .wrap { padding: var(--s6) var(--s3) var(--s5); text-align: center; }
+  .hero .wrap { padding: var(--s6) var(--s4) var(--s5); text-align: center; }
   .hero .shot img, .hero .shot video { object-position: center; }
   /* The seam runs straight through the middle on a phone, so the text needs a
      denser scrim than the wide layout, where it sits beside the bright part. */
