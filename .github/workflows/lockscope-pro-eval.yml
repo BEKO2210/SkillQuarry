@@ -40,13 +40,15 @@ jobs:
         run: |
           python3 -m py_compile \
             experiments/lockscope/semantic_probe.py \
+            experiments/lockscope/semantic_probe_v2.py \
             experiments/lockscope/repair_defer_lock.py \
-            experiments/lockscope/run_pro_fixture.py
-      - name: Run frozen semantic + compiler + repair matrix
+            experiments/lockscope/run_pro_fixture.py \
+            experiments/lockscope/run_pro_fixture_v2.py
+      - name: Run frozen semantic + compiler + repair matrix (A1/A2)
         working-directory: experiments/lockscope
         run: |
           set -o pipefail
-          python3 run_pro_fixture.py | tee lockscope-pro-fixture-result.json
+          python3 run_pro_fixture_v2.py | tee lockscope-pro-fixture-result-v2.json
 
   real:
     name: real repositories + repair
@@ -71,10 +73,12 @@ jobs:
         run: |
           python3 -m py_compile \
             experiments/lockscope/semantic_probe.py \
+            experiments/lockscope/semantic_probe_v2.py \
             experiments/lockscope/repair_defer_lock.py \
-            experiments/lockscope/run_pro_real.py
-      - name: Run frozen historical + real repair matrix
+            experiments/lockscope/run_pro_real.py \
+            experiments/lockscope/run_pro_real_v2.py
+      - name: Run frozen historical + real repair matrix (A1)
         working-directory: experiments/lockscope
         run: |
           set -o pipefail
-          python3 run_pro_real.py | tee lockscope-pro-real-result.json
+          python3 run_pro_real_v2.py | tee lockscope-pro-real-result-v2.json
