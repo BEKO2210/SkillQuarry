@@ -60,7 +60,7 @@ mod ffi {
 ///
 /// Double ownership/use-after-move is rejected by Rust's move semantics:
 ///
-/// ```compile_fail
+/// ```compile_fail,E0382
 /// use rangate_fixture::Device;
 /// let device = Device::open(1).unwrap();
 /// let moved = device;
@@ -70,7 +70,7 @@ mod ffi {
 ///
 /// Mutable aliasing is rejected before an unsafe operation is reached:
 ///
-/// ```compile_fail
+/// ```compile_fail,E0499
 /// use rangate_fixture::Device;
 /// let mut device = Device::open(1).unwrap();
 /// let first = &mut device;
@@ -82,7 +82,7 @@ mod ffi {
 /// Cross-thread transport is rejected while the external concurrency contract
 /// is deliberately unknown:
 ///
-/// ```compile_fail
+/// ```compile_fail,E0277
 /// use rangate_fixture::Device;
 /// let device = Device::open(1).unwrap();
 /// std::thread::spawn(move || drop(device));

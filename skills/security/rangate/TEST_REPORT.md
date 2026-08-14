@@ -86,7 +86,7 @@ OK
 
 This run includes the install → reinstall → uninstall test using a custom skills path containing spaces. The test also creates an unrelated `user-note.txt` and proves the uninstaller leaves it intact.
 
-## Stable harness — 13 named checks
+## Stable harness — 14 named checks
 
 `tests/run_tests.py` verifies:
 
@@ -223,7 +223,58 @@ The exploratory branch left `experiments/rangate/` and `rangate-eval.yml` in the
 
 Fix: the feature branch removes the prototype workflow/manifest and moves the evolved fixture under `skills/security/rangate/tests/fixture/`. The permanent workflow is `rangate-tests.yml`.
 
+### D5 — the compile-fail proofs did not prove *why* a program was rejected
+
+**Found by:** independent review on a machine with the pinned toolchain (rustc 1.97.1, Linux).
+
+**Cause:** the three `compile_fail` doctests asserted only that compilation fails.
+Replacing `Device::open` with `Devicee::open` in the ownership snippet left
+`cargo test --doc` at `3 passed; 0 failed` — a typo satisfied the proof. Pinning
+the code as ```compile_fail,E0382``` does not help either: on stable, rustdoc
+ignores it, and even the non-existent code `E0999` still passes.
+
+**Fix:** the snippets keep their pinned codes as documentation, and
+`test_14_compile_fail_reasons_are_verified_not_assumed` now compiles each one
+directly with `rustc --error-format=json` and asserts the pinned code appears
+among the emitted diagnostics. The test also requires every `compile_fail` block
+to carry a code, and includes a control snippet that fails for an unrelated
+reason and must *not* satisfy the pinned code — without that control the check
+could pass vacuously.
+
+**Regression command:**
+
+```bash
+python3 tests/run_tests.py   # test_14
+```
+
+Verified failure mode: rewriting the aliasing snippet into a move error reports
+`snippet at line 73 failed with ['E0382', 'E0596', 'unused_mut'], not E0499`.
+
+### D6 — a missing toolchain produced eight confusing failures
+
+**Found by:** the same review, on a machine without Rust installed.
+
+**Cause:** `run_tests.py` called `cargo` unconditionally. On a machine without it,
+the documented test command ended in eight tracebacks rather than one clear
+statement, and there was no way to distinguish "not installed here" from "broken".
+
+**Fix:** `require()` skips a check where its tool is genuinely absent and names
+what to install. CI sets `RANGATE_REQUIRE_TOOLCHAIN=1`, which turns the same
+condition into a failure, so a skip can never hide a broken skill in a green job.
+
+**Regression command:**
+
+```bash
+RANGATE_REQUIRE_TOOLCHAIN=1 python3 tests/run_tests.py   # fails if cargo/cc are missing
+```
+
 ## Known limits
+
+The review machine (Linux, rustc 1.97.1) had no C linker installed, so
+`cargo test --all-targets` and the release run were skipped there and are covered
+by CI only. Everything else in the suite — formatting, `cargo check`, the strict
+unsafe lint, clippy, the doctests, the reason-checked compile-fail proofs and the
+installer round trip — passes without a linker.
 
 - The fixture simulates an FFI-like raw API in Rust. It proves the protocol can contain raw ownership and pointer invariants; it cannot prove that an arbitrary C/C++ library honors its external contract.
 - Compile-fail doctests prove the three included invalid program shapes are rejected by the tested compiler. They are not a proof over every possible misuse.

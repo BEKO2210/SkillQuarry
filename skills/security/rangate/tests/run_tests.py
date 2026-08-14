@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -12,6 +13,42 @@ from pathlib import Path
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = SKILL_ROOT.parents[2]
 FIXTURE = SKILL_ROOT / "tests" / "fixture"
+
+# CI sets this so a missing toolchain fails the run instead of quietly skipping.
+REQUIRE_TOOLCHAIN = os.environ.get("RANGATE_REQUIRE_TOOLCHAIN") == "1"
+COMPILE_FAIL_PATTERN = re.compile(r"^/// ```compile_fail(?:,(?P<code>E\d{4}))?\s*$")
+
+
+def require(case: unittest.TestCase, *tools: str) -> None:
+    """Skip where a tool is genuinely absent; fail where CI promised it would exist."""
+    missing = [tool for tool in tools if shutil.which(tool) is None]
+    if not missing:
+        return
+    message = f"missing on this machine: {', '.join(missing)}"
+    if REQUIRE_TOOLCHAIN:
+        case.fail(f"RANGATE_REQUIRE_TOOLCHAIN=1 but {message}")
+    case.skipTest(message + " — install it to run this check locally")
+
+
+def compile_fail_snippets() -> list[tuple[int, str | None, str]]:
+    """Every compile_fail doctest in the fixture: line number, pinned code, source."""
+    found: list[tuple[int, str | None, str]] = []
+    lines = (FIXTURE / "src" / "lib.rs").read_text("utf-8").splitlines()
+    index = 0
+    while index < len(lines):
+        match = COMPILE_FAIL_PATTERN.match(lines[index])
+        if not match:
+            index += 1
+            continue
+        start = index + 1
+        body: list[str] = []
+        index = start
+        while index < len(lines) and lines[index].strip() != "/// ```":
+            body.append(lines[index].removeprefix("/// ").removeprefix("///"))
+            index += 1
+        found.append((start, match.group("code"), "\n".join(body)))
+        index += 1
+    return found
 
 
 def run_command(
@@ -51,7 +88,7 @@ class RanGateTests(unittest.TestCase):
         self.assertEqual(manifest["license"], "Apache-2.0")
         self.assertEqual(manifest["requires"]["packages"], [])
         self.assertEqual(manifest["workflow"], "rangate-tests.yml")
-        self.assertEqual(manifest["tests"]["count"], 13)
+        self.assertEqual(manifest["tests"]["count"], 14)
 
     def test_02_skill_contract_and_size(self) -> None:
         skill = (SKILL_ROOT / "SKILL.md").read_text("utf-8")
@@ -132,14 +169,17 @@ class RanGateTests(unittest.TestCase):
         self.assertIn('unsafe_op_in_unsafe_fn = "deny"', cargo)
 
     def test_06_rustfmt(self) -> None:
+        require(self, *("cargo",))
         result = run_command(["cargo", "fmt", "--check"], cwd=FIXTURE)
         assert_success(self, result)
 
     def test_07_cargo_check(self) -> None:
+        require(self, *("cargo",))
         result = run_command(["cargo", "check", "--all-targets"], cwd=FIXTURE)
         assert_success(self, result)
 
     def test_08_strict_unsafe_operation_lint(self) -> None:
+        require(self, *("cargo",))
         result = run_command(
             ["cargo", "check", "--all-targets"],
             cwd=FIXTURE,
@@ -148,6 +188,7 @@ class RanGateTests(unittest.TestCase):
         assert_success(self, result)
 
     def test_09_clippy_denies_warnings(self) -> None:
+        require(self, *("cargo",))
         result = run_command(
             ["cargo", "clippy", "--all-targets", "--", "-D", "warnings"],
             cwd=FIXTURE,
@@ -155,6 +196,7 @@ class RanGateTests(unittest.TestCase):
         assert_success(self, result)
 
     def test_10_runtime_scenarios(self) -> None:
+        require(self, *("cargo", "cc"))
         result = run_command(
             ["cargo", "test", "--all-targets", "--", "--nocapture"],
             cwd=FIXTURE,
@@ -163,11 +205,13 @@ class RanGateTests(unittest.TestCase):
         self.assertIn("5 passed; 0 failed", result.stdout)
 
     def test_11_compile_fail_proofs(self) -> None:
+        require(self, *("cargo",))
         result = run_command(["cargo", "test", "--doc"], cwd=FIXTURE)
         assert_success(self, result)
         self.assertIn("3 passed; 0 failed", result.stdout)
 
     def test_12_release_mode_scenarios(self) -> None:
+        require(self, *("cargo", "cc"))
         result = run_command(
             ["cargo", "test", "--release", "--all-targets"],
             cwd=FIXTURE,
@@ -176,8 +220,62 @@ class RanGateTests(unittest.TestCase):
         self.assertIn("5 passed; 0 failed", result.stdout)
 
     def test_13_rustdoc_builds_without_dependencies(self) -> None:
+        require(self, *("cargo",))
         result = run_command(["cargo", "doc", "--no-deps"], cwd=FIXTURE)
         assert_success(self, result)
+
+
+    def test_14_compile_fail_reasons_are_verified_not_assumed(self) -> None:
+        """rustdoc accepts any compilation error, so prove the *reason* with rustc.
+
+        On stable, `compile_fail,E0382` is not enforced: a snippet with a typo, or
+        one annotated with an error code that does not exist, still counts as a
+        pass. Each snippet is therefore compiled directly and its emitted error
+        codes are checked.
+        """
+        snippets = compile_fail_snippets()
+        self.assertEqual(len(snippets), 3, msg="expected three compile-fail proofs")
+        for line, code, _body in snippets:
+            self.assertIsNotNone(code, msg=f"compile_fail block at line {line} pins no error code")
+
+        require(self, "cargo", "rustc")
+        assert_success(self, run_command(["cargo", "build"], cwd=FIXTURE))
+        rlib = FIXTURE / "target" / "debug" / "librangate_fixture.rlib"
+        self.assertTrue(rlib.is_file(), msg="fixture rlib was not produced")
+
+        def emitted_codes(source: str) -> tuple[int, set[str]]:
+            with tempfile.TemporaryDirectory() as tmp:
+                path = Path(tmp) / "snippet.rs"
+                path.write_text(f"fn main() {{\n{source}\n}}\n", encoding="utf-8")
+                result = run_command([
+                    "rustc", "--edition", "2024", "--crate-type", "bin",
+                    "--error-format=json",
+                    "--extern", f"rangate_fixture={rlib}",
+                    "-L", f"dependency={FIXTURE / 'target' / 'debug' / 'deps'}",
+                    "-o", os.devnull, str(path),
+                ], cwd=FIXTURE)
+            codes = set()
+            for line in result.stdout.splitlines():
+                try:
+                    payload = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                code = (payload.get("code") or {}).get("code")
+                if code:
+                    codes.add(code)
+            return result.returncode, codes
+
+        for line, code, body in snippets:
+            status, codes = emitted_codes(body)
+            self.assertNotEqual(status, 0, msg=f"snippet at line {line} compiled successfully")
+            self.assertIn(code, codes, msg=f"snippet at line {line} failed with {sorted(codes)}, not {code}")
+
+        # Control: a snippet that fails for an unrelated reason must not satisfy the
+        # pinned code. Without this, the check above could pass vacuously.
+        broken = snippets[0][2].replace("Device::", "DeviceTypo::", 1)
+        status, codes = emitted_codes(broken)
+        self.assertNotEqual(status, 0)
+        self.assertNotIn(snippets[0][1], codes)
 
 
 if __name__ == "__main__":

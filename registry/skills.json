@@ -61,8 +61,8 @@
       ],
       "quality": "tested",
       "tests": {
-        "count": 13,
-        "coverage": "N/A — protocol skill; Rust fixture is compiled and exercised in debug, compile-fail, release and Miri jobs"
+        "count": 14,
+        "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"
       },
       "version": "1.0.0"
     }

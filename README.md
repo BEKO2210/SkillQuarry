@@ -8,7 +8,7 @@
 <!-- SKILLS:STATS:START -->
 ![Skills](https://img.shields.io/badge/skills-3-f0932b?style=for-the-badge)
 ![Categories](https://img.shields.io/badge/categories-2-5b8298?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-177%20passing-2ea043?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-178%20passing-2ea043?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)
 <!-- SKILLS:STATS:END -->
 
@@ -170,7 +170,7 @@ SkillQuarry is intended to become a searchable marketplace for agent capabilitie
 |---|---|---|---|---|
 | **[Strata](skills/autonomous/strata)** | 🤖 Autonomous agents | Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [100 tests, 100% core coverage](skills/autonomous/strata/TEST_REPORT.md) |
 | **[Cordon](skills/security/cordon)** | 🔐 Security | Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [64 tests, 100% core coverage](skills/security/cordon/TEST_REPORT.md) |
-| **[RanGate](skills/security/rangate)** | 🔐 Security | Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [13 tests, N/A — protocol skill; Rust fixture is compiled and exercised in debug, compile-fail, release and Miri jobs](skills/security/rangate/TEST_REPORT.md) |
+| **[RanGate](skills/security/rangate)** | 🔐 Security | Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [14 tests, N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs](skills/security/rangate/TEST_REPORT.md) |
 <!-- SKILLS:TABLE:END -->
 
 ## Planned categories
