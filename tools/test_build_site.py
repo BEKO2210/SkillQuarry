@@ -253,6 +253,9 @@ class DiscoveryTests(unittest.TestCase):
         video = blobs["assets/video/hero-4k.mp4"]
         size_mb = len(video) / 1024 / 1024
         self.assertLess(size_mb, 15, f"hero video is {size_mb:.1f} MB")
+        # A palindrome: the clip runs forward, then backward, so the last frame is
+        # the first frame's neighbour and the wrap has no visible seam.
+        self.assertGreater(len(video), 6 * 1024 * 1024, "the loop should carry both directions")
         self.assertEqual(self.mp4_dimensions(video), (3840, 2160), "the hero video must be true 4K")
         index = self.index
         self.assertIn('preload="none"', index)
