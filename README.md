@@ -26,6 +26,7 @@
 
 <br>
 
+[**Marketplace**](https://beko2210.github.io/SkillQuarry/) ·
 [**Skills**](#skills) ·
 [**Overview**](#overview) ·
 [**Skill Standard**](docs/SKILL-SPEC.md) ·
@@ -36,6 +37,8 @@
 <br>
 
 **Discover, build, test, share, and install reusable capabilities for AI coding agents.**
+
+**[Browse the marketplace →](https://beko2210.github.io/SkillQuarry/)**
 
 </div>
 
