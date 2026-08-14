@@ -1,28 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
-  <title id="title">Cordon — deterministic change envelopes</title>
-  <desc id="desc">An agent change flows through path and budget checks plus independent verification before acceptance.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" width="960" height="260" role="img" aria-label="Cordon — deterministic Git change envelopes for coding agents">
+  <title>Cordon — deterministic Git change envelopes for coding agents</title>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0B1220"/><stop offset="1" stop-color="#172033"/></linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2DD4BF"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient>
+    <linearGradient id="cdb-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#131c25"/>
+      <stop offset="1" stop-color="#0a1015"/>
+    </linearGradient>
+    <linearGradient id="cdb-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="cdb-line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="cdb-frame">
+      <rect x="64" y="66" width="128" height="128" rx="28"/>
+    </clipPath>
   </defs>
-  <rect width="1200" height="360" rx="32" fill="url(#bg)"/>
-  <g transform="translate(66 64)">
-    <rect width="112" height="112" rx="30" fill="#F8FAFC"/>
-    <path d="M38 28H27a8 8 0 0 0-8 8v40a8 8 0 0 0 8 8h11M74 28h11a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8H74" fill="none" stroke="#0F766E" stroke-width="8" stroke-linecap="round"/>
-    <path d="m37 56 13 13 27-31" fill="none" stroke="#6D28D9" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect width="960" height="260" fill="url(#cdb-bg)"/>
+
+  <!-- A faint boundary running across the banner: everything outside stays untouched. -->
+  <g opacity="0.16" fill="none" stroke="#5b8298" stroke-width="2" stroke-dasharray="10 12">
+    <path d="M0 226 H960"/>
   </g>
-  <text x="208" y="105" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="54" font-weight="750">Cordon</text>
-  <text x="208" y="151" fill="#A7B2C6" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="23">Deterministic Git change envelopes for coding agents</text>
-  <g font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="18" font-weight="650">
-    <rect x="66" y="228" width="170" height="58" rx="16" fill="#172C35" stroke="#2DD4BF"/><text x="151" y="264" text-anchor="middle" fill="#D5FFFA">ARM</text>
-    <path d="M246 257h54" stroke="#53617A" stroke-width="3"/><path d="m292 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
-    <rect x="314" y="228" width="170" height="58" rx="16" fill="#20253A" stroke="#8B5CF6"/><text x="399" y="264" text-anchor="middle" fill="#EDE9FE">AGENT</text>
-    <path d="M494 257h54" stroke="#53617A" stroke-width="3"/><path d="m540 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
-    <rect x="562" y="228" width="170" height="58" rx="16" fill="#172C35" stroke="#2DD4BF"/><text x="647" y="264" text-anchor="middle" fill="#D5FFFA">AUDIT</text>
-    <path d="M742 257h54" stroke="#53617A" stroke-width="3"/><path d="m788 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
-    <rect x="810" y="228" width="170" height="58" rx="16" fill="#20253A" stroke="#8B5CF6"/><text x="895" y="264" text-anchor="middle" fill="#EDE9FE">VERIFY</text>
-    <path d="M990 257h54" stroke="#53617A" stroke-width="3"/><path d="m1036 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
-    <rect x="1058" y="228" width="100" height="58" rx="16" fill="url(#accent)"/><text x="1108" y="264" text-anchor="middle" fill="#07131B">PASS</text>
+
+  <g>
+    <rect x="64" y="66" width="128" height="128" rx="28" fill="url(#cdb-ground)"/>
+    <g clip-path="url(#cdb-frame)">
+      <g fill="#233140">
+        <rect x="64" y="76" width="34" height="16" rx="4"/>
+        <rect x="106" y="72" width="26" height="16" rx="4"/>
+        <rect x="146" y="80" width="46" height="16" rx="4"/>
+        <rect x="64" y="160" width="30" height="16" rx="4"/>
+        <rect x="104" y="166" width="34" height="16" rx="4"/>
+        <rect x="152" y="158" width="40" height="16" rx="4"/>
+      </g>
+      <g fill="#4a6a80">
+        <rect x="102" y="108" width="44" height="9" rx="4.5"/>
+        <rect x="102" y="122" width="32" height="9" rx="4.5"/>
+        <rect x="102" y="136" width="38" height="9" rx="4.5"/>
+      </g>
+      <rect x="92" y="98" width="64" height="57" rx="10" fill="none" stroke="url(#cdb-line)" stroke-width="5"/>
+      <g stroke="url(#cdb-line)" stroke-width="5" stroke-linecap="round" fill="none">
+        <path d="M84 108 V102 a6 6 0 0 1 6 -6 H96"/>
+        <path d="M164 108 V102 a6 6 0 0 0 -6 -6 H152"/>
+        <path d="M84 145 V151 a6 6 0 0 0 6 6 H96"/>
+        <path d="M164 145 V151 a6 6 0 0 1 -6 6 H152"/>
+      </g>
+    </g>
+    <rect x="64.75" y="66.75" width="126.5" height="126.5" rx="27.25" fill="none" stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
   </g>
-  <text x="1134" y="327" text-anchor="end" fill="#65738D" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14">evidence &gt; claim</text>
+
+  <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+    <text x="236" y="126" fill="#f4f8fb" font-size="62" font-weight="700" letter-spacing="6">CORDON</text>
+    <text x="240" y="162" fill="#9fb8c9" font-size="21" letter-spacing="2.4">Deterministic Git change envelopes</text>
+    <g font-size="16" fill="#ffd479" letter-spacing="1.4">
+      <text x="240" y="196">Armed policy</text>
+      <text x="366" y="196" fill="#5b8298">·</text>
+      <text x="384" y="196">Independent audit</text>
+      <text x="536" y="196" fill="#5b8298">·</text>
+      <text x="554" y="196">Verified result</text>
+    </g>
+  </g>
 </svg>

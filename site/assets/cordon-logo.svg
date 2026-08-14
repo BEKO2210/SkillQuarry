@@ -1,11 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
-  <title id="title">Cordon logo</title>
-  <desc id="desc">A compact shield formed by two boundary brackets around a verified check.</desc>
-  <style>
-    .plate{fill:#111827}.edge{fill:none;stroke:#2DD4BF;stroke-width:8;stroke-linecap:round;stroke-linejoin:round}.check{fill:none;stroke:#A78BFA;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
-    @media (prefers-color-scheme: dark){.plate{fill:#F8FAFC}.edge{stroke:#0F766E}.check{stroke:#6D28D9}}
-  </style>
-  <rect class="plate" x="18" y="18" width="92" height="92" rx="26"/>
-  <path class="edge" d="M47 36H37a7 7 0 0 0-7 7v42a7 7 0 0 0 7 7h10M81 36h10a7 7 0 0 1 7 7v42a7 7 0 0 1-7 7H81"/>
-  <path class="check" d="m45 65 13 13 27-31"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Cordon">
+  <title>Cordon</title>
+  <desc>A closed boundary drawn around a small area of stone; what stays inside is the only thing that changed.</desc>
+  <defs>
+    <linearGradient id="cd-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="cd-line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="cd-frame">
+      <rect x="4" y="4" width="120" height="120" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#cd-ground)"/>
+
+  <g clip-path="url(#cd-frame)">
+    <!-- The repository: quiet stone in every direction. -->
+    <g fill="#233140">
+      <rect x="4" y="14" width="34" height="16" rx="4"/>
+      <rect x="46" y="10" width="26" height="16" rx="4"/>
+      <rect x="86" y="18" width="38" height="16" rx="4"/>
+      <rect x="4" y="98" width="30" height="16" rx="4"/>
+      <rect x="44" y="104" width="34" height="16" rx="4"/>
+      <rect x="92" y="96" width="32" height="16" rx="4"/>
+    </g>
+
+    <!-- Inside the cordon: the files the agent was allowed to touch. -->
+    <g fill="#4a6a80">
+      <rect x="42" y="46" width="44" height="9" rx="4.5"/>
+      <rect x="42" y="60" width="32" height="9" rx="4.5"/>
+      <rect x="42" y="74" width="38" height="9" rx="4.5"/>
+    </g>
+
+    <!-- The boundary itself: closed, deliberate, checked. -->
+    <rect x="32" y="36" width="64" height="57" rx="10" fill="none"
+          stroke="url(#cd-line)" stroke-width="5"/>
+    <g stroke="#0b1219" stroke-width="1.4" fill="none" opacity="0.5">
+      <rect x="32" y="36" width="64" height="57" rx="10"/>
+    </g>
+
+    <!-- The corner marks that make it read as a frame, not a box. -->
+    <g stroke="url(#cd-line)" stroke-width="5" stroke-linecap="round" fill="none">
+      <path d="M24 46 V40 a6 6 0 0 1 6 -6 H36"/>
+      <path d="M104 46 V40 a6 6 0 0 0 -6 -6 H92"/>
+      <path d="M24 83 V89 a6 6 0 0 0 6 6 H36"/>
+      <path d="M104 83 V89 a6 6 0 0 1 -6 6 H92"/>
+    </g>
+  </g>
+
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="25.25" fill="none" stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
 </svg>
