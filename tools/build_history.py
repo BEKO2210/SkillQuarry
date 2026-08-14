@@ -18,6 +18,7 @@ version does, which is what "history" should mean here anyway.
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import subprocess
 import sys
@@ -128,6 +129,14 @@ def main(argv: list[str] | None = None) -> int:
         if existing != document:
             print("build_history: registry/history.json is out of date; run tools/build_history.py",
                   file=sys.stderr)
+            # Say what differs. A check that only says "stale" cannot be debugged
+            # on a machine you do not have in front of you.
+            diff = difflib.unified_diff(
+                existing.splitlines(), document.splitlines(),
+                fromfile="committed", tofile="derived here", lineterm="", n=1,
+            )
+            for line in list(diff)[:40]:
+                print("  " + line, file=sys.stderr)
             return EXIT_STALE
         print("build_history: registry/history.json is up to date")
         return 0
