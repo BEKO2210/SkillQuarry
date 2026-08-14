@@ -9,6 +9,7 @@ on:
       - 'experiments/morphostat/pro_test_v2.py'
       - 'experiments/morphostat/redteam.py'
       - 'experiments/morphostat/compiler_native_feasibility.py'
+      - 'experiments/morphostat/lsp_semantic_feasibility.py'
       - '.github/workflows/morphostat-pro-eval.yml'
   workflow_dispatch:
 
@@ -24,14 +25,16 @@ jobs:
         run: |
           rustup toolchain install 1.97.1 --profile minimal --component clippy
           rustup default 1.97.1
+          rustup component add rust-analyzer rust-src --toolchain 1.97.1
           rustup toolchain install nightly-2026-08-13 --profile minimal
           rustc --version
           cargo --version
+          rust-analyzer --version
           rustc +nightly-2026-08-13 --version
           python3 --version
       - name: Syntax check
         working-directory: experiments/morphostat
-        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py compiler_native_feasibility.py
+        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py compiler_native_feasibility.py lsp_semantic_feasibility.py
       - name: Run 22-case A/B pro test
         working-directory: experiments/morphostat
         run: python3 pro_test_v2.py
@@ -41,3 +44,6 @@ jobs:
       - name: Evaluate compiler-native morphology sources
         working-directory: experiments/morphostat
         run: python3 compiler_native_feasibility.py
+      - name: Evaluate rust-analyzer semantic edges
+        working-directory: experiments/morphostat
+        run: python3 lsp_semantic_feasibility.py
