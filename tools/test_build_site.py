@@ -264,6 +264,20 @@ class DiscoveryTests(unittest.TestCase):
         self.assertNotIn("min-width: 900px", index)  # phones get the video too
         self.assertIn('poster="assets/img/hero-2400.webp"', index)
 
+    def test_the_stylesheet_url_carries_its_own_fingerprint(self):
+        """A phone that already has the old CSS must not keep it after a fix."""
+        token = bs.style_token()
+        self.assertRegex(token, r"^[0-9a-f]{10}$")
+        for name in ("index.html", "skills/cordon.html", "maintainers/index.html"):
+            self.assertIn(f"style.css?v={token}", self.files[name])
+        # The fingerprint has to follow the content, or it is decoration.
+        original = bs.STYLE
+        try:
+            bs.STYLE = original + "\n/* changed */"
+            self.assertNotEqual(bs.style_token(), token)
+        finally:
+            bs.STYLE = original
+
     def test_the_typeface_is_shipped_not_borrowed(self):
         style = self.files["style.css"]
         self.assertIn("@font-face", style)

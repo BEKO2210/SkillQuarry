@@ -664,6 +664,17 @@ def top_bar(depth: int) -> str:
 </div></div>"""
 
 
+def style_token() -> str:
+    """A fingerprint of the stylesheet, appended to its URL.
+
+    Without it a browser can hold yesterday's CSS against today's HTML — which is
+    exactly how a fixed layout kept looking broken on a phone that had already
+    fetched the new page.
+    """
+    import hashlib
+    return hashlib.sha256(STYLE.encode("utf-8")).hexdigest()[:10]
+
+
 def page(title: str, description: str, body: str, *, depth: int = 0, scripts: str = "") -> str:
     up = "../" * depth
     return f"""<!doctype html>
@@ -681,7 +692,7 @@ def page(title: str, description: str, body: str, *, depth: int = 0, scripts: st
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{up}assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="{up}assets/img/icon-quarry.webp">
-<link rel="stylesheet" href="{up}style.css">
+<link rel="stylesheet" href="{up}style.css?v={style_token()}">
 <script>{THEME_SCRIPT}</script>
 </head>
 <body>
