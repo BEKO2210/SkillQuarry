@@ -6,6 +6,7 @@ on:
       - test/morphostat-pro-20260814
     paths:
       - 'experiments/morphostat/realworld_final_test.py'
+      - 'experiments/morphostat/realworld_final_test_v2.py'
       - 'experiments/morphostat/compiler_native_feasibility.py'
       - 'experiments/morphostat/lsp_semantic_feasibility.py'
       - '.github/workflows/morphostat-realworld-final.yml'
@@ -33,7 +34,7 @@ jobs:
           python3 --version
       - name: Syntax check
         working-directory: experiments/morphostat
-        run: python3 -m py_compile realworld_final_test.py compiler_native_feasibility.py lsp_semantic_feasibility.py
+        run: python3 -m py_compile realworld_final_test.py realworld_final_test_v2.py compiler_native_feasibility.py lsp_semantic_feasibility.py
       - name: Run pinned ripgrep real-world final test
         working-directory: experiments/morphostat
-        run: python3 realworld_final_test.py
+        run: python3 realworld_final_test_v2.py
