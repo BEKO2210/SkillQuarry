@@ -1,0 +1,41 @@
+name: CrypticShift pro evaluation
+
+on:
+  push:
+    branches:
+      - test/crypticshift-pro-20260814
+    paths:
+      - 'experiments/crypticshift/pro_test.py'
+      - 'experiments/crypticshift/pro_test_v2.py'
+      - 'experiments/crypticshift/PRO_TEST_PROTOCOL.md'
+      - '.github/workflows/crypticshift-pro-eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pro:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust toolchain
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component clippy
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          python3 --version
+          git --version
+      - name: Harness syntax check
+        run: python3 -m py_compile experiments/crypticshift/pro_test.py experiments/crypticshift/pro_test_v2.py
+      - name: Run frozen pro test
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 experiments/crypticshift/pro_test_v2.py | tee crypticshift-pro-result.json

@@ -1,0 +1,31 @@
+name: CrypticShift small evaluation
+
+on:
+  push:
+    branches:
+      - test/crypticshift-small-20260814
+    paths:
+      - 'experiments/crypticshift/**'
+      - '.github/workflows/crypticshift-small-eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  small:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust toolchain
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component clippy
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+          python3 --version
+      - name: Syntax check
+        run: python3 -m py_compile experiments/crypticshift/small_test.py experiments/crypticshift/small_test_v3.py
+      - name: Run CrypticShift small test
+        run: python3 experiments/crypticshift/small_test_v3.py
