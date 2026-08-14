@@ -13,6 +13,7 @@
     }
   ],
   "tagline": "Prove when cached state can change without changing its key.",
+  "icon": "../../../assets/cacheclosure-logo.svg",
   "agents": [
     "claude-code",
     "agent-neutral-manual-mode"
