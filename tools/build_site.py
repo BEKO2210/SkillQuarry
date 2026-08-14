@@ -174,7 +174,9 @@ a:hover { text-decoration: underline; }
 }
 .hero h1 { margin: 0; font-size: clamp(var(--t6), 4.4vw, 56px); line-height: 1.08;
   letter-spacing: -.025em; font-weight: 800; color: var(--on-hero); text-wrap: balance; }
-@media (max-width: 1100px) { .wide-only { display: none; } }
+/* The second sentence gets its own line where there is room, and simply
+   follows the first — with a space — where there is not. */
+@media (min-width: 1101px) { .hero h1 .line { display: block; } }
 .hero h1 i { font-style: normal; color: var(--accent); }
 .hero .lede { margin: var(--s3) 0 0; max-width: 58ch; font-size: var(--t3); color: var(--on-hero-muted); }
 .actions { display: flex; flex-wrap: wrap; gap: var(--s2); margin: var(--s4) 0 0; }
@@ -804,7 +806,7 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
   {LAYER_ART}
   <div class="wrap"><div class="inner">
     <p class="eyebrow">Open marketplace for agent skills</p>
-    <h1>Build capabilities once.<br class="wide-only">Share <i>intelligence</i> everywhere.</h1>
+    <h1>Build capabilities once. <span class="line">Share <i>intelligence</i> everywhere.</span></h1>
     <p class="lede">Reusable capabilities for AI coding agents — inspectable, tested,
       versioned, checksum-verified, and installable with one command. No dependencies,
       no telemetry, nothing hidden.</p>
