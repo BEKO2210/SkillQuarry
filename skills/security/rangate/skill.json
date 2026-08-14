@@ -32,7 +32,7 @@
     "macos"
   ],
   "requires": {
-    "python": ">=3.10 for the repository test harness only",
+    "python": ">=3.10 (test harness only)",
     "binaries": [
       "cargo",
       "rustc"
@@ -44,10 +44,6 @@
     "shell": "runs the target project's Cargo/compiler/test commands",
     "network": "none required by the skill protocol",
     "environment": "none required"
-  },
-  "state": {
-    "directory": null,
-    "git": "no runtime state is created by RanGate"
   },
   "tests": {
     "command": "python3 tests/run_tests.py",
