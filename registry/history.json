@@ -10,6 +10,15 @@
         }
       ]
     },
+    "lockscope": {
+      "released": "2026-08-14T19:14:52Z",
+      "versions": [
+        {
+          "date": "2026-08-14T19:14:52Z",
+          "version": "1.0.0"
+        }
+      ]
+    },
     "rangate": {
       "released": "2026-08-14T01:52:04Z",
       "versions": [

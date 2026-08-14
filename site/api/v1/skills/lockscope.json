@@ -11,7 +11,15 @@
   "dependencies": [],
   "description": "Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.",
   "displayName": "LockScope",
-  "history": {},
+  "history": {
+    "released": "2026-08-14T19:14:52Z",
+    "versions": [
+      {
+        "date": "2026-08-14T19:14:52Z",
+        "version": "1.0.0"
+      }
+    ]
+  },
   "license": "Apache-2.0",
   "maintainers": [
     {
