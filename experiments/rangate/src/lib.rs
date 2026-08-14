@@ -1,50 +1,124 @@
+use std::marker::PhantomData;
 use std::ptr::NonNull;
+use std::rc::Rc;
 
-/// Baseline-style API: every caller must prove pointer validity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceError {
+    AllocationRejected,
+}
+
+mod ffi {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    static ACTIVE: AtomicUsize = AtomicUsize::new(0);
+
+    pub struct RawDevice {
+        value: i32,
+    }
+
+    pub fn create(initial: i32) -> *mut RawDevice {
+        if initial == i32::MIN {
+            return std::ptr::null_mut();
+        }
+        ACTIVE.fetch_add(1, Ordering::SeqCst);
+        Box::into_raw(Box::new(RawDevice { value: initial }))
+    }
+
+    pub unsafe fn read(ptr: *const RawDevice) -> i32 {
+        // SAFETY: caller guarantees `ptr` points to a live RawDevice.
+        unsafe { (*ptr).value }
+    }
+
+    pub unsafe fn write(ptr: *mut RawDevice, value: i32) {
+        // SAFETY: caller guarantees exclusive access to a live RawDevice.
+        unsafe {
+            (*ptr).value = value;
+        }
+    }
+
+    pub unsafe fn destroy(ptr: *mut RawDevice) {
+        // SAFETY: caller guarantees `ptr` came from `create`, is still live,
+        // and is destroyed exactly once.
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+        ACTIVE.fetch_sub(1, Ordering::SeqCst);
+    }
+
+    #[cfg(test)]
+    pub fn active_count() -> usize {
+        ACTIVE.load(Ordering::SeqCst)
+    }
+}
+
+/// Safe boundary around a private raw FFI-like handle.
 ///
-/// # Safety
-/// `ptr` must be non-null, aligned, and point to a live `i32` for the duration
-/// of the call.
-pub unsafe fn baseline_read(ptr: *const i32) -> i32 {
-    // SAFETY: upheld by the caller under the function's unsafe contract.
-    unsafe { *ptr }
+/// `Device` intentionally does not implement `Send` or `Sync`: the simulated
+/// foreign API has no cross-thread contract.
+///
+/// Double ownership is rejected by Rust's move semantics:
+///
+/// ```compile_fail
+/// use rangate_eval::Device;
+/// let device = Device::open(1).unwrap();
+/// let moved = device;
+/// drop(device);
+/// drop(moved);
+/// ```
+///
+/// Mutable aliasing is rejected before an unsafe operation is reached:
+///
+/// ```compile_fail
+/// use rangate_eval::Device;
+/// let mut device = Device::open(1).unwrap();
+/// let first = &mut device;
+/// let second = &mut device;
+/// first.set(2);
+/// second.set(3);
+/// ```
+///
+/// Cross-thread transport is rejected because the external concurrency
+/// contract is deliberately unknown:
+///
+/// ```compile_fail
+/// use rangate_eval::Device;
+/// let device = Device::open(1).unwrap();
+/// std::thread::spawn(move || drop(device));
+/// ```
+pub struct Device {
+    raw: NonNull<ffi::RawDevice>,
+    _not_send_or_sync: PhantomData<Rc<()>>,
 }
 
-/// RanGate-style boundary. Raw representation is accepted once and then kept
-/// private behind a safe API.
-pub struct IntHandle {
-    raw: NonNull<i32>,
-}
-
-impl IntHandle {
-    /// Takes ownership of a pointer created by `Box::into_raw`.
-    ///
-    /// # Safety
-    /// `ptr` must either be null or come from `Box<i32>::into_raw`, and no
-    /// other owner may free or mutably alias it after this call succeeds.
-    pub unsafe fn from_raw_owned(ptr: *mut i32) -> Option<Self> {
-        NonNull::new(ptr).map(|raw| Self { raw })
+impl Device {
+    pub fn open(initial: i32) -> Result<Self, DeviceError> {
+        let raw = NonNull::new(ffi::create(initial)).ok_or(DeviceError::AllocationRejected)?;
+        Ok(Self {
+            raw,
+            _not_send_or_sync: PhantomData,
+        })
     }
 
     pub fn get(&self) -> i32 {
-        // SAFETY: construction guarantees a live, owned `i32`; `self` keeps
-        // the allocation alive and shared access cannot mutate it.
-        unsafe { *self.raw.as_ptr() }
+        // SAFETY: `open` accepts only a non-null handle returned by `ffi::create`.
+        // The handle remains owned by `self` until Drop and shared access does
+        // not mutate the foreign object.
+        unsafe { ffi::read(self.raw.as_ptr()) }
     }
 
     pub fn set(&mut self, value: i32) {
-        // SAFETY: `&mut self` provides exclusive access to this owner and the
-        // allocation remains live until Drop.
-        unsafe { *self.raw.as_ptr() = value }
+        // SAFETY: `&mut self` gives exclusive Rust access to this unique owner,
+        // and the raw handle remains live until Drop.
+        unsafe { ffi::write(self.raw.as_ptr(), value) }
     }
 }
 
-impl Drop for IntHandle {
+impl Drop for Device {
     fn drop(&mut self) {
-        // SAFETY: `from_raw_owned` accepts only Box-owned pointers and this
-        // type is the sole owner. Drop runs once for the owning value.
+        // SAFETY: `Device` is the unique owner of the handle returned by
+        // `ffi::create`; the type is not Clone and Drop runs once per owner.
         unsafe {
-            drop(Box::from_raw(self.raw.as_ptr()));
+            ffi::destroy(self.raw.as_ptr());
         }
     }
 }
@@ -52,30 +126,64 @@ impl Drop for IntHandle {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::panic::{catch_unwind, AssertUnwindSafe};
+    use std::sync::Mutex;
+
+    static RESOURCE_TEST_LOCK: Mutex<()> = Mutex::new(());
 
     #[test]
-    fn beginner_safe_api_hides_raw_dereference() {
-        let raw = Box::into_raw(Box::new(41));
-        // SAFETY: `raw` was just produced by Box::into_raw and ownership is
-        // transferred exactly once into IntHandle.
-        let mut handle = unsafe { IntHandle::from_raw_owned(raw).unwrap() };
-        assert_eq!(handle.get(), 41);
-        handle.set(42);
-        assert_eq!(handle.get(), 42);
+    fn beginner_safe_api_contains_raw_pointer_knowledge() {
+        let _guard = RESOURCE_TEST_LOCK.lock().unwrap();
+        let mut device = Device::open(41).unwrap();
+        assert_eq!(device.get(), 41);
+        device.set(42);
+        assert_eq!(device.get(), 42);
     }
 
     #[test]
-    fn null_pointer_is_rejected_at_boundary() {
-        // SAFETY: null is explicitly accepted and rejected by this boundary.
-        let result = unsafe { IntHandle::from_raw_owned(std::ptr::null_mut()) };
-        assert!(result.is_none());
+    fn null_like_foreign_failure_is_rejected_at_boundary() {
+        let _guard = RESOURCE_TEST_LOCK.lock().unwrap();
+        let before = ffi::active_count();
+        let result = Device::open(i32::MIN);
+        assert_eq!(result.err(), Some(DeviceError::AllocationRejected));
+        assert_eq!(ffi::active_count(), before);
     }
 
     #[test]
-    fn baseline_requires_unsafe_at_every_call_site() {
-        let value = 7;
-        // SAFETY: pointer is derived from a live local value for this call.
-        let observed = unsafe { baseline_read(&value) };
-        assert_eq!(observed, 7);
+    fn drop_releases_exactly_one_foreign_allocation() {
+        let _guard = RESOURCE_TEST_LOCK.lock().unwrap();
+        let before = ffi::active_count();
+        {
+            let device = Device::open(9).unwrap();
+            assert_eq!(device.get(), 9);
+            assert_eq!(ffi::active_count(), before + 1);
+        }
+        assert_eq!(ffi::active_count(), before);
+    }
+
+    #[test]
+    fn panic_unwinding_still_runs_raii_cleanup() {
+        let _guard = RESOURCE_TEST_LOCK.lock().unwrap();
+        let before = ffi::active_count();
+        let result = catch_unwind(AssertUnwindSafe(|| {
+            let device = Device::open(77).unwrap();
+            assert_eq!(ffi::active_count(), before + 1);
+            assert_eq!(device.get(), 77);
+            panic!("intentional pro-test panic");
+        }));
+        assert!(result.is_err());
+        assert_eq!(ffi::active_count(), before);
+    }
+
+    #[test]
+    fn repeated_create_mutate_drop_cycles_do_not_leak() {
+        let _guard = RESOURCE_TEST_LOCK.lock().unwrap();
+        let before = ffi::active_count();
+        for value in 0..10_000 {
+            let mut device = Device::open(value).unwrap();
+            device.set(value + 1);
+            assert_eq!(device.get(), value + 1);
+        }
+        assert_eq!(ffi::active_count(), before);
     }
 }
