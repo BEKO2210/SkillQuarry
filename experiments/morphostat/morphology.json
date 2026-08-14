@@ -1,0 +1,28 @@
+{
+  "required_modules": [
+    "domain",
+    "storage",
+    "service",
+    "ui"
+  ],
+  "allowed_dependencies": {
+    "domain": [],
+    "storage": ["domain"],
+    "service": ["domain", "storage"],
+    "ui": ["service"]
+  },
+  "public_api": {
+    "domain": [
+      "pub fn apply_delta(value: i32, delta: i32) -> i32"
+    ],
+    "storage": [
+      "pub fn persist(value: i32) -> i32"
+    ],
+    "service": [
+      "pub fn process(value: i32) -> i32"
+    ],
+    "ui": [
+      "pub fn render(value: i32) -> String"
+    ]
+  }
+}
