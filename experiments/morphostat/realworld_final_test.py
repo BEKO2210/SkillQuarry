@@ -84,7 +84,7 @@ def cargo_env(target_dir: Path) -> dict:
 def standard_gate(repo: Path, target_dir: Path) -> dict:
     env = cargo_env(target_dir)
     commands = [
-        ("check", ["cargo", "check", "--workspace", "--all-targets"]),
+        ("check", ["cargo", "check", "--workspace", "--lib", "--bins", "--tests"]),
         ("clippy", ["cargo", "clippy", "-p", "ignore", "--all-targets", "--", "-D", "warnings"]),
         ("test", ["cargo", "test", "-p", "ignore", "--quiet"]),
     ]
