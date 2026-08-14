@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="CacheClosure">
+  <title>CacheClosure</title>
+  <desc>A cache key and its causal input closure joined by a verified edge.</desc>
+  <defs>
+    <linearGradient id="cc-ground" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17212b"/>
+      <stop offset="1" stop-color="#0a1016"/>
+    </linearGradient>
+    <linearGradient id="cc-signal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee7d8"/>
+      <stop offset="1" stop-color="#4aa3ff"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#cc-ground)"/>
+
+  <!-- Repository inputs on the left. -->
+  <g fill="#0a1016" stroke="#547083" stroke-width="3">
+    <circle cx="30" cy="36" r="9"/>
+    <circle cx="30" cy="64" r="9"/>
+    <circle cx="30" cy="92" r="9"/>
+  </g>
+
+  <!-- The measured closure, not a guessed dependency. -->
+  <path d="M39 36 C52 36 50 54 62 58 M39 64 H62 M39 92 C52 92 50 74 62 70"
+        fill="none" stroke="#547083" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Cache identity. -->
+  <rect x="62" y="45" width="39" height="38" rx="9" fill="#0a1016"
+        stroke="url(#cc-signal)" stroke-width="4"/>
+  <path d="M72 57 H91 M72 66 H86" stroke="url(#cc-signal)" stroke-width="4"
+        stroke-linecap="round"/>
+
+  <!-- A closed causal edge must reach the key. -->
+  <circle cx="62" cy="64" r="5" fill="url(#cc-signal)"/>
+  <path d="M101 64 H111" stroke="url(#cc-signal)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="112" cy="64" r="4" fill="url(#cc-signal)"/>
+
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="25.25" fill="none"
+        stroke="#6ee7d8" stroke-opacity="0.38" stroke-width="1.5"/>
+</svg>
