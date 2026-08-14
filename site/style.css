@@ -139,14 +139,18 @@ main { padding-bottom: 20px; }
 .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 .card {
   position: relative; background: var(--raised); border: 1px solid var(--edge);
-  border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; gap: 12px;
+  border-radius: var(--radius); padding: 0 var(--s4) var(--s4);
+  display: flex; flex-direction: column; gap: 12px;
   transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
 }
 .card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent-deep) 55%, var(--edge)); box-shadow: var(--shadow); }
-.card { padding: 0; overflow: hidden; }
-.card > *:not(.art) { margin-left: var(--s4); margin-right: var(--s4); }
+/* The inset belongs to the card, not to its children: a child rule that resets
+   its own margin can no longer push text against the edge. The picture is the
+   one part that is meant to reach the edge, so it cancels the inset itself. */
+.card { overflow: hidden; }
+.card > .art { margin: 0 calc(-1 * var(--s4)); }
 .card > .top { margin-top: var(--s4); }
-.card > .foot { margin-bottom: 0; padding-bottom: var(--s4); }
+.card > .foot { margin-bottom: 0; }
 .art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--raised-2); }
 .art img { width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform .5s cubic-bezier(.22,.75,.3,1); }

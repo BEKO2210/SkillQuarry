@@ -264,6 +264,39 @@ class DiscoveryTests(unittest.TestCase):
         self.assertNotIn("min-width: 900px", index)  # phones get the video too
         self.assertIn('poster="assets/img/hero-2400.webp"', index)
 
+    def css_rules(self):
+        """Every `selector { body }` pair of the stylesheet, at-rules aside."""
+        return [
+            (sel.strip(), body)
+            for sel, body in re.findall(r"([^{}@]+)\{([^{}]*)\}", bs.STYLE)
+        ]
+
+    def css_rule(self, pattern):
+        """The first rule matching `pattern`, as written."""
+        found = re.search(pattern, bs.STYLE)
+        self.assertIsNotNone(found, f"no rule matched {pattern}")
+        return found.group(0)
+
+    def test_card_text_keeps_its_distance_from_the_edge(self):
+        """The inset must live on the card itself.
+
+        It used to live on the children (`.card > *:not(.art)`), and a later,
+        more specific rule — `.card p.body { margin: 0 }` — silently won, so the
+        description of every skill touched the tile border on a phone. Nothing in
+        the test suite noticed, because the rule that was supposed to create the
+        gap was still there. Pinning the card's own padding removes that class of
+        failure: a child cannot reset a padding it does not own.
+        """
+        card = self.css_rule(r"\.card\s*\{[^}]*padding[^}]*\}")
+        self.assertIn("padding: 0 var(--s4) var(--s4)", card)
+        # The picture is the one child allowed to reach the edge.
+        self.assertIn(".card > .art { margin: 0 calc(-1 * var(--s4)); }", bs.STYLE)
+        # No rule inside a card may create the gap with a horizontal margin
+        # again — that is what made the previous version fragile.
+        for selector, body in self.css_rules():
+            if ".card" in selector and ("margin-left" in body or "margin-right" in body):
+                self.fail(f"card layout depends on a child margin again: {selector}")
+
     def test_the_stylesheet_url_carries_its_own_fingerprint(self):
         """A phone that already has the old CSS must not keep it after a fix."""
         token = bs.style_token()
