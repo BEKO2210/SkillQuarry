@@ -60,7 +60,7 @@
     "reviewed_by": "Frozen CacheClosure v0 protocol; GitHub Actions run 31850105648 passed Ubuntu and macOS on 2026-08-15."
   },
   "research": "RESEARCH.md",
-  "workflow": ".github/workflows/cacheclosure-tests.yml",
+  "workflow": "cacheclosure-tests.yml",
   "quickstart": "cd skills/coding/cacheclosure && ./install.sh\n\ncacheclosure .\ncacheclosure . --json",
   "homepage": "https://github.com/BEKO2210/SkillQuarry/tree/main/skills/coding/cacheclosure",
   "highlights": [
