@@ -139,7 +139,7 @@ a:hover { text-decoration: underline; }
 .bar .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
 .bar .mark { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
 .bar .mark:hover { text-decoration: none; }
-.bar .mark img { width: 28px; height: 28px; }
+.bar .mark img { width: 30px; height: 30px; border-radius: 8px; }
 .bar .mark span i { font-style: normal; color: var(--accent); }
 .bar nav { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 14px; }
 .bar nav a { color: var(--muted); }
@@ -239,7 +239,7 @@ main { padding-bottom: 20px; }
 .art-icon { display: grid; place-items: center; }
 .art-icon img { width: 42%; height: auto; object-fit: contain; }
 .card .top { display: flex; align-items: center; gap: 13px; }
-.card .top img { width: 46px; height: 46px; border-radius: 12px; flex: none; }
+.card .top img { width: 52px; height: 52px; border-radius: 13px; flex: none; }
 .card h3 { margin: 0; font-size: 19px; letter-spacing: -.01em; }
 .card h3 a { color: var(--ink); }
 .card h3 a::after { content: ""; position: absolute; inset: 0; }
@@ -291,7 +291,7 @@ main { padding-bottom: 20px; }
 .detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
 .detail-hero .wrap { padding: 40px 24px 34px; }
 .detail-hero .top { display: flex; align-items: center; gap: 18px; }
-.detail-hero img.icon { width: 68px; height: 68px; border-radius: 18px; flex: none; }
+.detail-hero img.icon { width: 76px; height: 76px; border-radius: 19px; flex: none; }
 .detail-hero h1 { margin: 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.02em; }
 .detail-hero .subtitle { color: var(--accent); margin: 6px 0 0; font-size: 17px; }
 .crumbs { font-size: 13px; color: var(--dim); margin: 0 0 18px; }
@@ -632,7 +632,7 @@ def top_bar(depth: int) -> str:
     up = "../" * depth
     return f"""<div class="bar"><div class="wrap">
   <a class="mark" href="{up}index.html">
-    <img src="{up}assets/skillquarry-logo.svg" alt="">
+    <img src="{up}assets/img/icon-quarry.webp" alt="">
     <span>Skill<i>Quarry</i></span>
   </a>
   <nav>
@@ -660,7 +660,8 @@ def page(title: str, description: str, body: str, *, depth: int = 0, scripts: st
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://beko2210.github.io/SkillQuarry/assets/img/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="{up}assets/skillquarry-logo.svg" type="image/svg+xml">
+<link rel="icon" href="{up}assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="{up}assets/img/icon-quarry.webp">
 <link rel="stylesheet" href="{up}style.css">
 <script>{THEME_SCRIPT}</script>
 </head>
@@ -686,12 +687,19 @@ def page(title: str, description: str, body: str, *, depth: int = 0, scripts: st
 """
 
 
-def icon_for(manifest: dict[str, Any], depth: int = 0) -> str | None:
-    """The skill's own logo, as it sits in the generated site."""
+def icon_for(manifest: dict[str, Any], depth: int = 0, name: str | None = None) -> str | None:
+    """The skill's mark: the rendered 3D tile when one exists, else its flat SVG.
+
+    The 3D file is found by convention (assets/img/icon-<name>.webp), so a skill
+    added tomorrow keeps working with nothing but its SVG — or with neither.
+    """
+    up = "../" * depth
+    if name and (REPO / "assets" / "img" / f"icon-{name}.webp").is_file():
+        return f"{up}assets/img/icon-{name}.webp"
     icon = manifest.get("icon")
     if not icon:
         return None
-    return f"{'../' * depth}assets/{Path(str(icon)).name}"
+    return f"{up}assets/{Path(str(icon)).name}"
 
 
 def gradient_for(name: str) -> str:
@@ -712,7 +720,7 @@ def artwork_for(manifest: dict[str, Any], skill: dict[str, Any], depth: int = 0)
     if image and (REPO / str(image)).is_file():
         return (f'<div class="art"><img src="{up}{esc(image)}" alt="" loading="lazy" '
                 f'decoding="async"></div>')
-    icon = icon_for(manifest, depth)
+    icon = icon_for(manifest, depth, name=name)
     if icon:
         return (f'<div class="art art-icon" style="background:{gradient_for(name)}">'
                 f'<img src="{esc(icon)}" alt="" loading="lazy" decoding="async"></div>')
@@ -731,7 +739,7 @@ def card(skill: dict[str, Any], manifest: dict[str, Any]) -> str:
         tags.append('<span class="tag warn">destructive</span>')
     for agent in skill.get("compatibility") or []:
         tags.append(f'<span class="tag">{esc(AGENT_LABELS.get(agent, agent))}</span>')
-    icon = icon_for(manifest)
+    icon = icon_for(manifest, name=str(skill.get("name")))
     tagline = manifest.get("tagline")
     return f"""      <article class="card" data-name="{esc(skill['name'])}">
         {artwork_for(manifest, skill)}
@@ -896,7 +904,7 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
     tests = skill.get("tests") or {}
     name = str(skill["name"])
     source = f"{SOURCE_URL}/tree/main/{skill['path']}"
-    icon = icon_for(manifest, depth=1)
+    icon = icon_for(manifest, depth=1, name=name)
     banner = manifest.get("banner")
 
     facts = [
@@ -1036,7 +1044,7 @@ def build_maintainer(handle: str, person: dict[str, Any], skills: dict[str, dict
     cards = "\n".join(
         f"""      <article class="card">
         <div class="top">
-          {f'<img src="{esc(icon_for(manifests[name], depth=1))}" alt="">' if icon_for(manifests[name]) else ''}
+          {f'<img src="{esc(icon_for(manifests[name], depth=1, name=name))}" alt="">' if icon_for(manifests[name], name=name) else ''}
           <div><h3><a href="../skills/{esc(name)}.html">{esc(skills[name].get('displayName'))}</a></h3></div>
         </div>
         <p class="body">{esc(skills[name].get('description'))}</p>

@@ -162,6 +162,13 @@ class DiscoveryTests(unittest.TestCase):
                 for skill in person["skills"]:
                     self.assertIn(f"../skills/{skill}.html", page)
 
+    def test_the_brand_mark_and_favicon_are_the_rendered_tile(self):
+        index = self.files["index.html"]
+        self.assertIn('href="assets/img/favicon.png"', index)
+        self.assertIn('src="assets/img/icon-quarry.webp"', index)
+        for name in ("assets/img/favicon.png", "assets/img/icon-quarry.webp"):
+            self.assertIn(name, bs.binary_files())
+
     def test_skills_link_back_to_their_maintainer(self):
         page = self.files["skills/strata.html"]
         self.assertIn("../maintainers/BEKO2210.html", page)
@@ -258,14 +265,23 @@ class DiscoveryTests(unittest.TestCase):
         for name in ("index.html", "skills/strata.html"):
             self.assertIn('property="og:image"', self.files[name])
 
-    def test_each_card_shows_the_skill_icon(self):
+    def test_each_card_shows_the_skill_mark(self):
         for entry in bs.load_registry():
+            name = str(entry["name"])
             manifest = bs.load_manifest(entry)
-            icon = bs.icon_for(manifest)
-            with self.subTest(skill=entry["name"]):
+            icon = bs.icon_for(manifest, name=name)
+            with self.subTest(skill=name):
                 self.assertIsNotNone(icon)
                 self.assertIn(icon, self.files["index.html"])
-                self.assertIn(icon, self.files)
+                self.assertIn(icon, {**self.files, **bs.binary_files()})
+
+    def test_the_rendered_mark_wins_over_the_flat_one(self):
+        """3D tile when it exists, SVG when it does not, nothing when neither."""
+        manifest = {"icon": "../../../assets/strata-logo.svg"}
+        self.assertEqual(bs.icon_for(manifest, name="strata"), "assets/img/icon-strata.webp")
+        self.assertEqual(bs.icon_for(manifest, name="no-such-skill"), "assets/strata-logo.svg")
+        self.assertIsNone(bs.icon_for({}, name="no-such-skill"))
+        self.assertEqual(bs.icon_for(manifest, depth=1, name="strata"), "../assets/img/icon-strata.webp")
 
     def test_the_page_still_works_when_that_call_fails(self):
         for page in (self.index, self.files["skills/strata.html"]):

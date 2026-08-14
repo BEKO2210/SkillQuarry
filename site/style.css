@@ -46,7 +46,7 @@ a:hover { text-decoration: underline; }
 .bar .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
 .bar .mark { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
 .bar .mark:hover { text-decoration: none; }
-.bar .mark img { width: 28px; height: 28px; }
+.bar .mark img { width: 30px; height: 30px; border-radius: 8px; }
 .bar .mark span i { font-style: normal; color: var(--accent); }
 .bar nav { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 14px; }
 .bar nav a { color: var(--muted); }
@@ -146,7 +146,7 @@ main { padding-bottom: 20px; }
 .art-icon { display: grid; place-items: center; }
 .art-icon img { width: 42%; height: auto; object-fit: contain; }
 .card .top { display: flex; align-items: center; gap: 13px; }
-.card .top img { width: 46px; height: 46px; border-radius: 12px; flex: none; }
+.card .top img { width: 52px; height: 52px; border-radius: 13px; flex: none; }
 .card h3 { margin: 0; font-size: 19px; letter-spacing: -.01em; }
 .card h3 a { color: var(--ink); }
 .card h3 a::after { content: ""; position: absolute; inset: 0; }
@@ -198,7 +198,7 @@ main { padding-bottom: 20px; }
 .detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
 .detail-hero .wrap { padding: 40px 24px 34px; }
 .detail-hero .top { display: flex; align-items: center; gap: 18px; }
-.detail-hero img.icon { width: 68px; height: 68px; border-radius: 18px; flex: none; }
+.detail-hero img.icon { width: 76px; height: 76px; border-radius: 19px; flex: none; }
 .detail-hero h1 { margin: 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.02em; }
 .detail-hero .subtitle { color: var(--accent); margin: 6px 0 0; font-size: 17px; }
 .crumbs { font-size: 13px; color: var(--dim); margin: 0 0 18px; }
