@@ -14,6 +14,7 @@
   ],
   "tagline": "Every generation is a fresh context. Only a validated core sample crosses the boundary.",
   "banner": "assets/strata-banner.svg",
+  "image": "assets/img/strata-card.webp",
   "agents": [
     "claude-code"
   ],

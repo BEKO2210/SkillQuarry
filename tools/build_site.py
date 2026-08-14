@@ -92,105 +92,350 @@ def load_manifest(skill: dict[str, Any]) -> dict[str, Any]:
 
 STYLE = """
 :root {
-  color-scheme: dark light;
-  --ground: #0d141b; --raised: #131c25; --edge: #24313d;
-  --ink: #f4f8fb; --muted: #9fb8c9; --dim: #6e8598;
-  --accent: #ffd479; --accent-deep: #f0932b;
-  --slate: #5b8298; --ok: #2ea043; --warn: #d29922;
-  --radius: 14px;
+  --ground: #0a1016; --raised: #111b24; --raised-2: #16222c; --edge: #223140;
+  --ink: #f2f7fa; --muted: #a8c0cf; --dim: #6f8798;
+  --accent: #ffd479; --accent-deep: #f0932b; --accent-soft: rgba(255, 212, 121, .12);
+  --ok: #4ade80; --warn: #fbbf24;
+  /* Golden ratio drives type, spacing and columns: every step is x1.618. */
+  --phi: 1.618;
+  --s1: 8px; --s2: 13px; --s3: 21px; --s4: 34px; --s5: 55px; --s6: 89px; --s7: 144px;
+  --t1: 13px; --t2: 15px; --t3: 17px; --t4: 21px; --t5: 27px; --t6: 44px; --t7: 71px;
+  --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -18px rgba(0,0,0,.9);
+  --page: 1140px;
+  --hero-top: #16222c; --hero-bottom: #0a1016;
+  --hero-scrim: rgba(10,16,22,.92); --hero-scrim-mid: rgba(10,16,22,.72); --hero-scrim-end: rgba(10,16,22,.35);
+  --on-hero: #f2f7fa; --on-hero-muted: #c4d6e2;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --ground: #f4f7f9; --raised: #ffffff; --edge: #d7e0e7;
-    --ink: #14202b; --muted: #4a6a80; --dim: #6e8598;
-    --accent: #b3730c; --accent-deep: #8a5806;
-  }
+:root[data-theme="light"] {
+  --ground: #eef2f6; --raised: #ffffff; --raised-2: #f3f7fa; --edge: #ccd8e2;
+  --ink: #0c1821; --muted: #3d5b72; --dim: #64809a;
+  --accent: #92560a; --accent-deep: #6f4106; --accent-soft: rgba(146, 86, 10, .12);
+  --ok: #16794a; --warn: #8a5a06;
+  --shadow: 0 1px 2px rgba(16,32,44,.06), 0 14px 34px -22px rgba(16,32,44,.5);
+  --hero-top: #dde8f0; --hero-bottom: #eef2f6;
+  --hero-scrim: rgba(8,14,20,.90); --hero-scrim-mid: rgba(8,14,20,.70); --hero-scrim-end: rgba(8,14,20,.34);
+  --on-hero: #ffffff; --on-hero-muted: #d9e6ef;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--ground); color: var(--ink);
-  font: 16px/1.6 "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font: 16px/1.65 "Inter", "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-header.top { border-bottom: 1px solid var(--edge); padding: 28px 0 22px; }
-header.top img { width: 100%; max-width: 760px; height: auto; }
-.lede { color: var(--muted); margin: 18px 0 0; }
-.stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
-.stats li {
-  border: 1px solid var(--edge); border-radius: 999px; padding: 4px 14px;
-  font-size: 14px; color: var(--muted); background: var(--raised);
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: var(--page); margin: 0 auto; padding: 0 24px; }
+
+/* ---------- top bar ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--edge);
 }
-.stats b { color: var(--accent); }
-.controls { display: grid; gap: 12px; margin: 26px 0 10px;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; }
-.controls label { display: block; font-size: 13px; color: var(--dim); margin-bottom: 5px; }
-input, select {
-  width: 100%; padding: 9px 11px; border-radius: 10px; font: inherit;
-  background: var(--raised); color: var(--ink); border: 1px solid var(--edge);
+.bar .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
+.bar .mark { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
+.bar .mark:hover { text-decoration: none; }
+.bar .mark img { width: 28px; height: 28px; }
+.bar .mark span i { font-style: normal; color: var(--accent); }
+.bar nav { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 14px; }
+.bar nav a { color: var(--muted); }
+.bar nav a:hover { color: var(--ink); text-decoration: none; }
+.ghost {
+  font: inherit; font-size: 14px; cursor: pointer; color: var(--muted);
+  background: transparent; border: 1px solid var(--edge); border-radius: 999px;
+  padding: 5px 12px; line-height: 1;
 }
-input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-.toggles { display: flex; gap: 18px; flex-wrap: wrap; margin: 4px 0 0; color: var(--muted); font-size: 14px; }
-.toggles label { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 14px; color: var(--muted); }
-.toggles input { width: auto; }
-.count { color: var(--dim); font-size: 14px; margin: 14px 0 6px; }
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); padding: 0 0 40px; }
-.card {
+.ghost:hover { color: var(--accent); border-color: var(--accent-deep); }
+
+/* ---------- hero ---------- */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--edge); isolation: isolate; }
+.hero .shot { position: absolute; inset: 0; z-index: -2; }
+.hero .shot img, .hero .shot video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero .shot video { position: absolute; inset: 0; }
+.hero .shot video[hidden] { display: none; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(1200px 520px at 18% 10%, rgba(10,16,22,.72), transparent 70%),
+    linear-gradient(100deg, var(--hero-scrim) 0%, var(--hero-scrim-mid) 52%, var(--hero-scrim-end) 100%);
+}
+.hero .layers { position: absolute; inset: auto 0 0 0; height: 190px; opacity: .28; pointer-events: none; z-index: -1; }
+.hero .wrap { position: relative; padding: var(--s6) var(--s3) var(--s5); max-width: var(--page); }
+.hero .inner { max-width: calc(var(--page) / var(--phi)); }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: var(--s1); font-size: var(--t1); letter-spacing: .12em;
+  text-transform: uppercase; color: #ffd479; border: 1px solid rgba(255,212,121,.34);
+  background: rgba(10,16,22,.55); border-radius: 999px; padding: 6px 15px; margin: 0 0 var(--s3);
+  backdrop-filter: blur(6px);
+}
+.hero h1 { margin: 0; font-size: clamp(var(--t6), 4.4vw, 56px); line-height: 1.08;
+  letter-spacing: -.025em; font-weight: 800; color: var(--on-hero); text-wrap: balance; }
+@media (max-width: 1100px) { .wide-only { display: none; } }
+.hero h1 i { font-style: normal; color: var(--accent); }
+.hero .lede { margin: var(--s3) 0 0; max-width: 58ch; font-size: var(--t3); color: var(--on-hero-muted); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--s2); margin: var(--s4) 0 0; }
+.button {
+  display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 11px 22px;
+  font-size: 15px; font-weight: 600; border: 1px solid transparent; transition: transform .12s ease;
+}
+.button:hover { text-decoration: none; transform: translateY(-1px); }
+.button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: #14202b; }
+.button.secondary { border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.08); color: #fff; backdrop-filter: blur(6px); }
+.cta .button.secondary, main .button.secondary { border-color: var(--edge); background: var(--raised); color: var(--ink); backdrop-filter: none; }
+.stats { display: flex; flex-wrap: wrap; gap: 26px; margin: 34px 0 0; padding: 0; list-style: none; }
+.stats li { display: flex; flex-direction: column; }
+.stats { gap: var(--s5); margin-top: var(--s4); }
+.stats b { font-size: var(--t5); line-height: 1.2; color: var(--on-hero); letter-spacing: -.01em; }
+.stats span { font-size: var(--t1); letter-spacing: .08em; text-transform: uppercase; color: var(--on-hero-muted); }
+
+/* ---------- filter panel ---------- */
+.panel {
   background: var(--raised); border: 1px solid var(--edge); border-radius: var(--radius);
-  padding: 20px; display: flex; flex-direction: column; gap: 10px;
+  padding: 18px; margin: -28px 0 0; position: relative; z-index: 5; box-shadow: var(--shadow);
 }
-.card h2 { margin: 0; font-size: 20px; }
-.card h2 a { color: var(--ink); }
-.card .tagline { color: var(--accent); font-size: 14px; margin: -4px 0 0; }
-.card p { margin: 0; color: var(--muted); font-size: 15px; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 6px; }
+.controls { display: grid; gap: 12px; grid-template-columns: 1.6fr repeat(4, 1fr); }
+.controls label { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+input, select {
+  width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); font: inherit; font-size: 15px;
+  background: var(--raised-2); color: var(--ink); border: 1px solid var(--edge);
+}
+.toggles { display: flex; gap: 20px; flex-wrap: wrap; margin: 14px 2px 0; color: var(--muted); font-size: 14px; }
+.toggles label { display: inline-flex; align-items: center; gap: 8px; margin: 0; text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--muted); }
+.toggles input { width: auto; }
+@media (max-width: 900px) { .controls { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .controls { grid-template-columns: 1fr; } }
+
+/* ---------- sections ---------- */
+main { padding-bottom: 20px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 46px 0 2px; }
+.section-head h2 { margin: 0; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.section-head a, .section-head span { font-size: 13px; color: var(--dim); }
+.count { color: var(--dim); font-size: 14px; margin: 10px 2px 14px; }
+
+/* ---------- cards ---------- */
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card {
+  position: relative; background: var(--raised); border: 1px solid var(--edge);
+  border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; gap: 12px;
+  transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+}
+.card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent-deep) 55%, var(--edge)); box-shadow: var(--shadow); }
+.card { padding: 0; overflow: hidden; }
+.card > *:not(.art) { margin-left: var(--s3); margin-right: var(--s3); }
+.card > .top { margin-top: var(--s3); }
+.card > .foot { margin-bottom: 0; padding-bottom: var(--s3); }
+.art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--raised-2); }
+.art img { width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .5s cubic-bezier(.22,.75,.3,1); }
+.card:hover .art img { transform: scale(1.045); }
+.art::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 45%, var(--raised)); }
+.art-icon { display: grid; place-items: center; }
+.art-icon img { width: 42%; height: auto; object-fit: contain; }
+.card .top { display: flex; align-items: center; gap: 13px; }
+.card .top img { width: 46px; height: 46px; border-radius: 12px; flex: none; }
+.card h3 { margin: 0; font-size: 19px; letter-spacing: -.01em; }
+.card h3 a { color: var(--ink); }
+.card h3 a::after { content: ""; position: absolute; inset: 0; }
+.card .tagline { color: var(--accent); font-size: 13.5px; margin: 2px 0 0; }
+.card p.body { margin: 0; color: var(--muted); font-size: 15px; }
+.tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; }
 .tag {
-  font-size: 12px; letter-spacing: .02em; padding: 3px 9px; border-radius: 999px;
-  border: 1px solid var(--edge); color: var(--muted);
+  font-size: 12px; padding: 3px 10px; border-radius: 999px;
+  border: 1px solid var(--edge); color: var(--muted); background: var(--raised-2);
 }
-.tag.ok { color: var(--ok); border-color: var(--ok); }
-.tag.warn { color: var(--warn); border-color: var(--warn); }
-.tag.accent { color: var(--accent); border-color: var(--accent-deep); }
-.empty { color: var(--muted); padding: 30px 0 60px; }
-main { padding-top: 26px; }
-h1.title { margin: 0 0 4px; font-size: 34px; }
-.subtitle { color: var(--accent); margin: 0 0 18px; }
-table { border-collapse: collapse; width: 100%; margin: 12px 0 28px; font-size: 15px; }
-th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--edge); vertical-align: top; }
-th { color: var(--dim); font-weight: 600; width: 190px; }
-pre {
-  background: var(--raised); border: 1px solid var(--edge); border-radius: 12px;
-  padding: 14px 16px; overflow-x: auto; font-size: 14px;
+.tag.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--edge)); }
+.tag.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, var(--edge)); }
+.tag.accent { color: var(--accent); border-color: color-mix(in srgb, var(--accent-deep) 45%, var(--edge)); }
+.card .foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border-top: 1px solid var(--edge); padding-top: 12px; font-size: 13px; color: var(--dim);
 }
-code { font-family: "Cascadia Code", "SF Mono", Consolas, monospace; }
-ul.plain { padding-left: 20px; color: var(--muted); }
-footer { border-top: 1px solid var(--edge); margin-top: 40px; padding: 22px 0 50px; color: var(--dim); font-size: 14px; }
-.back { display: inline-block; margin: 22px 0 10px; font-size: 14px; }
-.banner { width: 100%; max-width: 760px; height: auto; margin: 6px 0 18px; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 34px 0 4px; }
-.section-head h2 { margin: 0; font-size: 20px; }
-.section-head a { font-size: 14px; }
-.strip { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; padding: 0; list-style: none; }
-.strip li { border: 1px solid var(--edge); border-radius: 10px; padding: 8px 13px; background: var(--raised); font-size: 14px; }
-.strip .when { color: var(--dim); }
-.cloud { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
-.cloud button {
-  font: inherit; font-size: 13px; cursor: pointer; padding: 3px 11px; border-radius: 999px;
-  background: var(--raised); color: var(--muted); border: 1px solid var(--edge);
-}
-.cloud button:hover { color: var(--accent); border-color: var(--accent-deep); }
-.installs { color: var(--dim); font-size: 13px; }
 .installs b { color: var(--accent); }
-.cta {
-  border: 1px solid var(--edge); border-left: 3px solid var(--accent-deep); border-radius: var(--radius);
-  background: var(--raised); padding: 18px 20px; margin: 26px 0 40px;
+.empty {
+  color: var(--muted); text-align: center; border: 1px dashed var(--edge);
+  border-radius: var(--radius); padding: 46px 20px; margin: 4px 0 0;
 }
-.cta h2 { margin: 0 0 6px; font-size: 19px; }
-.cta p { margin: 0 0 8px; color: var(--muted); }
-.who { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+
+/* ---------- strips, keywords, cta ---------- */
+.strip { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.strip li {
+  border: 1px solid var(--edge); border-radius: 999px; padding: 7px 15px;
+  background: var(--raised); font-size: 14px;
+}
+.strip .when { color: var(--dim); margin-left: 6px; font-size: 13px; }
+.cloud { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.cloud button {
+  font: inherit; font-size: 13px; cursor: pointer; padding: 5px 13px; border-radius: 999px;
+  background: var(--raised); color: var(--muted); border: 1px solid var(--edge); transition: all .12s ease;
+}
+.cloud button:hover { color: var(--accent); border-color: var(--accent-deep); background: var(--accent-soft); }
+.cta {
+  display: grid; gap: 18px; grid-template-columns: 1.4fr 1fr; align-items: center;
+  border: 1px solid var(--edge); border-radius: var(--radius); background:
+    linear-gradient(135deg, var(--accent-soft), transparent 60%), var(--raised);
+  padding: 30px; margin: 46px 0 10px;
+}
+.cta h2 { margin: 0 0 8px; font-size: 24px; letter-spacing: -.01em; }
+.cta p { margin: 0; color: var(--muted); }
+.cta .links { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 800px) { .cta { grid-template-columns: 1fr; } }
+
+/* ---------- detail pages ---------- */
+.detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
+.detail-hero .wrap { padding: 40px 24px 34px; }
+.detail-hero .top { display: flex; align-items: center; gap: 18px; }
+.detail-hero img.icon { width: 68px; height: 68px; border-radius: 18px; flex: none; }
+.detail-hero h1 { margin: 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.02em; }
+.detail-hero .subtitle { color: var(--accent); margin: 6px 0 0; font-size: 17px; }
+.crumbs { font-size: 13px; color: var(--dim); margin: 0 0 18px; }
+.layout { display: grid; gap: var(--s4); grid-template-columns: minmax(0, var(--phi)fr) minmax(0, 1fr); padding: var(--s4) 0 10px; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+.content h2 {
+  font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim);
+  margin: 34px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--edge);
+}
+.content h2:first-child { margin-top: 0; }
+.content ul { padding-left: 20px; color: var(--muted); }
+.content li { margin: 6px 0; }
+.content li::marker { color: var(--accent-deep); }
+aside .box {
+  background: var(--raised); border: 1px solid var(--edge); border-radius: var(--radius);
+  padding: 20px; position: sticky; top: 78px;
+}
+aside h2 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin: 0 0 12px; }
+aside dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 12px; }
+aside dt { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+aside dd { margin: 2px 0 0; font-size: 14.5px; color: var(--ink); word-break: break-word; }
+aside .checksum { font-family: "Cascadia Code", "SF Mono", Consolas, monospace; font-size: 11.5px; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; margin: 4px 0 10px; font-size: 15px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+th { color: var(--dim); font-weight: 600; width: 170px; }
+.code { border: 1px solid var(--edge); border-radius: var(--radius-sm); overflow: hidden; margin: 0 0 18px; }
+.code .head {
+  background: var(--raised-2); border-bottom: 1px solid var(--edge); padding: 8px 14px;
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim);
+}
+pre { margin: 0; background: var(--raised); padding: 15px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; }
+code { font-family: "Cascadia Code", "SF Mono", Consolas, monospace; }
 time { color: var(--dim); }
+.who { color: var(--muted); font-size: 14.5px; margin: 14px 0 0; }
+
+/* ---------- mobile: centred and symmetric ---------- */
+@media (max-width: 720px) {
+  .wrap { padding-left: var(--s3); padding-right: var(--s3); }
+  .hero .wrap { padding: var(--s5) var(--s3); text-align: center; }
+  .hero .inner { max-width: 100%; margin: 0 auto; }
+  .hero h1 { font-size: clamp(30px, 9vw, 40px); }
+  .hero .lede { margin-left: auto; margin-right: auto; max-width: 40ch; }
+  .eyebrow { margin-left: auto; margin-right: auto; }
+  .actions { flex-direction: column; align-items: stretch; gap: var(--s2); }
+  .actions .button { width: 100%; justify-content: center; }
+  .stats { justify-content: space-between; gap: var(--s2) var(--s3); }
+  .stats li { flex: 1 1 40%; align-items: center; text-align: center; }
+  .panel { margin-top: calc(var(--s3) * -1); padding: var(--s3); }
+  .controls { grid-template-columns: 1fr; }
+  .toggles { flex-direction: column; align-items: center; gap: var(--s1); }
+  .count { text-align: center; }
+  .section-head { flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .strip, .cloud { justify-content: center; }
+  .card { align-items: center; text-align: center; }
+  .card .top { flex-direction: column; gap: var(--s1); }
+  .card p.body { text-align: left; }
+  .tags { justify-content: center; }
+  .card .foot { justify-content: center; gap: var(--s3); }
+  .cta { text-align: center; padding: var(--s4) var(--s3); }
+  .cta .links { justify-content: center; }
+  .cta .links .button { width: 100%; justify-content: center; }
+  .detail-hero .wrap { text-align: center; }
+  .detail-hero .top { flex-direction: column; gap: var(--s2); }
+  .crumbs { text-align: center; }
+  aside .box { position: static; }
+  footer .cols { flex-direction: column; align-items: center; text-align: center; }
+  footer .links { justify-content: center; }
+  .bar nav { gap: var(--s2); }
+  .bar nav a:nth-of-type(2), .bar nav a:nth-of-type(3) { display: none; }
+}
+
+/* ---------- motion ---------- */
+@keyframes drift { from { transform: translateX(-28px); } to { transform: translateX(28px); } }
+@keyframes glow { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes sheen { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+
+.reveal { opacity: 0; transform: translateY(18px);
+  transition: opacity .45s cubic-bezier(.22,.75,.3,1), transform .45s cubic-bezier(.22,.75,.3,1); }
+.reveal.in { opacity: 1; transform: none; }
+.grid .card.reveal { transition-delay: calc(var(--i, 0) * 45ms); }
+.hero .layers path:nth-child(1) { animation: drift 26s ease-in-out infinite alternate; }
+.hero .layers path:nth-child(2) { animation: drift 34s ease-in-out infinite alternate-reverse; }
+.hero .layers path:nth-child(3) { animation: drift 44s ease-in-out infinite alternate; }
+.hero::before { animation: glow 14s ease-in-out infinite; }
+.hero h1 i { background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: sheen 9s linear infinite; }
+.card .top img { transition: transform .25s cubic-bezier(.22,.75,.3,1); }
+.card:hover .top img { transform: rotate(-4deg) scale(1.06); }
+.button.primary { background-size: 180% 100%; transition: background-position .35s ease, transform .12s ease; }
+.button.primary:hover { background-position: 100% 50%; }
+.card, .tag, .cloud button, .strip li { will-change: transform; }
+.stats b { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal.in { opacity: 1; transform: none; transition: none; }
+  .hero .layers path, .hero::before, .hero h1 i { animation: none; }
+  .card:hover { transform: none; }
+  .card:hover .top img { transform: none; }
+}
+
+/* ---------- footer ---------- */
+footer { border-top: 1px solid var(--edge); margin-top: 56px; padding: 34px 0 60px; color: var(--dim); font-size: 14px; background: var(--raised); }
+footer .cols { display: flex; flex-wrap: wrap; gap: 30px; justify-content: space-between; }
+footer a { color: var(--muted); }
+footer .note { max-width: 58ch; margin: 0; }
+footer .links { display: flex; gap: 18px; flex-wrap: wrap; }
 """.strip()
+
+HERO_MEDIA = (
+    '<img src="assets/img/hero-2400.webp" srcset="assets/img/hero-1280.webp 1280w, '
+    'assets/img/hero-2400.webp 2400w" sizes="100vw" alt="" fetchpriority="high" decoding="async" '
+    'style="background:#0a1016">'
+    '<video id="hero-video" muted loop playsinline preload="none" aria-hidden="true" '
+    'poster="assets/img/hero-2400.webp" hidden></video>'
+)
+
+HERO_SCRIPT = r"""
+// The 4K hero loop is a bonus, never a cost: it loads only on a wide screen, only
+// when motion is welcome, and never on a metered or slow connection. Everyone else
+// keeps the still, which is the video's own first frame.
+(function () {
+  const video = document.getElementById('hero-video');
+  if (!video) return;
+  const wide = window.matchMedia('(min-width: 900px)').matches;
+  const motionOk = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const connection = navigator.connection || {};
+  const cheapData = connection.saveData === true ||
+    ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
+  if (!wide || !motionOk || cheapData) return;
+  video.src = 'assets/video/hero-4k.mp4';
+  video.addEventListener('canplay', function () {
+    video.hidden = false;
+    video.play().catch(function () { video.hidden = true; });
+  }, { once: true });
+})();
+""".strip()
+
+LAYER_ART = (
+    '<svg class="layers" viewBox="0 0 1440 190" preserveAspectRatio="none" aria-hidden="true">'
+    '<path d="M0 96 q180 -34 360 -8 q180 26 360 -6 q180 -32 360 4 q180 36 360 -10 V190 H0 Z" fill="#3d5568" opacity=".28"/>'
+    '<path d="M0 130 q200 30 400 4 q200 -26 400 8 q200 34 640 -14 V190 H0 Z" fill="#4a6a80" opacity=".3"/>'
+    '<path d="M0 164 q220 -24 440 2 q220 26 440 -6 q200 -28 560 8 V190 H0 Z" fill="#5b8298" opacity=".32"/>'
+    "</svg>"
+)
 
 SCRIPT = r"""
 const skills = JSON.parse(document.getElementById('skill-data').textContent);
@@ -223,6 +468,7 @@ function apply() {
     const skill = skills.find((item) => item.name === card.dataset.name);
     const visible = matches(skill);
     card.hidden = !visible;
+    if (visible) card.classList.add('in');
     if (visible) shown += 1;
   }
   count.textContent = shown === skills.length
@@ -238,12 +484,12 @@ for (const button of document.querySelectorAll('.cloud button')) {
   button.addEventListener('click', () => {
     controls[0].value = button.dataset.keyword;
     apply();
-    document.getElementById('grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('skills').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 }
 apply();
 
-// Install counts come from GitHub's public release API: one asset per skill
+// Download counts come from GitHub's public release API: one asset per skill
 // version, counted by GitHub itself. Nothing is sent about the reader, and the
 // page works unchanged when the request fails or is blocked.
 async function loadInstalls() {
@@ -265,11 +511,10 @@ async function loadInstalls() {
   }
   if (counts.size === 0) return;
   for (const element of document.querySelectorAll('[data-installs]')) {
-    const count = counts.get(element.dataset.installs);
-    if (count === undefined) continue;
-    element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+    const value = counts.get(element.dataset.installs);
+    if (value === undefined) continue;
+    element.innerHTML = '<b>' + value.toLocaleString() + '</b> download' + (value === 1 ? '' : 's');
   }
-  const grid = document.getElementById('grid');
   [...grid.children]
     .sort((a, b) => (counts.get(b.dataset.name) || 0) - (counts.get(a.dataset.name) || 0))
     .forEach((card) => grid.appendChild(card));
@@ -277,6 +522,69 @@ async function loadInstalls() {
 loadInstalls();
 """.strip()
 
+THEME_SCRIPT = r"""
+(function () {
+  const stored = localStorage.getItem('skillquarry-theme');
+  const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const root = document.documentElement;
+  root.dataset.theme = stored || system;
+  window.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('theme');
+    if (!button) return;
+    const label = () => { button.textContent = root.dataset.theme === 'light' ? 'Dark' : 'Light'; };
+    label();
+    button.addEventListener('click', function () {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('skillquarry-theme', root.dataset.theme);
+      label();
+    });
+  });
+})();
+""".strip()
+
+MOTION_SCRIPT = r"""
+// Entrance animation and stat count-up. Both are progressive: without JavaScript,
+// or with reduced motion requested, everything is simply visible immediately.
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.card, .section-head, .strip, .cloud, .cta, .panel, .content h2, aside .box');
+  if (reduced || !('IntersectionObserver' in window)) {
+    targets.forEach((element) => element.classList.add('in'));
+    return;
+  }
+  document.querySelectorAll('.grid').forEach((grid) => {
+    [...grid.children].forEach((card, index) => card.style.setProperty('--i', index));
+  });
+  targets.forEach((element) => element.classList.add('reveal'));
+  // Failsafe: whatever happens to the observer, nothing stays invisible.
+  const showEverything = () => targets.forEach((element) => element.classList.add('in'));
+  setTimeout(showEverything, 1500);
+  window.addEventListener('beforeprint', showEverything);
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  targets.forEach((element) => observer.observe(element));
+
+  for (const number of document.querySelectorAll('.stats b')) {
+    const final = parseInt(number.textContent, 10);
+    if (!Number.isFinite(final) || final === 0) continue;
+    const started = performance.now();
+    const duration = 900;
+    const step = (now) => {
+      const progress = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      number.textContent = Math.round(final * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    number.textContent = '0';
+    requestAnimationFrame(step);
+  }
+})();
+""".strip()
 
 INSTALL_SCRIPT = r"""
 // Same public source as the overview: GitHub's own per-asset download counter.
@@ -291,9 +599,9 @@ fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
       }
     }
     for (const element of document.querySelectorAll('[data-installs]')) {
-      const count = counts.get(element.dataset.installs);
-      if (count !== undefined) {
-        element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+      const value = counts.get(element.dataset.installs);
+      if (value !== undefined) {
+        element.innerHTML = '<b>' + value.toLocaleString() + '</b> download' + (value === 1 ? '' : 's');
       }
     }
   })
@@ -301,7 +609,24 @@ fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
 """.strip()
 
 
-def page(title: str, description: str, body: str, *, depth: int = 0) -> str:
+def top_bar(depth: int) -> str:
+    up = "../" * depth
+    return f"""<div class="bar"><div class="wrap">
+  <a class="mark" href="{up}index.html">
+    <img src="{up}assets/skillquarry-logo.svg" alt="">
+    <span>Skill<i>Quarry</i></span>
+  </a>
+  <nav>
+    <a href="{up}index.html#skills">Skills</a>
+    <a href="{up}maintainers/index.html">Maintainers</a>
+    <a href="{SOURCE_URL}/blob/main/docs/SKILL-SPEC.md">Spec</a>
+    <a href="{SOURCE_URL}">GitHub</a>
+    <button class="ghost" id="theme" type="button">Light</button>
+  </nav>
+</div></div>"""
+
+
+def page(title: str, description: str, body: str, *, depth: int = 0, scripts: str = "") -> str:
     up = "../" * depth
     return f"""<!doctype html>
 <html lang="en">
@@ -310,19 +635,69 @@ def page(title: str, description: str, body: str, *, depth: int = 0) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(description)}">
+<meta name="color-scheme" content="dark light">
+<meta property="og:title" content="{esc(title)}">
+<meta property="og:description" content="{esc(description)}">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://beko2210.github.io/SkillQuarry/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{up}assets/skillquarry-logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{up}style.css">
+<script>{THEME_SCRIPT}</script>
 </head>
 <body>
+{top_bar(depth)}
 {body}
-<footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
-Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
-· <a href="{SOURCE_URL}">Source on GitHub</a>
+<footer><div class="wrap cols">
+  <p class="note">Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+  Download counts come from GitHub's public release API — no cookies, no identifiers,
+  nothing recorded about you.</p>
+  <div class="links">
+    <a href="{SOURCE_URL}">Source</a>
+    <a href="{SOURCE_URL}/blob/main/CONTRIBUTING.md">Contributing</a>
+    <a href="{SOURCE_URL}/blob/main/SECURITY.md">Security</a>
+    <a href="{SOURCE_URL}/discussions">Discussions</a>
+    <a href="{up}registry.json">registry.json</a>
+  </div>
 </div></footer>
+<script>{MOTION_SCRIPT}</script>
+{scripts}
 </body>
 </html>
 """
+
+
+def icon_for(manifest: dict[str, Any], depth: int = 0) -> str | None:
+    """The skill's own logo, as it sits in the generated site."""
+    icon = manifest.get("icon")
+    if not icon:
+        return None
+    return f"{'../' * depth}assets/{Path(str(icon)).name}"
+
+
+def gradient_for(name: str) -> str:
+    """A deterministic fallback so a skill without artwork still looks intentional."""
+    seed = sum(ord(character) for character in name)
+    hue = seed % 360
+    return (f"linear-gradient(135deg, hsl({hue} 32% 26%), hsl({(hue + 42) % 360} 38% 16%))")
+
+
+def artwork_for(manifest: dict[str, Any], skill: dict[str, Any], depth: int = 0) -> str:
+    """Card artwork, in order: the manifest's image, the skill's icon, a generated gradient.
+
+    A skill added tomorrow needs none of them: the last step always works.
+    """
+    name = str(skill.get("name", ""))
+    up = "../" * depth
+    image = manifest.get("image")
+    if image and (REPO / str(image)).is_file():
+        return (f'<div class="art"><img src="{up}{esc(image)}" alt="" loading="lazy" '
+                f'decoding="async"></div>')
+    icon = icon_for(manifest, depth)
+    if icon:
+        return (f'<div class="art art-icon" style="background:{gradient_for(name)}">'
+                f'<img src="{esc(icon)}" alt="" loading="lazy" decoding="async"></div>')
+    return f'<div class="art" style="background:{gradient_for(name)}"></div>' 
 
 
 def card(skill: dict[str, Any], manifest: dict[str, Any]) -> str:
@@ -337,13 +712,23 @@ def card(skill: dict[str, Any], manifest: dict[str, Any]) -> str:
         tags.append('<span class="tag warn">destructive</span>')
     for agent in skill.get("compatibility") or []:
         tags.append(f'<span class="tag">{esc(AGENT_LABELS.get(agent, agent))}</span>')
+    icon = icon_for(manifest)
     tagline = manifest.get("tagline")
     return f"""      <article class="card" data-name="{esc(skill['name'])}">
-        <h2><a href="skills/{esc(skill['name'])}.html">{esc(skill.get('displayName'))}</a></h2>
-        {f'<p class="tagline">{esc(tagline)}</p>' if tagline else ''}
-        <p>{esc(skill.get('description'))}</p>
+        {artwork_for(manifest, skill)}
+        <div class="top">
+          {f'<img src="{esc(icon)}" alt="">' if icon else ''}
+          <div>
+            <h3><a href="skills/{esc(skill['name'])}.html">{esc(skill.get('displayName'))}</a></h3>
+            {f'<p class="tagline">{esc(tagline)}</p>' if tagline else ''}
+          </div>
+        </div>
+        <p class="body">{esc(skill.get('description'))}</p>
         <div class="tags">{''.join(tags)}</div>
-        <p class="installs" data-installs="{esc(skill['name'])}"></p>
+        <div class="foot">
+          <span>v{esc(skill.get('version'))}</span>
+          <span class="installs" data-installs="{esc(skill['name'])}"></span>
+        </div>
       </article>"""
 
 
@@ -354,20 +739,21 @@ def options(values: list[str], labels: dict[str, str], placeholder: str) -> str:
     return "".join(parts)
 
 
-def humanise(date: str) -> str:
+def humanise(date: str | None) -> str:
     return date[:10] if date else "—"
 
 
 def recently_updated(skills: list[dict[str, Any]], history: dict[str, Any], limit: int = 5) -> str:
     rows = sorted(
-        ((str(s["name"]), str(s.get("displayName")), (history.get(str(s["name"])) or {}).get("last_changed"))
+        ((str(s["name"]), str(s.get("displayName")), str(s.get("version")),
+          (history.get(str(s["name"])) or {}).get("released"))
          for s in skills),
-        key=lambda row: row[2] or "", reverse=True,
+        key=lambda row: row[3] or "", reverse=True,
     )[:limit]
     items = "".join(
-        f'<li><a href="skills/{esc(name)}.html">{esc(display)}</a> '
-        f'<span class="when">{esc(humanise(when))}</span></li>'
-        for name, display, when in rows
+        f'<li><a href="skills/{esc(name)}.html">{esc(display)}</a>'
+        f'<span class="when">v{esc(version)} · {esc(humanise(when))}</span></li>'
+        for name, display, version, when in rows
     )
     return f'<ul class="strip">{items}</ul>'
 
@@ -405,65 +791,84 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
     qualities = sorted({str(s.get("quality")) for s in skills})
     total_tests = sum(int((s.get("tests") or {}).get("count") or 0) for s in skills)
     data = json.dumps(skills, ensure_ascii=False, sort_keys=True).replace("</", "<\\/")
-    recently = recently_updated(skills, history)
-    cloud = keyword_cloud(manifests)
-    people = '<ul class="strip">' + "".join(
-        f'<li><a href="maintainers/{esc(handle)}.html">{esc(person["name"])}</a> '
+    people = maintainer_index(manifests)
+
+    maintainer_strip = '<ul class="strip">' + "".join(
+        f'<li><a href="maintainers/{esc(handle)}.html">{esc(person["name"])}</a>'
         f'<span class="when">{len(person["skills"])} skill{"" if len(person["skills"]) == 1 else "s"}</span></li>'
-        for handle, person in sorted(maintainer_index(manifests).items())
+        for handle, person in sorted(people.items())
     ) + "</ul>"
 
-    body = f"""<header class="top"><div class="wrap">
-  <img src="assets/skillquarry-banner.svg" alt="SkillQuarry — the open marketplace for agent skills">
-  <p class="lede">Reusable capabilities for AI coding agents: inspectable, tested, versioned, and installable with one command.</p>
-  <ul class="stats">
-    <li><b>{len(skills)}</b> skills</li>
-    <li><b>{len(categories)}</b> categories</li>
-    <li><b>{total_tests}</b> tests passing</li>
-    <li><b>0</b> dependencies</li>
-  </ul>
-</div></header>
+    body = f"""<header class="hero">
+  <div class="shot">{HERO_MEDIA}</div>
+  {LAYER_ART}
+  <div class="wrap"><div class="inner">
+    <p class="eyebrow">Open marketplace for agent skills</p>
+    <h1>Build capabilities once.<br class="wide-only">Share <i>intelligence</i> everywhere.</h1>
+    <p class="lede">Reusable capabilities for AI coding agents — inspectable, tested,
+      versioned, checksum-verified, and installable with one command. No dependencies,
+      no telemetry, nothing hidden.</p>
+    <div class="actions">
+      <a class="button primary" href="#skills">Browse {len(skills)} skills</a>
+      <a class="button secondary" href="{SOURCE_URL}#install-the-client">Install the client</a>
+    </div>
+    <ul class="stats">
+      <li><b>{len(skills)}</b><span>skills</span></li>
+      <li><b>{len(categories)}</b><span>categories</span></li>
+      <li><b>{total_tests}</b><span>tests passing</span></li>
+      <li><b>0</b><span>dependencies</span></li>
+    </ul>
+  </div></div>
+</header>
 <main class="wrap">
-  <div class="controls">
-    <div><label for="q">Search</label><input id="q" type="search" placeholder="name, description, keyword" autocomplete="off"></div>
-    <div><label for="agent">Agent</label><select id="agent">{options(agents, AGENT_LABELS, "Any agent")}</select></div>
-    <div><label for="platform">Platform</label><select id="platform">{options(platforms, {}, "Any platform")}</select></div>
-    <div><label for="category">Category</label><select id="category">{options(categories, CATEGORY_LABELS, "Any category")}</select></div>
-    <div><label for="quality">Quality</label><select id="quality">{options(qualities, {}, "Any level")}</select></div>
+  <div class="panel" id="skills">
+    <div class="controls">
+      <div><label for="q">Search</label><input id="q" type="search" placeholder="name, description, keyword" autocomplete="off"></div>
+      <div><label for="agent">Agent</label><select id="agent">{options(agents, AGENT_LABELS, "Any agent")}</select></div>
+      <div><label for="platform">Platform</label><select id="platform">{options(platforms, {}, "Any platform")}</select></div>
+      <div><label for="category">Category</label><select id="category">{options(categories, CATEGORY_LABELS, "Any category")}</select></div>
+      <div><label for="quality">Quality</label><select id="quality">{options(qualities, {}, "Any level")}</select></div>
+    </div>
+    <div class="toggles">
+      <label><input type="checkbox" id="offline"> needs no network of its own</label>
+      <label><input type="checkbox" id="nosecrets"> needs no credentials</label>
+    </div>
   </div>
-  <div class="toggles">
-    <label><input type="checkbox" id="offline"> needs no network of its own</label>
-    <label><input type="checkbox" id="nosecrets"> needs no credentials</label>
-  </div>
+
   <p class="count" id="count">{len(skills)} skills</p>
   <div class="grid" id="grid">
 {chr(10).join(card(skill, manifests[skill["name"]]) for skill in skills)}
   </div>
   <p class="empty" id="empty" hidden>No skill matches those filters.</p>
 
-  <div class="section-head"><h2>Recently updated</h2><span class="when">from the commit history</span></div>
-  {recently}
+  <div class="section-head"><h2>Recently updated</h2><span>by version date</span></div>
+  {recently_updated(skills, history)}
 
   <div class="section-head"><h2>Browse by keyword</h2></div>
-  {cloud}
+  {keyword_cloud(manifests)}
 
   <div class="section-head"><h2>Maintainers</h2><a href="maintainers/index.html">All maintainers &rarr;</a></div>
-  {people}
+  {maintainer_strip}
 
-  <div class="cta">
-    <h2>Add your skill</h2>
-    <p>A skill is a directory with a manifest, an agent-facing SKILL.md, tests and a test report.
-       Scaffold one from the reference skill, open a pull request, and CI checks the rest.</p>
-    <p><a href="{SOURCE_URL}/blob/main/CONTRIBUTING.md">Contributing</a> ·
-       <a href="{SOURCE_URL}/blob/main/docs/SKILL-SPEC.md">Skill specification</a> ·
-       <a href="{SOURCE_URL}/issues/new/choose">Propose a skill</a> ·
-       <a href="{SOURCE_URL}/discussions">Discussions</a></p>
-  </div>
+  <section class="cta">
+    <div>
+      <h2>Add your skill</h2>
+      <p>A skill is a directory with a manifest, an agent-facing SKILL.md, tests and a test
+         report. Scaffold one from the reference skill, open a pull request, and CI checks
+         the specification, the checksums and the registry for you.</p>
+    </div>
+    <div class="links">
+      <a class="button primary" href="{SOURCE_URL}/blob/main/CONTRIBUTING.md">Contributing</a>
+      <a class="button secondary" href="{SOURCE_URL}/blob/main/docs/SKILL-SPEC.md">Skill specification</a>
+      <a class="button secondary" href="{SOURCE_URL}/issues/new/choose">Propose a skill</a>
+      <a class="button secondary" href="{SOURCE_URL}/discussions">Discussions</a>
+    </div>
+  </section>
 </main>
-<script type="application/json" id="skill-data">{data}</script>
-<script>{SCRIPT}</script>"""
+<script type="application/json" id="skill-data">{data}</script>"""
     return page("SkillQuarry — the open marketplace for agent skills",
-                "Discover, inspect and install reusable capabilities for AI coding agents.", body)
+                "Discover, inspect and install reusable capabilities for AI coding agents.",
+                body, scripts=f"<script>{SCRIPT}</script>\n<script>{HERO_SCRIPT}</script>")
 
 
 def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
@@ -472,11 +877,12 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
     tests = skill.get("tests") or {}
     name = str(skill["name"])
     source = f"{SOURCE_URL}/tree/main/{skill['path']}"
+    icon = icon_for(manifest, depth=1)
     banner = manifest.get("banner")
 
-    rows = [
-        ("Category", CATEGORY_LABELS.get(skill.get("category"), skill.get("category"))),
+    facts = [
         ("Version", skill.get("version")),
+        ("Category", CATEGORY_LABELS.get(skill.get("category"), skill.get("category"))),
         ("Quality", skill.get("quality")),
         ("License", skill.get("license")),
         ("Agents", ", ".join(AGENT_LABELS.get(a, a) for a in skill.get("compatibility") or []) or "—"),
@@ -488,18 +894,10 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
         ("Writes outside the repository", "yes" if security.get("writes_outside_repository") else "no"),
         ("Irreversible operations", "; ".join(security.get("destructive_operations") or []) or "none declared"),
         ("Independently reviewed", security.get("reviewed_by", "not recorded")),
-        ("Checksum", skill.get("checksum")),
     ]
-    table = "\n".join(f"    <tr><th>{esc(key)}</th><td>{esc(value)}</td></tr>" for key, value in rows)
-
-    highlights = manifest.get("highlights") or []
-    highlight_block = ""
-    if highlights:
-        items = "\n".join(f"    <li>{esc(item)}</li>" for item in highlights)
-        highlight_block = f"  <h2>What it does</h2>\n  <ul class=\"plain\">\n{items}\n  </ul>\n"
-
-    quickstart = manifest.get("quickstart")
-    quickstart_block = f"  <h2>Quickstart</h2>\n  <pre><code>{esc(quickstart)}</code></pre>\n" if quickstart else ""
+    fact_list = "\n".join(
+        f"      <div><dt>{esc(key)}</dt><dd>{esc(value)}</dd></div>" for key, value in facts
+    )
 
     people = manifest.get("maintainers") or []
     who = ""
@@ -508,28 +906,34 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
             f'<a href="../maintainers/{esc(person.get("github"))}.html">{esc(person.get("name"))}</a>'
             for person in people
         )
-        who = f'  <p class="who">Maintained by {links} · <span class="installs" data-installs="{esc(name)}"></span></p>\n'
+        who = f'<p class="who">Maintained by {links} · <span class="installs" data-installs="{esc(name)}"></span></p>'
 
-    history = history or {}
+    highlights = manifest.get("highlights") or []
+    highlight_block = ""
+    if highlights:
+        items = "\n".join(f"      <li>{esc(item)}</li>" for item in highlights)
+        highlight_block = f"    <h2>What it does</h2>\n    <ul>\n{items}\n    </ul>\n"
+
+    quickstart = manifest.get("quickstart")
+    quickstart_block = ""
+    if quickstart:
+        quickstart_block = (
+            '    <h2>Quickstart</h2>\n'
+            '    <div class="code"><div class="head">shell</div>'
+            f"<pre><code>{esc(quickstart)}</code></pre></div>\n"
+        )
+
+    versions = (history or {}).get("versions") or []
     history_block = ""
-    versions = history.get("versions") or []
-    commits = history.get("commits") or []
-    if versions or commits:
-        version_rows = "".join(
-            f"    <tr><th>{esc(item['version'])}</th><td>{esc(humanise(item['date']))}</td></tr>"
+    if versions:
+        rows = "".join(
+            f"      <tr><th>v{esc(item['version'])}</th><td><time>{esc(humanise(item['date']))}</time></td></tr>"
             for item in versions
         )
-        commit_rows = "".join(
-            f"    <tr><th><time>{esc(humanise(item['date']))}</time></th>"
-            f'<td><a href="{esc(SOURCE_URL)}/commit/{esc(item["sha"])}">{esc(item["sha"])}</a> '
-            f"{esc(item['subject'])}</td></tr>"
-            for item in commits[:10]
-        )
         history_block = (
-            "  <h2>History</h2>\n"
-            f"  <table>\n{version_rows}\n  </table>\n"
-            f"  <table>\n{commit_rows}\n  </table>\n"
-            if version_rows else f"  <h2>History</h2>\n  <table>\n{commit_rows}\n  </table>\n"
+            "    <h2>Version history</h2>\n"
+            f"    <table>\n{rows}\n    </table>\n"
+            f'    <p><a href="{esc(SOURCE_URL)}/commits/main/{esc(skill["path"])}">Full commit history &rarr;</a></p>\n'
         )
 
     links = [f'<a href="{esc(source)}">Source</a>',
@@ -538,45 +942,71 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
     if tests.get("report"):
         links.append(f'<a href="{esc(source)}/{esc(tests["report"])}">Test report</a>')
 
-    body = f"""<main class="wrap">
-  <a class="back" href="../index.html">&larr; all skills</a>
-  {f'<img class="banner" src="../{esc(banner)}" alt="{esc(skill.get("displayName"))}">' if banner else ''}
-  <h1 class="title">{esc(skill.get('displayName'))}</h1>
-  {f'<p class="subtitle">{esc(manifest["tagline"])}</p>' if manifest.get('tagline') else ''}
-{who}  <p>{esc(skill.get('description'))}</p>
-{highlight_block}  <h2>Install</h2>
-  <pre><code>git clone {esc(SOURCE_URL)}.git
+    body = f"""<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / {esc(skill.get('displayName'))}</p>
+  <div class="top">
+    {f'<img class="icon" src="{esc(icon)}" alt="">' if icon else ''}
+    <div>
+      <h1>{esc(skill.get('displayName'))}</h1>
+      {f'<p class="subtitle">{esc(manifest["tagline"])}</p>' if manifest.get('tagline') else ''}
+    </div>
+  </div>
+  {who}
+</div></header>
+<main class="wrap">
+  <div class="layout">
+    <div class="content">
+      {f'<img class="banner" src="../{esc(banner)}" alt="{esc(skill.get("displayName"))}" style="width:100%;border-radius:14px;border:1px solid var(--edge);margin:0 0 26px">' if banner else ''}
+      <h2>Overview</h2>
+      <p>{esc(skill.get('description'))}</p>
+{highlight_block}    <h2>Install</h2>
+    <div class="code"><div class="head">shell</div><pre><code>git clone {esc(SOURCE_URL)}.git
 cd SkillQuarry/cli &amp;&amp; ./install.sh
 skillquarry info {esc(name)}
-skillquarry install {esc(name)}</code></pre>
-  <p>Installation verifies the checksum below before running the skill's own installer.</p>
-{quickstart_block}  <h2>Facts</h2>
-  <table>
-{table}
-  </table>
-{history_block}  <p>{' · '.join(links)}</p>
-</main>
-<script>{INSTALL_SCRIPT}</script>"""
-    return page(f"{skill.get('displayName')} — SkillQuarry", str(skill.get("description", "")), body, depth=1)
+skillquarry install {esc(name)}</code></pre></div>
+    <p>Installation verifies the checksum in the sidebar before running the skill's own installer.</p>
+{quickstart_block}{history_block}    <h2>Read next</h2>
+    <p>{' · '.join(links)}</p>
+    </div>
+    <aside>
+      <div class="box">
+        <h2>Facts</h2>
+        <dl>
+{fact_list}
+          <div><dt>Checksum</dt><dd class="checksum">{esc(skill.get('checksum'))}</dd></div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</main>"""
+    return page(f"{skill.get('displayName')} — SkillQuarry", str(skill.get("description", "")),
+                body, depth=1, scripts=f"<script>{INSTALL_SCRIPT}</script>")
 
 
 def build_maintainer(handle: str, person: dict[str, Any], skills: dict[str, dict[str, Any]],
                      manifests: dict[str, dict[str, Any]]) -> str:
     cards = "\n".join(
         f"""      <article class="card">
-        <h2><a href="../skills/{esc(name)}.html">{esc(skills[name].get('displayName'))}</a></h2>
-        <p>{esc(skills[name].get('description'))}</p>
+        <div class="top">
+          {f'<img src="{esc(icon_for(manifests[name], depth=1))}" alt="">' if icon_for(manifests[name]) else ''}
+          <div><h3><a href="../skills/{esc(name)}.html">{esc(skills[name].get('displayName'))}</a></h3></div>
+        </div>
+        <p class="body">{esc(skills[name].get('description'))}</p>
         <div class="tags"><span class="tag accent">{esc(CATEGORY_LABELS.get(skills[name].get('category'), skills[name].get('category')))}</span></div>
       </article>"""
         for name in person["skills"] if name in skills
     )
-    body = f"""<main class="wrap">
-  <a class="back" href="../index.html">&larr; all skills</a>
-  <h1 class="title">{esc(person.get('name'))}</h1>
-  <p class="subtitle">{esc(person.get('role') or 'maintainer')}</p>
+    body = f"""<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / <a href="index.html">Maintainers</a> / {esc(person.get('name'))}</p>
+  <div class="top"><div>
+    <h1>{esc(person.get('name'))}</h1>
+    <p class="subtitle">{esc(person.get('role') or 'maintainer')}</p>
+  </div></div>
   <p class="who"><a href="https://github.com/{esc(handle)}">@{esc(handle)}</a> ·
      maintains {len(person['skills'])} skill{'' if len(person['skills']) == 1 else 's'}</p>
-  <div class="grid">
+</div></header>
+<main class="wrap">
+  <div class="grid" style="margin-top:34px">
 {cards}
   </div>
 </main>"""
@@ -587,17 +1017,24 @@ def build_maintainer(handle: str, person: dict[str, Any], skills: dict[str, dict
 def build_maintainer_index(people: dict[str, dict[str, Any]]) -> str:
     cards = "\n".join(
         f"""      <article class="card">
-        <h2><a href="{esc(handle)}.html">{esc(person.get('name'))}</a></h2>
-        <p>{esc(person.get('role') or 'maintainer')} · maintains {', '.join(esc(s) for s in person['skills'])}</p>
+        <div class="top"><div>
+          <h3><a href="{esc(handle)}.html">{esc(person.get('name'))}</a></h3>
+          <p class="tagline">{esc(person.get('role') or 'maintainer')}</p>
+        </div></div>
+        <p class="body">Maintains {', '.join(esc(s) for s in person['skills'])}.</p>
         <div class="tags"><span class="tag">@{esc(handle)}</span></div>
       </article>"""
         for handle, person in sorted(people.items())
     )
-    body = f"""<main class="wrap">
-  <a class="back" href="../index.html">&larr; all skills</a>
-  <h1 class="title">Maintainers</h1>
-  <p class="who">The people responsible for the skills in this quarry.</p>
-  <div class="grid">
+    body = f"""<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / Maintainers</p>
+  <div class="top"><div>
+    <h1>Maintainers</h1>
+    <p class="subtitle">The people responsible for the skills in this quarry</p>
+  </div></div>
+</div></header>
+<main class="wrap">
+  <div class="grid" style="margin-top:34px">
 {cards}
   </div>
 </main>"""
@@ -630,14 +1067,37 @@ def render() -> dict[str, str]:
     return files
 
 
+def binary_files() -> dict[str, bytes]:
+    """Images are copied verbatim; they are not generated, only carried."""
+    found: dict[str, bytes] = {}
+    for folder in ("img", "video"):
+        for asset in sorted((ASSETS / folder).glob("*")):
+            if asset.is_file():
+                found[f"assets/{folder}/{asset.name}"] = asset.read_bytes()
+    return found
+
+
+TEXT_SUFFIXES = {".html", ".css", ".json", ".svg", ".js", ""}
+
+
 def current() -> dict[str, str]:
     if not SITE.is_dir():
         return {}
     found = {}
     for path in sorted(SITE.rglob("*")):
-        if path.is_file():
+        if path.is_file() and path.suffix in TEXT_SUFFIXES:
             found[path.relative_to(SITE).as_posix()] = path.read_text("utf-8")
     return found
+
+
+def current_binaries() -> dict[str, bytes]:
+    if not SITE.is_dir():
+        return {}
+    return {
+        path.relative_to(SITE).as_posix(): path.read_bytes()
+        for path in sorted(SITE.rglob("*"))
+        if path.is_file() and path.suffix not in TEXT_SUFFIXES
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -647,23 +1107,27 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         files = render()
+        images = binary_files()
     except SiteError as exc:
         print(f"build_site: {exc}", file=sys.stderr)
         return 2
 
     existing = current()
     if args.check:
-        if existing != files:
-            missing = sorted(set(files) - set(existing))
-            extra = sorted(set(existing) - set(files))
-            changed = sorted(k for k in set(files) & set(existing) if files[k] != existing[k])
+        if existing != files or current_binaries() != images:
+            existing_images = current_binaries()
+            all_new = {**files, **images}
+            all_old = {**existing, **existing_images}
+            missing = sorted(set(all_new) - set(all_old))
+            extra = sorted(set(all_old) - set(all_new))
+            changed = sorted(k for k in set(all_new) & set(all_old) if all_new[k] != all_old[k])
             print("build_site: site/ is out of date", file=sys.stderr)
             for label, items in (("missing", missing), ("stale", changed), ("unexpected", extra)):
                 if items:
                     print(f"  {label}: {', '.join(items)}", file=sys.stderr)
             print("  run `python3 tools/build_site.py` and commit the result", file=sys.stderr)
             return EXIT_STALE
-        print(f"build_site: site/ is up to date ({len(files)} files)")
+        print(f"build_site: site/ is up to date ({len(files) + len(images)} files)")
         return 0
 
     if SITE.exists():
@@ -672,7 +1136,11 @@ def main(argv: list[str] | None = None) -> int:
         target = SITE / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
-    print(f"build_site: wrote {len(files)} files to site/")
+    for relative, blob in images.items():
+        target = SITE / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(blob)
+    print(f"build_site: wrote {len(files) + len(images)} files to site/")
     return 0
 
 

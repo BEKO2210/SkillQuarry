@@ -100,6 +100,11 @@
       "description": "Repository-relative path to an SVG banner, usually under assets/.",
       "maxLength": 200
     },
+    "image": {
+      "type": "string",
+      "description": "Optional repository-relative card image (WebP/JPG/PNG). Absent is fine: the site falls back to the skill's SVG icon, then to a generated gradient.",
+      "maxLength": 200
+    },
     "icon": {
       "type": "string",
       "description": "Path to an SVG icon, relative to the skill directory.",

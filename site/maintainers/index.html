@@ -5,26 +5,118 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Maintainers — SkillQuarry</title>
 <meta name="description" content="The people responsible for the skills in this quarry.">
+<meta name="color-scheme" content="dark light">
+<meta property="og:title" content="Maintainers — SkillQuarry">
+<meta property="og:description" content="The people responsible for the skills in this quarry.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://beko2210.github.io/SkillQuarry/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../assets/skillquarry-logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../style.css">
+<script>(function () {
+  const stored = localStorage.getItem('skillquarry-theme');
+  const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const root = document.documentElement;
+  root.dataset.theme = stored || system;
+  window.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('theme');
+    if (!button) return;
+    const label = () => { button.textContent = root.dataset.theme === 'light' ? 'Dark' : 'Light'; };
+    label();
+    button.addEventListener('click', function () {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('skillquarry-theme', root.dataset.theme);
+      label();
+    });
+  });
+})();</script>
 </head>
 <body>
+<div class="bar"><div class="wrap">
+  <a class="mark" href="../index.html">
+    <img src="../assets/skillquarry-logo.svg" alt="">
+    <span>Skill<i>Quarry</i></span>
+  </a>
+  <nav>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../maintainers/index.html">Maintainers</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/docs/SKILL-SPEC.md">Spec</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry">GitHub</a>
+    <button class="ghost" id="theme" type="button">Light</button>
+  </nav>
+</div></div>
+<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / Maintainers</p>
+  <div class="top"><div>
+    <h1>Maintainers</h1>
+    <p class="subtitle">The people responsible for the skills in this quarry</p>
+  </div></div>
+</div></header>
 <main class="wrap">
-  <a class="back" href="../index.html">&larr; all skills</a>
-  <h1 class="title">Maintainers</h1>
-  <p class="who">The people responsible for the skills in this quarry.</p>
-  <div class="grid">
+  <div class="grid" style="margin-top:34px">
       <article class="card">
-        <h2><a href="BEKO2210.html">Belkis Aslani</a></h2>
-        <p>maintainer · maintains cordon, rangate, strata</p>
+        <div class="top"><div>
+          <h3><a href="BEKO2210.html">Belkis Aslani</a></h3>
+          <p class="tagline">maintainer</p>
+        </div></div>
+        <p class="body">Maintains cordon, rangate, strata.</p>
         <div class="tags"><span class="tag">@BEKO2210</span></div>
       </article>
   </div>
 </main>
-<footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
-Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
-· <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
+<footer><div class="wrap cols">
+  <p class="note">Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+  Download counts come from GitHub's public release API — no cookies, no identifiers,
+  nothing recorded about you.</p>
+  <div class="links">
+    <a href="https://github.com/BEKO2210/SkillQuarry">Source</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/CONTRIBUTING.md">Contributing</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/SECURITY.md">Security</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/discussions">Discussions</a>
+    <a href="../registry.json">registry.json</a>
+  </div>
 </div></footer>
+<script>// Entrance animation and stat count-up. Both are progressive: without JavaScript,
+// or with reduced motion requested, everything is simply visible immediately.
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.card, .section-head, .strip, .cloud, .cta, .panel, .content h2, aside .box');
+  if (reduced || !('IntersectionObserver' in window)) {
+    targets.forEach((element) => element.classList.add('in'));
+    return;
+  }
+  document.querySelectorAll('.grid').forEach((grid) => {
+    [...grid.children].forEach((card, index) => card.style.setProperty('--i', index));
+  });
+  targets.forEach((element) => element.classList.add('reveal'));
+  // Failsafe: whatever happens to the observer, nothing stays invisible.
+  const showEverything = () => targets.forEach((element) => element.classList.add('in'));
+  setTimeout(showEverything, 1500);
+  window.addEventListener('beforeprint', showEverything);
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  targets.forEach((element) => observer.observe(element));
+
+  for (const number of document.querySelectorAll('.stats b')) {
+    const final = parseInt(number.textContent, 10);
+    if (!Number.isFinite(final) || final === 0) continue;
+    const started = performance.now();
+    const duration = 900;
+    const step = (now) => {
+      const progress = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      number.textContent = Math.round(final * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    number.textContent = '0';
+    requestAnimationFrame(step);
+  }
+})();</script>
+
 </body>
 </html>

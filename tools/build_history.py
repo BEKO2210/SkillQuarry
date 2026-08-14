@@ -2,12 +2,14 @@
 """Derive each skill's history from git into registry/history.json. Standard library only.
 
 The history is taken from the repository itself rather than from a hand-written
-changelog, so it cannot claim a release that never happened. For every commit that
-touched a skill it records the date, the subject and the version the manifest
-carried at that commit; from that, the version timeline follows.
+changelog, so it cannot claim a release that never happened: for every commit that
+touched a skill's manifest, the version it carried there, reduced to the date each
+version first appeared.
 
-Committing the result keeps the site build free of git: the generator reads this
-file, CI regenerates it.
+Only version changes are recorded, deliberately. A file derived from *every*
+commit would change with every commit — including the commit that writes it — so
+the committed copy could never be current. The version timeline moves only when a
+version does, which is what "history" should mean here anyway.
 
     python3 tools/build_history.py            # write registry/history.json
     python3 tools/build_history.py --check    # exit 3 if it is out of date
@@ -25,7 +27,7 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[1]
 REGISTRY = REPO / "registry" / "skills.json"
 HISTORY = REPO / "registry" / "history.json"
-MAX_COMMITS = 20
+MAX_COMMITS = 400  # commits scanned per skill, not entries kept
 EXIT_STALE = 3
 SEPARATOR = "\x1f"
 
@@ -74,25 +76,25 @@ def version_at(sha: str, path: str) -> str | None:
         return None
 
 
-def commits_for(path: str) -> list[dict[str, Any]]:
-    raw = git("log", f"--max-count={MAX_COMMITS}", f"--pretty=format:%h{SEPARATOR}%cI{SEPARATOR}%s",
-              "--", path)
+def manifest_commits(path: str) -> list[tuple[str, str]]:
+    """(sha, date) for every commit that touched the skill's manifest, newest first."""
+    raw = git("log", f"--max-count={MAX_COMMITS}", f"--pretty=format:%h{SEPARATOR}%cI",
+              "--", f"{path}/skill.json")
     entries = []
     for line in raw.splitlines():
-        if not line.strip():
-            continue
-        sha, date, subject = line.split(SEPARATOR, 2)
-        entries.append({"sha": sha, "date": date, "subject": subject, "version": version_at(sha, path)})
+        if line.strip():
+            sha, date = line.split(SEPARATOR, 1)
+            entries.append((sha, date))
     return entries
 
 
-def timeline(commits: list[dict[str, Any]]) -> list[dict[str, str]]:
+def timeline(path: str) -> list[dict[str, str]]:
     """Each version with the date it first appeared, newest first."""
     first_seen: dict[str, str] = {}
-    for commit in reversed(commits):  # oldest first
-        version = commit.get("version")
+    for sha, date in reversed(manifest_commits(path)):  # oldest first
+        version = version_at(sha, path)
         if version and version not in first_seen:
-            first_seen[version] = commit["date"]
+            first_seen[version] = date
     return [{"version": version, "date": date} for version, date in reversed(list(first_seen.items()))]
 
 
@@ -102,11 +104,10 @@ def render() -> str:
     document: dict[str, Any] = {"schema_version": 1, "skills": {}}
     for skill in skills:
         name = str(skill["name"])
-        commits = commits_for(str(skill["path"]))
+        versions = timeline(str(skill["path"]))
         document["skills"][name] = {
-            "commits": commits,
-            "versions": timeline(commits),
-            "last_changed": commits[0]["date"] if commits else None,
+            "versions": versions,
+            "released": versions[0]["date"] if versions else None,
         }
     return json.dumps(document, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
 

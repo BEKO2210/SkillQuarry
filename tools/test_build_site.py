@@ -62,8 +62,8 @@ class ContentTests(unittest.TestCase):
     def test_counts_shown_match_the_registry(self):
         registry = bs.load_registry()
         total = sum(int((s.get("tests") or {}).get("count") or 0) for s in registry)
-        self.assertIn(f"<b>{len(registry)}</b> skills", self.index)
-        self.assertIn(f"<b>{total}</b> tests passing", self.index)
+        self.assertIn(f"<b>{len(registry)}</b><span>skills</span>", self.index)
+        self.assertIn(f"<b>{total}</b><span>tests passing</span>", self.index)
 
     def test_detail_pages_state_the_security_surface(self):
         page = self.files["skills/rangate.html"]
@@ -72,14 +72,18 @@ class ContentTests(unittest.TestCase):
             self.assertIn(expected, page)
 
     def test_pages_reference_only_files_the_site_contains(self):
+        available = set(self.files) | set(bs.binary_files())
         for name, content in self.files.items():
             if not name.endswith(".html"):
                 continue
             base = Path(name).parent
             for reference in re.findall(r'(?:href|src)="(?!https?:|#|mailto:)([^"]+)"', content):
-                resolved = os.path.normpath(os.path.join(str(base), reference)).replace(os.sep, "/")
+                target = reference.split("#")[0]
+                if not target:
+                    continue  # a link to a fragment on the same page
+                resolved = os.path.normpath(os.path.join(str(base), target)).replace(os.sep, "/")
                 with self.subTest(page=name, reference=reference):
-                    self.assertIn(resolved, self.files)
+                    self.assertIn(resolved, available)
 
     def test_nothing_is_loaded_from_a_third_party(self):
         for name, content in self.files.items():
@@ -128,26 +132,23 @@ class DiscoveryTests(unittest.TestCase):
         self.files = bs.render()
         self.index = self.files["index.html"]
 
-    def test_recently_updated_is_ordered_by_the_commit_history(self):
+    def test_recently_updated_is_ordered_by_release_date(self):
         history = bs.load_history()
-        expected = sorted(history, key=lambda name: history[name]["last_changed"] or "", reverse=True)
-        positions = [self.index.index(f'skills/{name}.html">') for name in expected
-                     if f'skills/{name}.html">' in self.index]
+        expected = sorted(history, key=lambda name: history[name]["released"] or "", reverse=True)
         section = self.index[self.index.index("Recently updated"):]
         order = [name for name in expected if f'skills/{name}.html' in section]
-        self.assertEqual(order[0], expected[0])
-        self.assertTrue(positions)
+        self.assertEqual(order, expected)
 
-    def test_detail_pages_carry_the_version_timeline_and_commits(self):
+    def test_detail_pages_carry_the_version_timeline(self):
         history = bs.load_history()
         for name, entry in history.items():
             page = self.files[f"skills/{name}.html"]
             with self.subTest(skill=name):
-                self.assertIn("History", page)
+                self.assertIn("Version history", page)
                 for item in entry["versions"]:
-                    self.assertIn(item["version"], page)
-                if entry["commits"]:
-                    self.assertIn(entry["commits"][0]["sha"], page)
+                    self.assertIn(f"v{item['version']}", page)
+                    self.assertIn(item["date"][:10], page)
+                self.assertIn(f"/commits/main/{bs.load_registry()[0]['path'].rsplit('/', 2)[0]}", page)
 
     def test_every_maintainer_has_a_page_listing_their_skills(self):
         manifests = {str(s["name"]): bs.load_manifest(s) for s in bs.load_registry()}
@@ -182,6 +183,77 @@ class DiscoveryTests(unittest.TestCase):
         self.assertTrue(calls)
         for url in calls:
             self.assertEqual(url, "https://api.github.com/repos/BEKO2210/SkillQuarry/releases")
+
+    def test_motion_is_optional_and_respects_the_reader(self):
+        self.assertIn("prefers-reduced-motion", self.files["style.css"])
+        for name in ("index.html", "skills/strata.html", "maintainers/index.html"):
+            page = self.files[name]
+            with self.subTest(page=name):
+                self.assertIn("prefers-reduced-motion", page)
+                self.assertIn("IntersectionObserver", page)
+
+    def test_artwork_falls_back_when_a_skill_has_none(self):
+        """A skill added tomorrow carries no image; the card must still look intentional."""
+        bare = {"name": "future-skill"}
+        rendered = bs.artwork_for({}, bare)
+        self.assertIn("linear-gradient", rendered)
+        self.assertNotIn("<img", rendered)
+        with_icon = bs.artwork_for({"icon": "../../../assets/strata-logo.svg"}, bare)
+        self.assertIn("assets/strata-logo.svg", with_icon)
+        self.assertIn("linear-gradient", with_icon)
+        missing_file = bs.artwork_for({"image": "assets/img/does-not-exist.webp"}, bare)
+        self.assertNotIn("does-not-exist", missing_file)
+
+    def test_gradient_fallback_is_deterministic(self):
+        self.assertEqual(bs.gradient_for("alpha"), bs.gradient_for("alpha"))
+        self.assertNotEqual(bs.gradient_for("alpha"), bs.gradient_for("beta"))
+
+    def test_real_images_are_used_where_a_manifest_declares_one(self):
+        for entry in bs.load_registry():
+            manifest = bs.load_manifest(entry)
+            if not manifest.get("image"):
+                continue
+            with self.subTest(skill=entry["name"]):
+                self.assertIn(manifest["image"], self.index)
+                self.assertIn(manifest["image"], bs.binary_files())
+
+    def test_the_hero_image_is_shipped_in_both_sizes(self):
+        for name in ("assets/img/hero-1280.webp", "assets/img/hero-2400.webp"):
+            self.assertIn(name, bs.binary_files())
+        self.assertIn("assets/img/hero-2400.webp", self.index)
+
+    def test_the_hero_video_is_4k_and_loads_only_where_it_belongs(self):
+        import subprocess
+        blobs = bs.binary_files()
+        self.assertIn("assets/video/hero-4k.mp4", blobs)
+        size_mb = len(blobs["assets/video/hero-4k.mp4"]) / 1024 / 1024
+        self.assertLess(size_mb, 15, f"hero video is {size_mb:.1f} MB")
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height", "-of", "csv=p=0",
+             str(bs.ASSETS / "video" / "hero-4k.mp4")],
+            stdout=subprocess.PIPE, text=True, check=False,
+        )
+        self.assertEqual(probe.stdout.strip(), "3840,2160", "the hero video must be true 4K")
+        index = self.index
+        self.assertIn('preload="none"', index)
+        self.assertIn("prefers-reduced-motion", index)
+        self.assertIn("saveData", index)
+        self.assertIn("min-width: 900px", index)
+        self.assertIn('poster="assets/img/hero-2400.webp"', index)
+
+    def test_link_previews_have_an_image(self):
+        for name in ("index.html", "skills/strata.html"):
+            self.assertIn('property="og:image"', self.files[name])
+
+    def test_each_card_shows_the_skill_icon(self):
+        for entry in bs.load_registry():
+            manifest = bs.load_manifest(entry)
+            icon = bs.icon_for(manifest)
+            with self.subTest(skill=entry["name"]):
+                self.assertIsNotNone(icon)
+                self.assertIn(icon, self.files["index.html"])
+                self.assertIn(icon, self.files)
 
     def test_the_page_still_works_when_that_call_fails(self):
         for page in (self.index, self.files["skills/strata.html"]):

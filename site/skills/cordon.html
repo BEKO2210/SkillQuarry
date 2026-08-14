@@ -5,65 +5,169 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cordon — SkillQuarry</title>
 <meta name="description" content="Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.">
+<meta name="color-scheme" content="dark light">
+<meta property="og:title" content="Cordon — SkillQuarry">
+<meta property="og:description" content="Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://beko2210.github.io/SkillQuarry/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../assets/skillquarry-logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../style.css">
+<script>(function () {
+  const stored = localStorage.getItem('skillquarry-theme');
+  const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const root = document.documentElement;
+  root.dataset.theme = stored || system;
+  window.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('theme');
+    if (!button) return;
+    const label = () => { button.textContent = root.dataset.theme === 'light' ? 'Dark' : 'Light'; };
+    label();
+    button.addEventListener('click', function () {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('skillquarry-theme', root.dataset.theme);
+      label();
+    });
+  });
+})();</script>
 </head>
 <body>
-<main class="wrap">
-  <a class="back" href="../index.html">&larr; all skills</a>
-  <img class="banner" src="../assets/cordon-banner.svg" alt="Cordon">
-  <h1 class="title">Cordon</h1>
-  <p class="subtitle">Limit the blast radius. Verify the result.</p>
+<div class="bar"><div class="wrap">
+  <a class="mark" href="../index.html">
+    <img src="../assets/skillquarry-logo.svg" alt="">
+    <span>Skill<i>Quarry</i></span>
+  </a>
+  <nav>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../maintainers/index.html">Maintainers</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/docs/SKILL-SPEC.md">Spec</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry">GitHub</a>
+    <button class="ghost" id="theme" type="button">Light</button>
+  </nav>
+</div></div>
+<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / Cordon</p>
+  <div class="top">
+    <img class="icon" src="../assets/cordon-logo.svg" alt="">
+    <div>
+      <h1>Cordon</h1>
+      <p class="subtitle">Limit the blast radius. Verify the result.</p>
+    </div>
+  </div>
   <p class="who">Maintained by <a href="../maintainers/BEKO2210.html">Belkis Aslani</a> · <span class="installs" data-installs="cordon"></span></p>
-  <p>Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.</p>
-  <h2>What it does</h2>
-  <ul class="plain">
-    <li>Arms an allow/deny path policy plus file, line, byte, binary and commit budgets.</li>
-    <li>Audits the Git-visible result independently of anything the agent reports.</li>
-    <li>Refuses to arm when index flags would hide a tracked file from the audit.</li>
-    <li>Works with any agent in manual mode, or wraps Claude Code end to end.</li>
-  </ul>
-  <h2>Install</h2>
-  <pre><code>git clone https://github.com/BEKO2210/SkillQuarry.git
+</div></header>
+<main class="wrap">
+  <div class="layout">
+    <div class="content">
+      <img class="banner" src="../assets/cordon-banner.svg" alt="Cordon" style="width:100%;border-radius:14px;border:1px solid var(--edge);margin:0 0 26px">
+      <h2>Overview</h2>
+      <p>Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.</p>
+    <h2>What it does</h2>
+    <ul>
+      <li>Arms an allow/deny path policy plus file, line, byte, binary and commit budgets.</li>
+      <li>Audits the Git-visible result independently of anything the agent reports.</li>
+      <li>Refuses to arm when index flags would hide a tracked file from the audit.</li>
+      <li>Works with any agent in manual mode, or wraps Claude Code end to end.</li>
+    </ul>
+    <h2>Install</h2>
+    <div class="code"><div class="head">shell</div><pre><code>git clone https://github.com/BEKO2210/SkillQuarry.git
 cd SkillQuarry/cli &amp;&amp; ./install.sh
 skillquarry info cordon
-skillquarry install cordon</code></pre>
-  <p>Installation verifies the checksum below before running the skill's own installer.</p>
-  <h2>Quickstart</h2>
-  <pre><code>cd skills/security/cordon &amp;&amp; ./install.sh
+skillquarry install cordon</code></pre></div>
+    <p>Installation verifies the checksum in the sidebar before running the skill's own installer.</p>
+    <h2>Quickstart</h2>
+    <div class="code"><div class="head">shell</div><pre><code>cd skills/security/cordon &amp;&amp; ./install.sh
 
 cordon run &quot;Fix the parser regression and touch nothing else.&quot; \
   --allow &quot;src/parser/**&quot; \
   --allow &quot;tests/parser/**&quot; \
   --verify &quot;python3 -m unittest discover -s tests&quot; \
   --max-files 8 \
-  --max-added-lines 400</code></pre>
-  <h2>Facts</h2>
-  <table>
-    <tr><th>Category</th><td>Security</td></tr>
-    <tr><th>Version</th><td>1.0.0</td></tr>
-    <tr><th>Quality</th><td>tested</td></tr>
-    <tr><th>License</th><td>Apache-2.0</td></tr>
-    <tr><th>Agents</th><td>Claude Code, Any agent (manual mode)</td></tr>
-    <tr><th>Platforms</th><td>linux, macos</td></tr>
-    <tr><th>Tests</th><td>64 — 100% of core.py executable lines (989/989)</td></tr>
-    <tr><th>Needs installed</th><td>git</td></tr>
-    <tr><th>Network access</th><td>indirect</td></tr>
-    <tr><th>Credentials</th><td>none</td></tr>
-    <tr><th>Writes outside the repository</th><td>no</td></tr>
-    <tr><th>Irreversible operations</th><td>none declared</td></tr>
-    <tr><th>Independently reviewed</th><td>Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.</td></tr>
-    <tr><th>Checksum</th><td>sha256:571f9c5da352eaf6e940988f9f89dd2418d2d30cb65443ef523d87117f04ca64</td></tr>
-  </table>
-  <h2>History</h2>
-  <table>
-    <tr><th>1.0.0</th><td>2026-08-14</td></tr>
-  </table>
-  <table>
-    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/eaf8b0a">eaf8b0a</a> feat: the skillquarry client — roadmap phase 4 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/6b4b7dc">6b4b7dc</a> feat: registry with checksums, security metadata and filtering — phase 3 complete</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/a6c4045">a6c4045</a> docs(cordon): record the platform results the review actually produced</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/731471f">731471f</a> fix(cordon): let the byte-path tests adapt to the filesystem, not the other way round</td></tr>    <tr><th><time>2026-08-14</time></th><td><a href="https://github.com/BEKO2210/SkillQuarry/commit/c578616">c578616</a> feat: add Cordon, close an audit bypass, and generate the README from manifests</td></tr>
-  </table>
-  <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon/SKILL.md">SKILL.md</a></p>
+  --max-added-lines 400</code></pre></div>
+    <h2>Version history</h2>
+    <table>
+      <tr><th>v1.0.0</th><td><time>2026-08-14</time></td></tr>
+    </table>
+    <p><a href="https://github.com/BEKO2210/SkillQuarry/commits/main/skills/security/cordon">Full commit history &rarr;</a></p>
+    <h2>Read next</h2>
+    <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon/SKILL.md">SKILL.md</a></p>
+    </div>
+    <aside>
+      <div class="box">
+        <h2>Facts</h2>
+        <dl>
+      <div><dt>Version</dt><dd>1.0.0</dd></div>
+      <div><dt>Category</dt><dd>Security</dd></div>
+      <div><dt>Quality</dt><dd>tested</dd></div>
+      <div><dt>License</dt><dd>Apache-2.0</dd></div>
+      <div><dt>Agents</dt><dd>Claude Code, Any agent (manual mode)</dd></div>
+      <div><dt>Platforms</dt><dd>linux, macos</dd></div>
+      <div><dt>Tests</dt><dd>64 — 100% of core.py executable lines (989/989)</dd></div>
+      <div><dt>Needs installed</dt><dd>git</dd></div>
+      <div><dt>Network access</dt><dd>indirect</dd></div>
+      <div><dt>Credentials</dt><dd>none</dd></div>
+      <div><dt>Writes outside the repository</dt><dd>no</dd></div>
+      <div><dt>Irreversible operations</dt><dd>none declared</dd></div>
+      <div><dt>Independently reviewed</dt><dd>Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.</dd></div>
+          <div><dt>Checksum</dt><dd class="checksum">sha256:e3017ec2810f5abd57b0ff5f86ff7d4e016e9ef4660821125b88a923d6d5f8c1</dd></div>
+        </dl>
+      </div>
+    </aside>
+  </div>
 </main>
+<footer><div class="wrap cols">
+  <p class="note">Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+  Download counts come from GitHub's public release API — no cookies, no identifiers,
+  nothing recorded about you.</p>
+  <div class="links">
+    <a href="https://github.com/BEKO2210/SkillQuarry">Source</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/CONTRIBUTING.md">Contributing</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/SECURITY.md">Security</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/discussions">Discussions</a>
+    <a href="../registry.json">registry.json</a>
+  </div>
+</div></footer>
+<script>// Entrance animation and stat count-up. Both are progressive: without JavaScript,
+// or with reduced motion requested, everything is simply visible immediately.
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.card, .section-head, .strip, .cloud, .cta, .panel, .content h2, aside .box');
+  if (reduced || !('IntersectionObserver' in window)) {
+    targets.forEach((element) => element.classList.add('in'));
+    return;
+  }
+  document.querySelectorAll('.grid').forEach((grid) => {
+    [...grid.children].forEach((card, index) => card.style.setProperty('--i', index));
+  });
+  targets.forEach((element) => element.classList.add('reveal'));
+  // Failsafe: whatever happens to the observer, nothing stays invisible.
+  const showEverything = () => targets.forEach((element) => element.classList.add('in'));
+  setTimeout(showEverything, 1500);
+  window.addEventListener('beforeprint', showEverything);
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  targets.forEach((element) => observer.observe(element));
+
+  for (const number of document.querySelectorAll('.stats b')) {
+    const final = parseInt(number.textContent, 10);
+    if (!Number.isFinite(final) || final === 0) continue;
+    const started = performance.now();
+    const duration = 900;
+    const step = (now) => {
+      const progress = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      number.textContent = Math.round(final * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    number.textContent = '0';
+    requestAnimationFrame(step);
+  }
+})();</script>
 <script>// Same public source as the overview: GitHub's own per-asset download counter.
 fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
   .then((response) => (response.ok ? response.json() : []))
@@ -76,17 +180,12 @@ fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
       }
     }
     for (const element of document.querySelectorAll('[data-installs]')) {
-      const count = counts.get(element.dataset.installs);
-      if (count !== undefined) {
-        element.innerHTML = '<b>' + count.toLocaleString() + '</b> download' + (count === 1 ? '' : 's');
+      const value = counts.get(element.dataset.installs);
+      if (value !== undefined) {
+        element.innerHTML = '<b>' + value.toLocaleString() + '</b> download' + (value === 1 ? '' : 's');
       }
     }
   })
   .catch(() => {});</script>
-<footer><div class="wrap">
-Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
-Download counts come from GitHub's public release API — no cookies, no identifiers, nothing recorded about you.
-· <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
-</div></footer>
 </body>
 </html>
