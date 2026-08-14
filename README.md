@@ -6,9 +6,9 @@
 <br>
 
 <!-- SKILLS:STATS:START -->
-![Skills](https://img.shields.io/badge/skills-4-f0932b?style=for-the-badge)
+![Skills](https://img.shields.io/badge/skills-5-f0932b?style=for-the-badge)
 ![Categories](https://img.shields.io/badge/categories-3-5b8298?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-320%20passing-2ea043?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-336%20passing-2ea043?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)
 <!-- SKILLS:STATS:END -->
 
@@ -16,6 +16,7 @@
 
 <!-- SKILLS:CI:START -->
 [![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Strata)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
+[![CacheClosure tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cacheclosure-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=CacheClosure)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cacheclosure-tests.yml)
 [![LockScope tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/lockscope-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=LockScope)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/lockscope-tests.yml)
 [![Cordon tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cordon-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Cordon)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cordon-tests.yml)
 [![RanGate tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/rangate-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=RanGate)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/rangate-tests.yml)
@@ -173,6 +174,7 @@ SkillQuarry is intended to become a searchable marketplace for agent capabilitie
 | Skill | Category | What it does | Agents | Quality |
 |---|---|---|---|---|
 | **[Strata](skills/autonomous/strata)** | 🤖 Autonomous agents | Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [100 tests, 100% core coverage](skills/autonomous/strata/TEST_REPORT.md) |
+| **[CacheClosure](skills/coding/cacheclosure)** | 💻 Coding | Detect GitHub Actions cache identities that are mechanically invariant to repository inputs which can change cached state, using file resolution and shell control-flow witnesses. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [16 tests, 95.7% of cacheclosure/core.py executable lines in the frozen suite; 2/3 pinned historical defects recovered and both recovered witnesses cleared by their historical repairs](skills/coding/cacheclosure/TEST_REPORT.md) |
 | **[LockScope](skills/coding/lockscope)** | 💻 Coding | Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [142 tests, 142 tests: 82 structural, 45 semantic against rust-analyzer, 5 compiler Send probes and 10 runtime repair proofs; 17 more against three pinned real repositories](skills/coding/lockscope/TEST_REPORT.md) |
 | **[Cordon](skills/security/cordon)** | 🔐 Security | Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [64 tests, 100% core coverage](skills/security/cordon/TEST_REPORT.md) |
 | **[RanGate](skills/security/rangate)** | 🔐 Security | Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [14 tests, N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs](skills/security/rangate/TEST_REPORT.md) |
@@ -325,6 +327,28 @@ strata start "Fix the repository so lint and build pass without weakening checks
 ```
 
 [Documentation](skills/autonomous/strata/README.md) · [Skill](skills/autonomous/strata/SKILL.md) · [Test report](skills/autonomous/strata/TEST_REPORT.md)
+
+---
+
+### CacheClosure
+
+**Prove when cached state can change without changing its key.**
+
+Detect GitHub Actions cache identities that are mechanically invariant to repository inputs which can change cached state, using file resolution and shell control-flow witnesses.
+
+- Proves when a literal hashFiles contribution resolves to zero repository files.
+- Tracks cached file sentinels into later shell steps and requires a real unkeyed repository input before reporting.
+- Uses historical human repairs as external oracles; a language model is not part of the decision.
+- Keeps a known runtime-only defect as a frozen miss instead of broadening the heuristic after seeing the result.
+
+```bash
+cd skills/coding/cacheclosure && ./install.sh
+
+cacheclosure .
+cacheclosure . --json
+```
+
+[Documentation](skills/coding/cacheclosure/README.md) · [Skill](skills/coding/cacheclosure/SKILL.md) · [Test report](skills/coding/cacheclosure/TEST_REPORT.md) · [Research](skills/coding/cacheclosure/RESEARCH.md)
 
 ---
 
