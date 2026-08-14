@@ -7,6 +7,7 @@ on:
       - "skills/**/skill.json"
       - "tools/**"
       - "templates/**"
+      - "cli/**"
       - "README.md"
       - "registry/**"
       - "docs/**"
@@ -16,6 +17,7 @@ on:
       - "skills/**/skill.json"
       - "tools/**"
       - "templates/**"
+      - "cli/**"
       - "README.md"
       - "registry/**"
       - "docs/**"
@@ -46,6 +48,10 @@ jobs:
       # suite runs here; a rotten example would be inherited by every new skill.
       - name: Run the example skill's suite
         working-directory: templates/example-skill
+        run: python3 tests/run_tests.py --min 100
+
+      - name: Run the skillquarry client suite
+        working-directory: cli
         run: python3 tests/run_tests.py --min 100
 
       - name: Validate skill manifests against registry/schema.json

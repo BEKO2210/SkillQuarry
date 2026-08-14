@@ -4,7 +4,7 @@
   "skills": [
     {
       "category": "autonomous",
-      "checksum": "sha256:cff6c39aa9a92c879c609ab1f0af5e7f7c3281c4636b46dd66b29d39a9b93608",
+      "checksum": "sha256:165f933f64dcf61d80569826365baba0c3f105abc351a493885b27b5762f280e",
       "compatibility": [
         "claude-code"
       ],
@@ -44,7 +44,7 @@
     },
     {
       "category": "security",
-      "checksum": "sha256:6173ea39e7ac92b46b27f2da8d2d74229fed0e26e0380747c88ee7f3fcd076f5",
+      "checksum": "sha256:3f97b55471397b7e6e55f53cc4a8cd4c08ad5c1049adfc0ecf9e1975b22765e5",
       "compatibility": [
         "claude-code",
         "agent-neutral-manual-mode"
@@ -84,7 +84,7 @@
     },
     {
       "category": "security",
-      "checksum": "sha256:b055ea68b20f8682f0ca1fb8dd728b21cb5a9d1605464d008619e542074e6039",
+      "checksum": "sha256:e6aad308504e5163c0f28d2011ea7618c9d48ae571f69cf0cd1fbb2a24e59202",
       "compatibility": [
         "claude-code"
       ],

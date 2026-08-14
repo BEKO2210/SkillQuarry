@@ -70,6 +70,16 @@ The skill list, the skill cards, the badge counters and `registry/skills.json`
 are generated from the manifests by `tools/render_readme.py`. Never hand-edit
 anything between the `SKILLS:*` markers in the root README — edit the manifest.
 
+### 2.2 Being installable by the client
+
+`entrypoints.install` and `entrypoints.uninstall` name the scripts, and
+`entrypoints.prefix_env` names the environment variable the installer honours to
+choose its target directory. Without it, `skillquarry install --prefix` is refused
+rather than silently installing somewhere else.
+
+The client never invents an install procedure: it verifies the checksum, then runs
+the skill's own script.
+
 ## 3. Declaring what the skill touches
 
 Any skill that runs commands must declare `permissions` in plain language:

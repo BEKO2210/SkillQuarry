@@ -25,7 +25,8 @@
     "skill": "SKILL.md",
     "cli": "cordon",
     "install": "install.sh",
-    "uninstall": "uninstall.sh"
+    "uninstall": "uninstall.sh",
+    "prefix_env": "CORDON_PREFIX"
   },
   "compatibility": [
     "claude-code",

@@ -681,6 +681,9 @@ SkillQuarry/
 │   ├── schema.json             manifest schema, enforced in CI
 │   └── skills.json             generated index: versions, checksums, security
 │
+├── cli/
+│   └── skillquarry.py          the client: search, install, update, doctor
+│
 ├── templates/
 │   └── example-skill/          the reference skill; scaffold from it
 │
@@ -701,12 +704,10 @@ SkillQuarry/
 │   ├── ISSUE_TEMPLATE/
 │   └── PULL_REQUEST_TEMPLATE.md
 │
-├── CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · LICENSE · README.md
-│
-└── (planned) adapters/ · cli/
+└── CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · LICENSE · README.md
 ```
 
-`adapters/` and `cli/` do not exist yet; everything else above does.
+`adapters/` for non-Claude agents is the one planned directory that does not exist yet.
 
 ---
 
@@ -715,15 +716,22 @@ SkillQuarry/
 The registry is generated from the manifests and carries what a marketplace needs
 to answer questions without downloading anything: version, category, agents,
 platforms, quality, test numbers, the declared security surface, and a content
-checksum per skill.
-
-### Search and filter — works today
+checksum per skill. The `skillquarry` client reads it.
 
 ```bash
-python3 tools/registry.py list
-python3 tools/registry.py list --agent claude-code --platform linux --quality tested
-python3 tools/registry.py list --offline --no-secrets      # nothing of its own to phone home with
-python3 tools/registry.py list --keyword unsafe --json     # machine-readable
+cd cli && ./install.sh          # installs `skillquarry` into ~/.local/bin
+```
+
+The client records the quarry it was installed from, so the commands below work
+from any directory. `--quarry` and `$SKILLQUARRY_ROOT` override it.
+
+### Search
+
+```bash
+skillquarry search unsafe
+skillquarry search --agent claude-code --platform linux --quality tested
+skillquarry search --offline --no-secrets    # nothing of its own to phone home with
+skillquarry search --category security --json
 ```
 
 ```text
@@ -732,28 +740,61 @@ cordon     1.0.0    security     tested         64 tests  runs-commands
 rangate    1.0.0    security     tested         14 tests  offline, runs-commands, destructive
 ```
 
-### Inspect
+### Inspect before installing
 
 ```bash
-python3 tools/registry.py show cordon
+skillquarry info rangate
 ```
 
-### Verify integrity
+Prints the description, agents, platforms, test numbers, required binaries, the
+declared network reach, whether it needs secrets, which irreversible operations it
+can perform, who reviewed it, its checksum, and whether it is installed.
+
+### Install, update, remove
 
 ```bash
-python3 tools/registry.py verify
+skillquarry install cordon --prefix ~/.local
+skillquarry update --dry-run
+skillquarry update
+skillquarry uninstall cordon
 ```
 
-Recomputes every checksum — SHA-256 over each file's path, executable bit and
-contents, excluding build output — and fails if the registry describes files that
-are no longer there. This runs in CI on every change.
+Installation is refused unless the files still match the registry checksum, and
+then the skill's **own** installer runs — the client never invents an install
+procedure. What it installed is recorded in
+`~/.local/state/skillquarry/installed.json`, which is what `update` compares
+against.
+
+### Validate and diagnose
+
+```bash
+skillquarry validate skills/security/cordon
+skillquarry doctor
+```
+
+```text
+ok    python                 3.12.3 (3.10+ required)
+ok    git                    /usr/bin/git
+ok    registry               3 skills
+ok    checksum:strata        matches the files on disk
+warn  requires:rangate       missing: cargo, rustc
+ok    install record         1 installed (~/.local/state/skillquarry/installed.json)
+warn  PATH                   ~/.local/bin is not in PATH
+```
+
+`doctor` exits non-zero when something is broken rather than merely missing, so it
+is usable in a script.
+
+### Maintainer tools
+
+`tools/registry.py` covers the repository side of the same data — `verify`
+recomputes every checksum in CI. The client is for users of a quarry; the tools
+are for people changing one.
 
 ### Still planned
 
-A published `skillquarry` command that installs across repositories
-(`skillquarry install cordon`), remote registries, and signed releases. The local
-tools above are the working subset.
-
+A published package so `skillquarry` can be installed without cloning, remote
+registries and signed releases.
 
 ---
 
@@ -795,12 +836,12 @@ tools above are the working subset.
 
 ## Phase 4 — CLI
 
-- [ ] Implement search
-- [ ] Implement skill information
-- [ ] Implement installation
-- [ ] Implement updates
-- [ ] Implement validation
-- [ ] Implement diagnostics
+- [x] Implement search (`skillquarry search`, with agent/platform/quality/offline filters)
+- [x] Implement skill information (`skillquarry info`)
+- [x] Implement installation (`skillquarry install`, checksum-verified)
+- [x] Implement updates (`skillquarry update`, with `--dry-run`)
+- [x] Implement validation (`skillquarry validate`)
+- [x] Implement diagnostics (`skillquarry doctor`)
 
 ## Phase 5 — Marketplace
 

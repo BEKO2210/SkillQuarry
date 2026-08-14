@@ -22,7 +22,8 @@
   "entrypoints": {
     "skill": "SKILL.md",
     "install": "install.sh",
-    "uninstall": "uninstall.sh"
+    "uninstall": "uninstall.sh",
+    "prefix_env": "RANGATE_SKILLS_DIR"
   },
   "compatibility": [
     "claude-code"

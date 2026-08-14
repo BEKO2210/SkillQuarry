@@ -22,8 +22,10 @@ python3 tools/test_new_skill.py         # tests for the scaffolder and the templ
 python3 tools/test_registry.py          # tests for the registry query/verify tool
 python3 tools/registry.py verify        # registry checksums match the files on disk
 
-cd skills/autonomous/strata && python3 tests/run_tests.py --min 100
-cd ../../security/cordon   && python3 tests/run_tests.py --min 100
+cd cli && python3 tests/run_tests.py --min 100        # the skillquarry client
+cd ../templates/example-skill && python3 tests/run_tests.py --min 100
+cd ../../skills/autonomous/strata && python3 tests/run_tests.py --min 100
+cd ../../security/cordon      && python3 tests/run_tests.py --min 100
 ```
 
 No installation step, no virtual environment, no packages. Python 3.10+ and

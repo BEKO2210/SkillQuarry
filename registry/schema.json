@@ -173,6 +173,12 @@
         "uninstall": {
           "type": "string",
           "maxLength": 200
+        },
+        "prefix_env": {
+          "type": "string",
+          "description": "Environment variable the installer honours to choose its target directory. Required for the skillquarry CLI to install the skill anywhere but the default.",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "maxLength": 60
         }
       }
     },

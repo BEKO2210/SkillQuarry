@@ -20,7 +20,8 @@
     "skill": "SKILL.md",
     "cli": "example-skill",
     "install": "install.sh",
-    "uninstall": "uninstall.sh"
+    "uninstall": "uninstall.sh",
+    "prefix_env": "EXAMPLE_SKILL_PREFIX"
   },
   "requires": {
     "python": ">=3.10",

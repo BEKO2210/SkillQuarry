@@ -23,7 +23,8 @@
     "skill": "SKILL.md",
     "cli": "strata",
     "install": "install.sh",
-    "uninstall": "uninstall.sh"
+    "uninstall": "uninstall.sh",
+    "prefix_env": "STRATA_PREFIX"
   },
   "compatibility": [
     "claude-code"
