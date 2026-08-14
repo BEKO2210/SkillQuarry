@@ -295,8 +295,12 @@ main { padding-bottom: 20px; }
 .detail-hero h1 { margin: 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.02em; }
 .detail-hero .subtitle { color: var(--accent); margin: 6px 0 0; font-size: 17px; }
 .crumbs { font-size: 13px; color: var(--dim); margin: 0 0 18px; }
-.layout { display: grid; gap: var(--s4); grid-template-columns: minmax(0, var(--phi)fr) minmax(0, 1fr); padding: var(--s4) 0 10px; }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+.layout { display: grid; gap: var(--s4); grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
+  padding: var(--s4) 0 10px; }
+/* Without min-width: 0 a grid item is as wide as its widest child, so one long
+   line of code drags the whole page sideways. */
+.layout > * { min-width: 0; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
 .content h2 {
   font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim);
   margin: 34px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--edge);
@@ -314,15 +318,19 @@ aside dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 12px; }
 aside dt { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
 aside dd { margin: 2px 0 0; font-size: 14.5px; color: var(--ink); word-break: break-word; }
 aside .checksum { font-family: "Cascadia Code", "SF Mono", Consolas, monospace; font-size: 11.5px; color: var(--muted); }
-table { border-collapse: collapse; width: 100%; margin: 4px 0 10px; font-size: 15px; }
-th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+table { border-collapse: collapse; width: 100%; margin: 4px 0 10px; font-size: 15px; table-layout: fixed; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--edge); vertical-align: top;
+  overflow-wrap: anywhere; }
 th { color: var(--dim); font-weight: 600; width: 170px; }
+.content p, .content li { overflow-wrap: anywhere; }
 .code { border: 1px solid var(--edge); border-radius: var(--radius-sm); overflow: hidden; margin: 0 0 18px; }
 .code .head {
   background: var(--raised-2); border-bottom: 1px solid var(--edge); padding: 8px 14px;
   font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim);
 }
-pre { margin: 0; background: var(--raised); padding: 15px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; }
+pre { margin: 0; max-width: 100%; background: var(--raised); padding: 15px 16px; overflow-x: auto;
+  font-size: 13.5px; line-height: 1.6; }
+pre code { display: block; min-width: 0; }
 code { font-family: "Cascadia Code", "SF Mono", Consolas, monospace; }
 time { color: var(--dim); }
 .who { color: var(--muted); font-size: 14.5px; margin: 14px 0 0; }
@@ -362,6 +370,11 @@ time { color: var(--dim); }
   .detail-hero .top { flex-direction: column; gap: var(--s2); }
   .crumbs { text-align: center; }
   aside .box { position: static; }
+  .content table, aside dl { font-size: 14px; }
+  .content th { width: 40%; }
+  /* A phone should not have to scroll a command sideways to read it. */
+  .code pre { font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .detail-hero img.icon { width: 60px; height: 60px; }
   footer .cols { flex-direction: column; align-items: center; text-align: center; }
   footer .links { justify-content: center; }
   .bar nav { gap: var(--s2); }
