@@ -68,7 +68,7 @@ verify / find:             7.9%
 Frozen death threshold: verification greater than 25% of discovery. Observed:
 7.9%.
 
-## Defects found while developing the detector
+## Defects found while developing and integrating the detector
 
 The first workflow field parser accepted `name:` but not the YAML sequence form
 `- name:`. That lost the cache step's human name. A regression test now pins the
@@ -77,6 +77,14 @@ sequence-item form.
 A test fixture also over-escaped `${{ ... }}` expressions, preventing symbolic
 cache-path matching. The fixture was corrected. No threshold or historical
 repository SHA changed after either defect.
+
+The first marketplace PR run then failed an existing SkillQuarry site contract:
+every published skill card must have a skill mark. CacheClosure had no `icon`
+manifest field, so `test_each_card_shows_the_skill_mark` failed even though the
+detector, manifest, registry and security checks before it were green. The
+integration fix adds `assets/cacheclosure-logo.svg` and points the manifest at
+it. Detector logic, historical oracles, thresholds and expected recovery remain
+unchanged.
 
 ## Limits
 
