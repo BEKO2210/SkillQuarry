@@ -1,0 +1,38 @@
+name: Cordon tests
+
+on:
+  push:
+    paths:
+      - 'skills/security/cordon/**'
+      - 'assets/cordon-*.svg'
+      - '.github/workflows/cordon-tests.yml'
+  pull_request:
+    paths:
+      - 'skills/security/cordon/**'
+      - 'assets/cordon-*.svg'
+      - '.github/workflows/cordon-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ['3.10', '3.11', '3.12', '3.13']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Environment
+        run: |
+          python3 --version
+          git --version
+      - name: Test and enforce core coverage
+        working-directory: skills/security/cordon
+        run: python3 tests/run_tests.py --min 100

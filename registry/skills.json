@@ -1,0 +1,49 @@
+{
+  "generated_by": "tools/render_readme.py",
+  "schema_version": 1,
+  "skills": [
+    {
+      "category": "autonomous",
+      "compatibility": [
+        "claude-code"
+      ],
+      "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.",
+      "displayName": "Strata",
+      "license": "Apache-2.0",
+      "name": "strata",
+      "path": "skills/autonomous/strata",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "tests": {
+        "count": 100,
+        "coverage": "100% of runner.py executable lines"
+      },
+      "version": "1.0.0"
+    },
+    {
+      "category": "security",
+      "compatibility": [
+        "claude-code",
+        "agent-neutral-manual-mode"
+      ],
+      "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.",
+      "displayName": "Cordon",
+      "license": "Apache-2.0",
+      "name": "cordon",
+      "path": "skills/security/cordon",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "tests": {
+        "count": 64,
+        "coverage": "100% of core.py executable lines (989/989)"
+      },
+      "version": "1.0.0"
+    }
+  ]
+}

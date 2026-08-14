@@ -1,33 +1,39 @@
 <div align="center">
 
-# ⛏️ SkillQuarry
+<img src="assets/skillquarry-banner.svg" alt="SkillQuarry — the open marketplace for agent skills" width="820">
 
-### The open marketplace for agent skills
+<br>
+<br>
 
-**Discover, build, test, share, and install reusable capabilities for AI coding agents.**
+<!-- SKILLS:STATS:START -->
+![Skills](https://img.shields.io/badge/skills-2-f0932b?style=for-the-badge)
+![Categories](https://img.shields.io/badge/categories-2-5b8298?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-164%20passing-2ea043?style=for-the-badge)
+![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)
+<!-- SKILLS:STATS:END -->
 
 <br>
 
-[![Stars](https://img.shields.io/github/stars/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Stars)](https://github.com/BEKO2210/SkillQuarry/stargazers)
-[![Forks](https://img.shields.io/github/forks/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Forks)](https://github.com/BEKO2210/SkillQuarry/network/members)
-[![Issues](https://img.shields.io/github/issues/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Issues)](https://github.com/BEKO2210/SkillQuarry/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/BEKO2210/SkillQuarry?style=for-the-badge&logo=github&label=Pull%20Requests)](https://github.com/BEKO2210/SkillQuarry/pulls)
-[![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Strata%20tests)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
-[![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=for-the-badge)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/BEKO2210/SkillQuarry?style=for-the-badge&logo=git)](https://github.com/BEKO2210/SkillQuarry/commits/main)
+<!-- SKILLS:CI:START -->
+[![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Strata)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
+[![Cordon tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cordon-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Cordon)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cordon-tests.yml)
+<!-- SKILLS:CI:END -->
+[![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=flat-square)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/BEKO2210/SkillQuarry?style=flat-square&logo=github)](https://github.com/BEKO2210/SkillQuarry/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/BEKO2210/SkillQuarry?style=flat-square&logo=git)](https://github.com/BEKO2210/SkillQuarry/commits/main)
 
 <br>
 
+[**Skills**](#skills) ·
 [**Overview**](#overview) ·
-[**Marketplace**](#skill-marketplace) ·
 [**Skill Standard**](#skill-standard) ·
-[**Strata**](#strata) ·
 [**Security**](#security) ·
+[**Contributing**](#contributing) ·
 [**Roadmap**](#roadmap)
 
 <br>
 
-> **Build capabilities once. Share intelligence everywhere.**
+**Discover, build, test, share, and install reusable capabilities for AI coding agents.**
 
 </div>
 
@@ -157,9 +163,12 @@ SkillQuarry is intended to become a searchable marketplace for agent capabilitie
 
 ## Available now
 
+<!-- SKILLS:TABLE:START -->
 | Skill | Category | What it does | Agents | Quality |
 |---|---|---|---|---|
-| **[Strata](skills/autonomous/strata)** | Autonomous agents | Runs a long task as a chain of fresh Claude Code processes that hand a validated handoff forward, with independent verification of completion and crash-safe state | Claude Code | Tested — [100 tests, 100% coverage](skills/autonomous/strata/TEST_REPORT.md) |
+| **[Strata](skills/autonomous/strata)** | 🤖 Autonomous agents | Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [100 tests, 100% core coverage](skills/autonomous/strata/TEST_REPORT.md) |
+| **[Cordon](skills/security/cordon)** | 🔐 Security | Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [64 tests, 100% core coverage](skills/security/cordon/TEST_REPORT.md) |
+<!-- SKILLS:TABLE:END -->
 
 ## Planned categories
 
@@ -254,28 +263,29 @@ Additional metadata may eventually describe:
 
 ---
 
-# Featured Skill
+# Skills
 
-## Strata
+Everything below this line is generated from the `skill.json` manifests by
+`tools/render_readme.py`. Adding a skill means adding its folder — the README and
+`registry/skills.json` update themselves in CI.
+
+<!-- SKILLS:CARDS:START -->
+### Strata
 
 <div align="center">
 
-<img src="assets/strata-banner.svg" alt="Strata — generational handoff runner for Claude Code" width="760">
-
-<br>
-
-[![Status](https://img.shields.io/badge/status-tested-2ea043?style=for-the-badge)](skills/autonomous/strata/TEST_REPORT.md)
-[![Tests](https://img.shields.io/badge/tests-100%20passing-2ea043?style=for-the-badge)](skills/autonomous/strata/TEST_REPORT.md)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-2ea043?style=for-the-badge)](skills/autonomous/strata/TEST_REPORT.md)
-[![Dependencies](https://img.shields.io/badge/dependencies-none-5b8298?style=for-the-badge)](skills/autonomous/strata#install)
+<img src="assets/strata-banner.svg" alt="Strata — Every generation is a fresh context. Only a validated core sample crosses the boundary." width="720">
 
 </div>
 
-### Fresh context. Persistent progress. Controlled autonomy.
+**Every generation is a fresh context. Only a validated core sample crosses the boundary.**
 
-The first skill in the quarry is **[Strata](skills/autonomous/strata)** — a
-generational handoff runner for Claude Code, and this repository's implementation
-of the Ralph generational-handoff concept.
+Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.
+
+- Each generation is its own `claude -p` process — context never accumulates.
+- Independent `--verify` commands overrule the agent's own completion claim.
+- Atomic state: a killed host resumes from the last validated handoff.
+- Stall detector, generation ceiling, turn cap and cost ceiling stop runaway loops.
 
 ```bash
 cd skills/autonomous/strata && ./install.sh
@@ -287,9 +297,44 @@ strata start "Fix the repository so lint and build pass without weakening checks
   --max-budget-usd 3
 ```
 
-Documentation: **[README](skills/autonomous/strata/README.md)** ·
-**[SKILL.md](skills/autonomous/strata/SKILL.md)** ·
-**[Test report](skills/autonomous/strata/TEST_REPORT.md)**
+[Documentation](skills/autonomous/strata/README.md) · [Skill](skills/autonomous/strata/SKILL.md) · [Test report](skills/autonomous/strata/TEST_REPORT.md)
+
+---
+
+### Cordon
+
+<div align="center">
+
+<img src="assets/cordon-banner.svg" alt="Cordon — Limit the blast radius. Verify the result." width="720">
+
+</div>
+
+**Limit the blast radius. Verify the result.**
+
+Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.
+
+- Arms an allow/deny path policy plus file, line, byte, binary and commit budgets.
+- Audits the Git-visible result independently of anything the agent reports.
+- Refuses to arm when index flags would hide a tracked file from the audit.
+- Works with any agent in manual mode, or wraps Claude Code end to end.
+
+```bash
+cd skills/security/cordon && ./install.sh
+
+cordon run "Fix the parser regression and touch nothing else." \
+  --allow "src/parser/**" \
+  --allow "tests/parser/**" \
+  --verify "python3 -m unittest discover -s tests" \
+  --max-files 8 \
+  --max-added-lines 400
+```
+
+[Documentation](skills/security/cordon/README.md) · [Skill](skills/security/cordon/SKILL.md) · [Test report](skills/security/cordon/TEST_REPORT.md) · [Research](skills/security/cordon/RESEARCH.md)
+<!-- SKILLS:CARDS:END -->
+
+---
+
+# How generational handoff works
 
 Traditional autonomous agent loops can accumulate increasingly large conversation histories.
 
@@ -413,6 +458,7 @@ The key is not simply clearing context.
 The key is creating a **high-quality transition before the context disappears**.
 
 ---
+
 
 ## External Verification
 
@@ -665,6 +711,7 @@ These commands describe the intended interface and may not yet be implemented.
 ## Phase 2 — First Skills
 
 - [x] Add the first skill: Strata
+- [x] Add the second skill: Cordon
 - [x] Add automated skill tests
 - [ ] Add example skills
 - [x] Add compatibility metadata
@@ -673,9 +720,9 @@ These commands describe the intended interface and may not yet be implemented.
 
 ## Phase 3 — Registry
 
-- [ ] Build skill registry
+- [x] Build skill registry (generated: `registry/skills.json`)
 - [ ] Add semantic versioning
-- [ ] Add category system
+- [x] Add category system
 - [ ] Add checksums
 - [ ] Add compatibility filtering
 - [ ] Add automated validation
@@ -737,6 +784,28 @@ Contributions may include:
 Until a dedicated `CONTRIBUTING.md` exists, contributions can be proposed through GitHub Issues and Pull Requests.
 
 ---
+
+## Adding a skill — the README updates itself
+
+The README is generated from the manifests. There is no skill list to maintain by hand.
+
+1. Create `skills/<category>/<name>/` with `skill.json`, `SKILL.md`, `README.md`,
+   tests and a test report.
+2. Fill in the manifest. `name`, `displayName`, `version`, `description`,
+   `category` and `license` are required; `tagline`, `banner`, `highlights`,
+   `quickstart`, `agents`, `tests` and `quality` shape how the skill is presented.
+3. Add `.github/workflows/<name>-tests.yml` (or set `workflow` in the manifest).
+4. Run `python3 tools/render_readme.py`, or just open the pull request — CI checks
+   that the generated blocks match the manifests and regenerates them on `main`.
+
+Everything between the `SKILLS:*` markers, plus `registry/skills.json`, is written
+by `tools/render_readme.py`. Edit the manifest, never the generated block.
+
+```bash
+python3 tools/render_readme.py           # regenerate
+python3 tools/render_readme.py --check   # fail if out of date
+python3 tools/test_render_readme.py      # test the generator itself
+```
 
 ## Creating a Skill
 
@@ -821,7 +890,7 @@ AI agents may execute commands, modify files, install software, or interact with
 
 <div align="center">
 
-# ⛏️ SkillQuarry
+<img src="assets/skillquarry-logo.svg" alt="SkillQuarry" width="72">
 
 ### Build capabilities once. Share intelligence everywhere.
 

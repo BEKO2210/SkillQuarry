@@ -1,0 +1,58 @@
+name: readme
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**/skill.json"
+      - "tools/render_readme.py"
+      - "README.md"
+      - "registry/**"
+      - ".github/workflows/readme.yml"
+  pull_request:
+    paths:
+      - "skills/**/skill.json"
+      - "tools/render_readme.py"
+      - "README.md"
+      - "registry/**"
+      - ".github/workflows/readme.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test the generator
+        run: python3 tools/test_render_readme.py
+
+      # On a pull request the generated files must already be current, because the
+      # workflow cannot push to a fork.
+      - name: Verify generated files are current
+        if: github.event_name == 'pull_request'
+        run: python3 tools/render_readme.py --check
+
+      - name: Regenerate README and registry
+        if: github.event_name != 'pull_request'
+        run: python3 tools/render_readme.py
+
+      - name: Commit if the manifests moved ahead of the README
+        if: github.event_name != 'pull_request'
+        run: |
+          if git diff --quiet -- README.md registry/skills.json; then
+            echo "README and registry already match the manifests."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md registry/skills.json
+          git commit -m "docs: regenerate README and registry from skill manifests [skip ci]"
+          git push

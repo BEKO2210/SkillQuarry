@@ -1,0 +1,10 @@
+[project]
+name = "skillquarry-cordon"
+version = "1.0.0"
+description = "Deterministic Git change envelopes for AI coding agents"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = []
+
+[project.scripts]
+cordon = "cordon.cli:main"

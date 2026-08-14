@@ -1,0 +1,72 @@
+{
+  "name": "cordon",
+  "displayName": "Cordon",
+  "version": "1.0.0",
+  "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.",
+  "category": "security",
+  "license": "Apache-2.0",
+  "tagline": "Limit the blast radius. Verify the result.",
+  "banner": "assets/cordon-banner.svg",
+  "agents": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "research": "RESEARCH.md",
+  "highlights": [
+    "Arms an allow/deny path policy plus file, line, byte, binary and commit budgets.",
+    "Audits the Git-visible result independently of anything the agent reports.",
+    "Refuses to arm when index flags would hide a tracked file from the audit.",
+    "Works with any agent in manual mode, or wraps Claude Code end to end."
+  ],
+  "quickstart": "cd skills/security/cordon && ./install.sh\n\ncordon run \"Fix the parser regression and touch nothing else.\" \\\n  --allow \"src/parser/**\" \\\n  --allow \"tests/parser/**\" \\\n  --verify \"python3 -m unittest discover -s tests\" \\\n  --max-files 8 \\\n  --max-added-lines 400",
+  "homepage": "https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/cordon",
+  "icon": "../../../assets/cordon-logo.svg",
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "cli": "cordon",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh"
+  },
+  "compatibility": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "requires": {
+    "python": ">=3.10",
+    "binaries": [
+      "git"
+    ],
+    "packages": []
+  },
+  "permissions": {
+    "filesystem": "reads Git-visible repository state; writes only .cordon state and installation files unless the wrapped coding agent changes the target repository",
+    "shell": "spawns git, configured verifier commands, and optionally claude",
+    "network": "none in arm/check/status/reset; only indirectly through Claude Code in run/resume",
+    "environment": "CORDON_PREFIX is read by install/uninstall wrappers; runtime core does not require secrets"
+  },
+  "state": {
+    "directory": ".cordon",
+    "git": "registered in .git/info/exclude; .gitignore untouched"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py --min 100",
+    "count": 64,
+    "coverage": "100% of core.py executable lines (989/989)",
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "tested",
+  "keywords": [
+    "agent-safety",
+    "git",
+    "change-envelope",
+    "blast-radius",
+    "verification",
+    "claude-code",
+    "guardrail",
+    "audit"
+  ]
+}
