@@ -37,6 +37,8 @@ jobs:
           rustup default 1.97.1
           rustc --version
           cargo --version
+          python3 --version
+          bash --version | head -n 1
       - name: Run RanGate suite
         working-directory: skills/security/rangate
         run: python3 tests/run_tests.py
