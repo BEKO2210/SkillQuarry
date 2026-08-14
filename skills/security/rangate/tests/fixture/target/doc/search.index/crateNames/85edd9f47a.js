@@ -1,1 +1,0 @@
-rd_("orangate_fixture")

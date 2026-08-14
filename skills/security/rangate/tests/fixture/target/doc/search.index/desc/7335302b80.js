@@ -1,1 +1,0 @@
-rd_("AoReturns the argument unchanged.0BaCalls <code>U::from(self)</code>.0CcSafe boundary around a private raw FFI-like handle.")

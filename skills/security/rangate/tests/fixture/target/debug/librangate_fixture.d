@@ -1,1 +1,0 @@
-/tmp/claude-1000/-home-belkis-StudioProjects-foldpage-android/92fa28f8-5d4e-43ef-b5cb-3b98934dc7dc/scratchpad/SkillQuarry/skills/security/rangate/tests/fixture/target/debug/librangate_fixture.rlib: /tmp/claude-1000/-home-belkis-StudioProjects-foldpage-android/92fa28f8-5d4e-43ef-b5cb-3b98934dc7dc/scratchpad/SkillQuarry/skills/security/rangate/tests/fixture/src/lib.rs
