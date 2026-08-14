@@ -24,12 +24,12 @@ jobs:
         with:
           python-version: '3.13'
       - name: Syntax check
-        run: python -m py_compile experiments/perfforge/run_pro_test.py
-      - name: Run frozen synthetic matrix
+        run: python -m py_compile experiments/perfforge/run_pro_test.py experiments/perfforge/run_pro_test_a1.py
+      - name: Run frozen synthetic matrix (A1 fixture-construction amendment)
         working-directory: experiments/perfforge
         run: |
           set -o pipefail
-          python run_pro_test.py --mode synthetic | tee pro-synthetic-result.json
+          python run_pro_test_a1.py --mode synthetic | tee pro-synthetic-result.json
       - name: Confirm binding result
         working-directory: experiments/perfforge
         run: |
