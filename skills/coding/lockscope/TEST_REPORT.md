@@ -223,6 +223,34 @@ The research measurement of 168.267 s is the reference point for the
 real-repository stage. A serious regression against it would need explaining;
 none was observed.
 
+## Continuous integration
+
+`.github/workflows/lockscope-tests.yml` runs, on every push and pull request
+touching the skill:
+
+| Job | Platforms | What it proves |
+|---|---|---|
+| structural | Ubuntu 24.04, macOS 15 | 82 tests without any Rust toolchain |
+| semantic | Ubuntu 24.04, macOS 15 | all 142 tests, with `LOCKSCOPE_REQUIRE_TOOLCHAIN=1` so a skipped suite fails the job |
+| real repositories | Ubuntu 24.04 | the 17 tests against pinned commits |
+| registry and metadata | Ubuntu 24.04 | manifest, layout, README, registry, history and site are current, and nothing generated is left dirty |
+
+Four infrastructure defects were found by CI rather than by re-reading the file,
+and each is recorded here because "green on the second try" is only honest if
+the first try is shown:
+
+1. `rustup ... --component rust-analyzer clippy` — rustup takes one component
+   per flag, so it read `clippy` as a toolchain name.
+2. The registry job checked out shallowly, and `build_history` correctly refused
+   to derive a version history from a truncated log.
+3. The real-repository job called `unittest` directly and lost the runner's
+   import path, so the suite could not find its own harness. It now goes through
+   the runner, which also keeps the skip-is-a-failure rule.
+4. A commit changed a skill file without re-rendering the registry checksum. The
+   `checks` workflow caught it, which is what that check exists for.
+
+No test, expectation or threshold changed in any of the four.
+
 ## Honest notes
 
 - **No acceptance criterion was weakened.** The inherited expectations are the
