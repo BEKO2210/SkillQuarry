@@ -10,6 +10,7 @@ on:
       - 'experiments/morphostat/redteam.py'
       - 'experiments/morphostat/compiler_native_feasibility.py'
       - 'experiments/morphostat/lsp_semantic_feasibility.py'
+      - 'experiments/morphostat/lsp_semantic_feasibility_v2.py'
       - '.github/workflows/morphostat-pro-eval.yml'
   workflow_dispatch:
 
@@ -34,7 +35,7 @@ jobs:
           python3 --version
       - name: Syntax check
         working-directory: experiments/morphostat
-        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py compiler_native_feasibility.py lsp_semantic_feasibility.py
+        run: python3 -m py_compile pro_test.py pro_test_v2.py redteam.py compiler_native_feasibility.py lsp_semantic_feasibility.py lsp_semantic_feasibility_v2.py
       - name: Run 22-case A/B pro test
         working-directory: experiments/morphostat
         run: python3 pro_test_v2.py
@@ -44,6 +45,6 @@ jobs:
       - name: Evaluate compiler-native morphology sources
         working-directory: experiments/morphostat
         run: python3 compiler_native_feasibility.py
-      - name: Evaluate rust-analyzer semantic edges
+      - name: Evaluate rust-analyzer semantic edges after readiness
         working-directory: experiments/morphostat
-        run: python3 lsp_semantic_feasibility.py
+        run: python3 lsp_semantic_feasibility_v2.py
