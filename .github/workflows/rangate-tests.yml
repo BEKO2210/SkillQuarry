@@ -1,0 +1,59 @@
+name: RanGate tests
+
+on:
+  push:
+    branches:
+      - main
+      - feat/rangate-skill
+    paths:
+      - 'skills/security/rangate/**'
+      - 'assets/rangate-*.svg'
+      - '.github/workflows/rangate-tests.yml'
+  pull_request:
+    paths:
+      - 'skills/security/rangate/**'
+      - 'assets/rangate-*.svg'
+      - '.github/workflows/rangate-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stable:
+    name: stable / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin Rust toolchain
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component rustfmt,clippy
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+      - name: Run RanGate suite
+        working-directory: skills/security/rangate
+        run: python3 tests/run_tests.py
+
+  miri:
+    name: miri / nightly-2026-08-13
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned Miri toolchain
+        run: |
+          rustup toolchain install nightly-2026-08-13 --profile minimal --component miri
+          rustc +nightly-2026-08-13 --version
+          cargo +nightly-2026-08-13 miri --version
+      - name: Prepare Miri
+        working-directory: skills/security/rangate/tests/fixture
+        run: cargo +nightly-2026-08-13 miri setup
+      - name: Execute fixture under Miri
+        working-directory: skills/security/rangate/tests/fixture
+        run: cargo +nightly-2026-08-13 miri test -- --nocapture
