@@ -488,7 +488,10 @@ class RemoteRegistryTests(Base):
         payload = json.dumps(self.registry_document()).encode("utf-8")
         with mock.patch.object(sq, "fetch", return_value=payload):
             skills, document = sq.load_remote_registry("https://example.invalid/registry.json")
-        self.assertEqual({s["name"] for s in skills}, {"strata", "cordon", "rangate"})
+        # Derived from the quarry, not written out: a hardcoded list turns
+        # "someone published a skill" into "four unrelated tests failed".
+        self.assertEqual({s["name"] for s in skills},
+                         {str(item["name"]) for item in sq.load_registry(QUARRY)})
         self.assertIn("archive_base", document)
 
     def test_a_registry_that_is_not_a_registry_is_refused(self):

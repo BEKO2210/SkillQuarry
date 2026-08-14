@@ -63,6 +63,74 @@
       "workflow": "strata-tests.yml"
     },
     {
+      "category": "coding",
+      "checksum": "sha256:7e58c5fc495f4f4bf470105567213d265b1c8ee18e5eb86201bb6ecc89fa99a6",
+      "compatibility": [
+        "claude-code",
+        "agent-neutral-manual-mode"
+      ],
+      "composes_with": [
+        "cordon"
+      ],
+      "dependencies": [],
+      "description": "Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.",
+      "displayName": "LockScope",
+      "license": "Apache-2.0",
+      "maintainers": [
+        {
+          "github": "BEKO2210",
+          "name": "Belkis Aslani",
+          "role": "maintainer"
+        }
+      ],
+      "name": "lockscope",
+      "path": "skills/coding/lockscope",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "requires": {
+        "binaries": [
+          "cargo",
+          "rustc",
+          "rust-analyzer"
+        ],
+        "packages": [
+          "tree-sitter==0.25.2",
+          "tree-sitter-rust==0.24.0"
+        ],
+        "python": ">=3.10"
+      },
+      "security": {
+        "destructive_operations": [
+          "rewrites one Rust source file in repair mode, moving a single lock acquisition"
+        ],
+        "network_access": "none",
+        "requires_secrets": false,
+        "reviewed_by": "Frozen production-strength evaluation on Ubuntu and macOS (PASS_V2, workflow run 31823072283), reproduced locally on rustc 1.97.1 before release.",
+        "runs_external_commands": true,
+        "threat_model": "README.md",
+        "writes_outside_repository": false
+      },
+      "tests": {
+        "count": 142,
+        "coverage": "142 tests: 82 structural, 45 semantic against rust-analyzer, 5 compiler Send probes and 10 runtime repair proofs; 17 more against three pinned real repositories"
+      },
+      "verifications": [
+        {
+          "by": "Frozen research evaluation (LockScope v2)",
+          "date": "2026-08-14",
+          "findings": "PASS_V2. One infrastructure-only amendment: macOS system Python refused a global pip install under PEP 668, so the pinned packages moved into a virtual environment. No expectation, threshold or repository commit changed.",
+          "method": "Preregistered protocol: 20 inherited semantic cases plus 5 structured-syntax cases on Ubuntu and macOS, 4 compiler Send probes, lock-order cycles, deterministic replay, a Tokio contention repair proof, and three pinned real repositories.",
+          "result": "passed",
+          "url": "https://github.com/BEKO2210/SkillQuarry/blob/main/skills/coding/lockscope/TEST_REPORT.md"
+        }
+      ],
+      "version": "1.0.0",
+      "workflow": "lockscope-tests.yml"
+    },
+    {
       "category": "security",
       "checksum": "sha256:043b9054886f61682ee89414463a2fe7ebe95e86a3743505fed31bd3fa5e55cd",
       "compatibility": [

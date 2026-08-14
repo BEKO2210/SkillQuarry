@@ -6,9 +6,9 @@
 <br>
 
 <!-- SKILLS:STATS:START -->
-![Skills](https://img.shields.io/badge/skills-3-f0932b?style=for-the-badge)
-![Categories](https://img.shields.io/badge/categories-2-5b8298?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-178%20passing-2ea043?style=for-the-badge)
+![Skills](https://img.shields.io/badge/skills-4-f0932b?style=for-the-badge)
+![Categories](https://img.shields.io/badge/categories-3-5b8298?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-320%20passing-2ea043?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)
 <!-- SKILLS:STATS:END -->
 
@@ -16,6 +16,7 @@
 
 <!-- SKILLS:CI:START -->
 [![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Strata)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
+[![LockScope tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/lockscope-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=LockScope)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/lockscope-tests.yml)
 [![Cordon tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cordon-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Cordon)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cordon-tests.yml)
 [![RanGate tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/rangate-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=RanGate)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/rangate-tests.yml)
 <!-- SKILLS:CI:END -->
@@ -172,6 +173,7 @@ SkillQuarry is intended to become a searchable marketplace for agent capabilitie
 | Skill | Category | What it does | Agents | Quality |
 |---|---|---|---|---|
 | **[Strata](skills/autonomous/strata)** | 🤖 Autonomous agents | Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [100 tests, 100% core coverage](skills/autonomous/strata/TEST_REPORT.md) |
+| **[LockScope](skills/coding/lockscope)** | 💻 Coding | Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [142 tests, 142 tests: 82 structural, 45 semantic against rust-analyzer, 5 compiler Send probes and 10 runtime repair proofs; 17 more against three pinned real repositories](skills/coding/lockscope/TEST_REPORT.md) |
 | **[Cordon](skills/security/cordon)** | 🔐 Security | Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [64 tests, 100% core coverage](skills/security/cordon/TEST_REPORT.md) |
 | **[RanGate](skills/security/rangate)** | 🔐 Security | Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [14 tests, N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs](skills/security/rangate/TEST_REPORT.md) |
 <!-- SKILLS:TABLE:END -->
@@ -323,6 +325,35 @@ strata start "Fix the repository so lint and build pass without weakening checks
 ```
 
 [Documentation](skills/autonomous/strata/README.md) · [Skill](skills/autonomous/strata/SKILL.md) · [Test report](skills/autonomous/strata/TEST_REPORT.md)
+
+---
+
+### LockScope
+
+<div align="center">
+
+<img src="assets/lockscope-banner.svg" alt="LockScope — Hold the lock for as long as you must, and no longer." width="720">
+
+</div>
+
+**Hold the lock for as long as you must, and no longer.**
+
+Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis.
+
+- Reads lock acquisitions from a Rust syntax tree, so a multiline or macro-generated acquisition is not missed.
+- Asks rust-analyzer what a value really is: a method named lock() on a plain struct is not a lock.
+- Builds a lock-order graph from acquisitions that genuinely nest, and reports its cycles.
+- Applies exactly one repair — take the lock after the independent await — and lets the compiler and the tests overrule it.
+
+```bash
+cd skills/coding/lockscope && ./install.sh
+
+lockscope scan .                 # what is held across an await
+lockscope repair . --json out.json
+lockscope doctor                 # is this machine able to run it
+```
+
+[Documentation](skills/coding/lockscope/README.md) · [Skill](skills/coding/lockscope/SKILL.md) · [Test report](skills/coding/lockscope/TEST_REPORT.md) · [Research](skills/coding/lockscope/RESEARCH.md)
 
 ---
 
