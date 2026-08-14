@@ -6,9 +6,9 @@
 <br>
 
 <!-- SKILLS:STATS:START -->
-![Skills](https://img.shields.io/badge/skills-2-f0932b?style=for-the-badge)
+![Skills](https://img.shields.io/badge/skills-3-f0932b?style=for-the-badge)
 ![Categories](https://img.shields.io/badge/categories-2-5b8298?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-164%20passing-2ea043?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-177%20passing-2ea043?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)
 <!-- SKILLS:STATS:END -->
 
@@ -17,6 +17,7 @@
 <!-- SKILLS:CI:START -->
 [![Strata tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/strata-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Strata)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/strata-tests.yml)
 [![Cordon tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cordon-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Cordon)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cordon-tests.yml)
+[![RanGate tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/rangate-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=RanGate)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/rangate-tests.yml)
 <!-- SKILLS:CI:END -->
 [![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/BEKO2210/SkillQuarry?style=flat-square&logo=github)](https://github.com/BEKO2210/SkillQuarry/stargazers)
@@ -168,6 +169,7 @@ SkillQuarry is intended to become a searchable marketplace for agent capabilitie
 |---|---|---|---|---|
 | **[Strata](skills/autonomous/strata)** | 🤖 Autonomous agents | Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [100 tests, 100% core coverage](skills/autonomous/strata/TEST_REPORT.md) |
 | **[Cordon](skills/security/cordon)** | 🔐 Security | Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [64 tests, 100% core coverage](skills/security/cordon/TEST_REPORT.md) |
+| **[RanGate](skills/security/rangate)** | 🔐 Security | Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [13 tests, N/A — protocol skill; Rust fixture is compiled and exercised in debug, compile-fail, release and Miri jobs](skills/security/rangate/TEST_REPORT.md) |
 <!-- SKILLS:TABLE:END -->
 
 ## Planned categories
@@ -330,6 +332,34 @@ cordon run "Fix the parser regression and touch nothing else." \
 ```
 
 [Documentation](skills/security/cordon/README.md) · [Skill](skills/security/cordon/SKILL.md) · [Test report](skills/security/cordon/TEST_REPORT.md) · [Research](skills/security/cordon/RESEARCH.md)
+
+---
+
+### RanGate
+
+<div align="center">
+
+<img src="assets/rangate-banner.svg" alt="RanGate — Unsafe stays behind the membrane. Safe Rust gets typed capabilities." width="720">
+
+</div>
+
+**Unsafe stays behind the membrane. Safe Rust gets typed capabilities.**
+
+Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.
+
+- Maps the unsafe blast radius before editing, so the refactor has a measurable baseline.
+- Converts raw representation at one boundary instead of exporting pointer validity and ownership obligations to callers.
+- Uses compile-fail proofs for ownership, aliasing and thread-transport constraints — invalid safe programs must fail to compile.
+- Adds independent stable, release and pinned-nightly Miri verification without installing toolchains at skill runtime.
+
+```bash
+cd skills/security/rangate && ./install.sh
+
+# In Claude Code, from the target Rust repository:
+/rangate Refactor this unsafe/FFI boundary so raw invariants stop leaking into callers. Prove the result with compiler and test evidence.
+```
+
+[Documentation](skills/security/rangate/README.md) · [Skill](skills/security/rangate/SKILL.md) · [Test report](skills/security/rangate/TEST_REPORT.md)
 <!-- SKILLS:CARDS:END -->
 
 ---

@@ -44,6 +44,27 @@
         "coverage": "100% of core.py executable lines (989/989)"
       },
       "version": "1.0.0"
+    },
+    {
+      "category": "security",
+      "compatibility": [
+        "claude-code"
+      ],
+      "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.",
+      "displayName": "RanGate",
+      "license": "Apache-2.0",
+      "name": "rangate",
+      "path": "skills/security/rangate",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "tests": {
+        "count": 13,
+        "coverage": "N/A — protocol skill; Rust fixture is compiled and exercised in debug, compile-fail, release and Miri jobs"
+      },
+      "version": "1.0.0"
     }
   ]
 }
