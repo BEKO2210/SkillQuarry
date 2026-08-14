@@ -26,7 +26,7 @@
 }
 :root[data-theme="light"] {
   --ground: #eef2f6; --raised: #ffffff; --raised-2: #f3f7fa; --edge: #ccd8e2;
-  --ink: #0c1821; --muted: #3d5b72; --dim: #64809a;
+  --ink: #0c1821; --muted: #3d5b72; --dim: #546d85;
   --accent: #92560a; --accent-deep: #6f4106; --accent-soft: rgba(146, 86, 10, .12);
   --ok: #16794a; --warn: #8a5a06;
   --shadow: 0 1px 2px rgba(16,32,44,.06), 0 14px 34px -22px rgba(16,32,44,.5);
