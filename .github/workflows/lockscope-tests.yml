@@ -107,7 +107,9 @@ jobs:
         env:
           LOCKSCOPE_REAL_REPOS: "1"
           LOCKSCOPE_REQUIRE_TOOLCHAIN: "1"
-        run: PYTHONPATH="$PWD/src" .venv/bin/python -m unittest -v tests.test_real_repos
+        # Through the runner, so the suite's own import path and its
+        # skip-is-a-failure rule both apply.
+        run: PYTHONPATH="$PWD/src" .venv/bin/python tests/run_tests.py --only test_real_repos --min 17
 
   # The skill has to satisfy the marketplace it is published in.
   registry:
@@ -117,7 +119,11 @@ jobs:
       run:
         working-directory: .
     steps:
+      # The version history is derived from every release tag in the log, so a
+      # shallow clone cannot produce it — and build_history refuses to guess.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

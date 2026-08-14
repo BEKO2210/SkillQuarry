@@ -34,15 +34,25 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--structural", action="store_true", help="only the suites that need no Rust")
     parser.add_argument("--real", action="store_true", help="include the real-repository suite")
+    parser.add_argument("--only", action="append", metavar="SUITE",
+                        help="run just these suites (repeatable), e.g. --only test_real_repos")
     parser.add_argument("--min", type=int, default=0, help="fail if fewer than this many tests ran")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
 
-    modules = list(STRUCTURAL)
-    if not args.structural:
-        modules += TOOLCHAIN
-    if args.real:
-        modules += REAL
+    if args.only:
+        known = set(STRUCTURAL + TOOLCHAIN + REAL)
+        unknown = [name for name in args.only if name not in known]
+        if unknown:
+            print(f"unknown suite(s): {', '.join(unknown)}", file=sys.stderr)
+            return 3
+        modules = list(args.only)
+    else:
+        modules = list(STRUCTURAL)
+        if not args.structural:
+            modules += TOOLCHAIN
+        if args.real:
+            modules += REAL
 
     if not harness.parser_available():
         print("tree-sitter and tree-sitter-rust are required; run ./install.sh first", file=sys.stderr)
