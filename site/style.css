@@ -208,6 +208,29 @@ main { padding-bottom: 20px; }
 .cta .links { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 800px) { .cta { grid-template-columns: 1fr; } }
 
+/* The three installation steps read left to right on a desktop and stack in the
+   same order on a phone, where they are centred like everything else. */
+.install { margin: 46px 0 10px; }
+.install .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s3); }
+.install .steps > div {
+  border: 1px solid var(--edge); border-radius: var(--radius);
+  background: var(--raised); padding: var(--s3); display: flex; flex-direction: column;
+}
+.install h3 { margin: 0 0 6px; font-size: 15px; letter-spacing: -.01em; }
+.install .steps p { margin: 0 0 var(--s2); color: var(--muted); font-size: 14px; }
+.install .steps .code { margin: auto 0 0; }
+/* A command someone is meant to copy has to be readable in one look, so these
+   blocks wrap instead of scrolling sideways — long URLs and all. */
+.install .steps pre, .content > .code pre, details.alt pre {
+  font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.install .note { margin: var(--s2) 0 0; color: var(--dim); font-size: 14px; }
+.install .note code { font-size: 12.5px; }
+details.alt { margin: 0 0 18px; }
+details.alt summary { cursor: pointer; color: var(--dim); font-size: 14px; margin-bottom: 10px; }
+details.alt summary:hover { color: var(--accent); }
+@media (max-width: 900px) { .install .steps { grid-template-columns: 1fr; } }
+
 /* ---------- detail pages ---------- */
 .detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
 .detail-hero .wrap { padding: 40px 24px 34px; }
@@ -288,6 +311,8 @@ time { color: var(--dim); }
   .card p.body { text-align: left; }
   .tags { justify-content: center; }
   .card .foot { justify-content: center; gap: var(--s3); }
+  .install .steps > div { text-align: center; align-items: stretch; }
+  .install .steps .code, .install .note { text-align: left; }
   .cta { text-align: center; padding: var(--s4) var(--s3); }
   .cta .links { justify-content: center; }
   .cta .links .button { width: 100%; justify-content: center; }

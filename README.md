@@ -837,8 +837,11 @@ rebuilds the archives and uploads them.
 No checkout is needed. Fetch the client, point it at a registry, and install:
 
 ```bash
+mkdir -p ~/.local/bin
 curl -fsSL https://raw.githubusercontent.com/BEKO2210/SkillQuarry/main/cli/skillquarry.py \
-  -o ~/.local/bin/skillquarry && chmod +x ~/.local/bin/skillquarry
+  -o ~/.local/bin/skillquarry
+chmod +x ~/.local/bin/skillquarry
+export PATH="$HOME/.local/bin:$PATH"   # if it is not already
 
 export SKILLQUARRY_REGISTRY=https://beko2210.github.io/SkillQuarry/api/v1/skills.json
 

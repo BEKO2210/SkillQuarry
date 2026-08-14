@@ -264,6 +264,35 @@ class DiscoveryTests(unittest.TestCase):
         self.assertNotIn("min-width: 900px", index)  # phones get the video too
         self.assertIn('poster="assets/img/hero-2400.webp"', index)
 
+    def test_the_site_shows_how_to_install_without_a_checkout(self):
+        """A visitor must be able to install from the page alone.
+
+        The site used to print `git clone` and nothing else, while the client can
+        install straight from the published registry. Someone who only reads the
+        page would never learn that.
+        """
+        index = self.files["index.html"]
+        self.assertIn(bs.CLIENT_URL, index)
+        self.assertIn(f"export SKILLQUARRY_REGISTRY={bs.REGISTRY_URL}", index)
+        self.assertIn('id="install"', index)
+        # The hero button points at that section, not at a heading on another
+        # site that may not exist.
+        self.assertIn('href="#install"', index)
+        self.assertNotIn("#install-the-client", index)
+        # Every skill page names its own install command against the registry.
+        for skill in bs.load_registry():
+            page = self.files[f"skills/{skill['name']}.html"]
+            self.assertIn(bs.REGISTRY_URL, page)
+            self.assertIn(f"skillquarry install {skill['name']} --prefix", page)
+            self.assertIn(f"skillquarry uninstall {skill['name']}", page)
+
+    def test_the_published_addresses_follow_the_repository(self):
+        """A fork must not advertise this repository's registry."""
+        self.assertEqual(bs.REGISTRY_URL, f"{bs.PAGES_URL}/api/v1/skills.json")
+        self.assertIn(bs.REPO_SLUG, bs.CLIENT_URL)
+        served = json.loads(self.files[".well-known/skillquarry.json"])
+        self.assertEqual(served["registry"], bs.REGISTRY_URL)
+
     def css_rules(self):
         """Every `selector { body }` pair of the stylesheet, at-rules aside."""
         return [

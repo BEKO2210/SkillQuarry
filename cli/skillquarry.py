@@ -528,7 +528,14 @@ def format_row(skill: dict[str, Any]) -> str:
     )
 
 
-def format_info(root: Path, skill: dict[str, Any], installed: dict[str, Any] | None) -> str:
+def location(root: Path | str, path: str) -> str:
+    """Where a skill lives — a directory for a checkout, the registry for a URL."""
+    if isinstance(root, str):
+        return f"{path} (from {root})"
+    return str(root / path)
+
+
+def format_info(root: Path | str, skill: dict[str, Any], installed: dict[str, Any] | None) -> str:
     security = skill.get("security") or {}
     tests = skill.get("tests") or {}
     lines = [
@@ -548,7 +555,9 @@ def format_info(root: Path, skill: dict[str, Any], installed: dict[str, Any] | N
         f"destructive   {'; '.join(security.get('destructive_operations') or []) or 'none declared'}",
         f"reviewed by   {security.get('reviewed_by', 'not recorded')}",
         f"checksum      {skill.get('checksum')}",
-        f"path          {root / str(skill.get('path'))}",
+        # A remote quarry is a URL, not a directory: joining it as a path would
+        # print `https:/host/registry.json/skills/...`, which is neither.
+        f"path          {location(root, str(skill.get('path')))}",
     ]
     if installed:
         lines += ["", f"installed     {installed.get('version')} at {installed.get('prefix') or 'the default prefix'}"]
@@ -648,7 +657,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "info":
             skills = load_remote_registry(remote)[0] if root is None else load_registry(root)
             skill = find_skill(skills, args.name)
-            print(format_info(root or Path(remote), skill, load_state()["installed"].get(args.name)))
+            print(format_info(root if root is not None else str(remote), skill,
+                              load_state()["installed"].get(args.name)))
             return EXIT_OK
 
         if args.command == "install":

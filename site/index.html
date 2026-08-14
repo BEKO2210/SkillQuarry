@@ -13,7 +13,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-quarry.webp">
-<link rel="stylesheet" href="style.css?v=029bf9c8f7">
+<link rel="stylesheet" href="style.css?v=afe50da7f2">
 <script>(function () {
   const stored = localStorage.getItem('skillquarry-theme');
   const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -57,7 +57,7 @@
       no telemetry, nothing hidden.</p>
     <div class="actions">
       <a class="button primary" href="#skills">Browse 3 skills</a>
-      <a class="button secondary" href="https://github.com/BEKO2210/SkillQuarry#install-the-client">Install the client</a>
+      <a class="button secondary" href="#install">How to install</a>
     </div>
     <ul class="stats">
       <li><b>3</b><span>skills</span></li>
@@ -143,6 +143,36 @@
 
   <div class="section-head"><h2>Maintainers</h2><a href="maintainers/index.html">All maintainers &rarr;</a></div>
   <ul class="strip"><li><a href="maintainers/BEKO2210.html">Belkis Aslani</a><span class="when">3 skills</span></li></ul>
+
+  <section class="install" id="install">
+    <div class="section-head"><h2>Install a skill</h2><span>no checkout needed</span></div>
+    <div class="steps">
+      <div>
+        <h3>1 &middot; Get the client</h3>
+        <p>One file, standard library only. Nothing else is downloaded.</p>
+        <div class="code"><div class="head">shell</div><pre><code>mkdir -p ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/BEKO2210/SkillQuarry/main/cli/skillquarry.py -o ~/.local/bin/skillquarry
+chmod +x ~/.local/bin/skillquarry
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;   # if it is not already</code></pre></div>
+      </div>
+      <div>
+        <h3>2 &middot; Point it at this quarry</h3>
+        <p>Any registry of the same shape works — this one, or your own.</p>
+        <div class="code"><div class="head">shell</div><pre><code>export SKILLQUARRY_REGISTRY=https://beko2210.github.io/SkillQuarry/api/v1/skills.json</code></pre></div>
+      </div>
+      <div>
+        <h3>3 &middot; Install, update, remove</h3>
+        <p>Every install verifies the checksum before the skill&rsquo;s own installer runs.</p>
+        <div class="code"><div class="head">shell</div><pre><code>skillquarry search
+skillquarry install strata --prefix ~/.local
+skillquarry update
+skillquarry uninstall strata</code></pre></div>
+      </div>
+    </div>
+    <p class="note">Prefer a checkout? <code>git clone https://github.com/BEKO2210/SkillQuarry.git</code> and run
+      <code>cli/install.sh</code>. Either way, <code>skillquarry doctor</code> reports what a
+      skill still needs before you install it.</p>
+  </section>
 
   <section class="cta">
     <div>

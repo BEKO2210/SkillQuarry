@@ -545,6 +545,24 @@ class RemoteRegistryTests(Base):
             sq.unpack_archive(self._archive(), self.root, "something-else-1.0.0")
 
 
+class RemoteInfoTests(RemoteRegistryTests):
+    """`info` against a URL must not pretend the registry is a directory."""
+
+    def test_a_remote_skill_reports_the_registry_it_came_from(self):
+        document = json.dumps(self.registry_document()).encode("utf-8")
+        with mock.patch.object(sq, "fetch", return_value=document):
+            out, err = io.StringIO(), io.StringIO()
+            with redirect_stdout(out), redirect_stderr(err):
+                code = sq.main(["--registry", "https://example.invalid/registry.json", "info", "cordon"])
+        self.assertEqual(code, sq.EXIT_OK, err.getvalue())
+        self.assertIn("skills/security/cordon (from https://example.invalid/registry.json)", out.getvalue())
+        self.assertNotIn("https:/example.invalid", out.getvalue())
+
+    def test_a_checkout_still_reports_a_directory(self):
+        skill = sq.find_skill(sq.load_registry(QUARRY), "cordon")
+        self.assertEqual(sq.location(QUARRY, skill["path"]), str(QUARRY / skill["path"]))
+
+
 class RemoteUpdateTests(RemoteRegistryTests):
     """Updating without a checkout goes back to the registry it came from."""
 

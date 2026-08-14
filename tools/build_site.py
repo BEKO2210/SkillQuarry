@@ -27,6 +27,11 @@ SITE = REPO / "site"
 ASSETS = REPO / "assets"
 REPO_SLUG = "BEKO2210/SkillQuarry"
 SOURCE_URL = f"https://github.com/{REPO_SLUG}"
+# Where the published quarry answers from, and where the client itself lives.
+# Both are derived from the slug so a fork gets its own addresses for free.
+PAGES_URL = "https://{}.github.io/{}".format(*REPO_SLUG.lower().split("/")[:1] + REPO_SLUG.split("/")[1:])
+REGISTRY_URL = f"{PAGES_URL}/api/v1/skills.json"
+CLIENT_URL = f"https://raw.githubusercontent.com/{REPO_SLUG}/main/cli/skillquarry.py"
 EXIT_STALE = 3
 
 CATEGORY_LABELS = {
@@ -301,6 +306,29 @@ main { padding-bottom: 20px; }
 .cta .links { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 800px) { .cta { grid-template-columns: 1fr; } }
 
+/* The three installation steps read left to right on a desktop and stack in the
+   same order on a phone, where they are centred like everything else. */
+.install { margin: 46px 0 10px; }
+.install .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s3); }
+.install .steps > div {
+  border: 1px solid var(--edge); border-radius: var(--radius);
+  background: var(--raised); padding: var(--s3); display: flex; flex-direction: column;
+}
+.install h3 { margin: 0 0 6px; font-size: 15px; letter-spacing: -.01em; }
+.install .steps p { margin: 0 0 var(--s2); color: var(--muted); font-size: 14px; }
+.install .steps .code { margin: auto 0 0; }
+/* A command someone is meant to copy has to be readable in one look, so these
+   blocks wrap instead of scrolling sideways — long URLs and all. */
+.install .steps pre, .content > .code pre, details.alt pre {
+  font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.install .note { margin: var(--s2) 0 0; color: var(--dim); font-size: 14px; }
+.install .note code { font-size: 12.5px; }
+details.alt { margin: 0 0 18px; }
+details.alt summary { cursor: pointer; color: var(--dim); font-size: 14px; margin-bottom: 10px; }
+details.alt summary:hover { color: var(--accent); }
+@media (max-width: 900px) { .install .steps { grid-template-columns: 1fr; } }
+
 /* ---------- detail pages ---------- */
 .detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
 .detail-hero .wrap { padding: 40px 24px 34px; }
@@ -381,6 +409,8 @@ time { color: var(--dim); }
   .card p.body { text-align: left; }
   .tags { justify-content: center; }
   .card .foot { justify-content: center; gap: var(--s3); }
+  .install .steps > div { text-align: center; align-items: stretch; }
+  .install .steps .code, .install .note { text-align: left; }
   .cta { text-align: center; padding: var(--s4) var(--s3); }
   .cta .links { justify-content: center; }
   .cta .links .button { width: 100%; justify-content: center; }
@@ -871,7 +901,7 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
       no telemetry, nothing hidden.</p>
     <div class="actions">
       <a class="button primary" href="#skills">Browse {len(skills)} skills</a>
-      <a class="button secondary" href="{SOURCE_URL}#install-the-client">Install the client</a>
+      <a class="button secondary" href="#install">How to install</a>
     </div>
     <ul class="stats">
       <li><b>{len(skills)}</b><span>skills</span></li>
@@ -910,6 +940,36 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
 
   <div class="section-head"><h2>Maintainers</h2><a href="maintainers/index.html">All maintainers &rarr;</a></div>
   {maintainer_strip}
+
+  <section class="install" id="install">
+    <div class="section-head"><h2>Install a skill</h2><span>no checkout needed</span></div>
+    <div class="steps">
+      <div>
+        <h3>1 &middot; Get the client</h3>
+        <p>One file, standard library only. Nothing else is downloaded.</p>
+        <div class="code"><div class="head">shell</div><pre><code>mkdir -p ~/.local/bin
+curl -fsSL {esc(CLIENT_URL)} -o ~/.local/bin/skillquarry
+chmod +x ~/.local/bin/skillquarry
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;   # if it is not already</code></pre></div>
+      </div>
+      <div>
+        <h3>2 &middot; Point it at this quarry</h3>
+        <p>Any registry of the same shape works — this one, or your own.</p>
+        <div class="code"><div class="head">shell</div><pre><code>export SKILLQUARRY_REGISTRY={esc(REGISTRY_URL)}</code></pre></div>
+      </div>
+      <div>
+        <h3>3 &middot; Install, update, remove</h3>
+        <p>Every install verifies the checksum before the skill&rsquo;s own installer runs.</p>
+        <div class="code"><div class="head">shell</div><pre><code>skillquarry search
+skillquarry install {esc(str(skills[0]["name"]))} --prefix ~/.local
+skillquarry update
+skillquarry uninstall {esc(str(skills[0]["name"]))}</code></pre></div>
+      </div>
+    </div>
+    <p class="note">Prefer a checkout? <code>git clone {esc(SOURCE_URL)}.git</code> and run
+      <code>cli/install.sh</code>. Either way, <code>skillquarry doctor</code> reports what a
+      skill still needs before you install it.</p>
+  </section>
 
   <section class="cta">
     <div>
@@ -1050,11 +1110,22 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
       <h2>Overview</h2>
       <p>{esc(skill.get('description'))}</p>
 {highlight_block}    <h2>Install</h2>
+    <p>From this quarry, without a checkout:</p>
+    <div class="code"><div class="head">shell</div><pre><code>mkdir -p ~/.local/bin
+curl -fsSL {esc(CLIENT_URL)} -o ~/.local/bin/skillquarry
+chmod +x ~/.local/bin/skillquarry
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;   # if it is not already
+export SKILLQUARRY_REGISTRY={esc(REGISTRY_URL)}
+
+skillquarry info {esc(name)}
+skillquarry install {esc(name)} --prefix ~/.local</code></pre></div>
+    <p>Installation verifies the checksum in the sidebar before running the skill's own
+       installer. <code>skillquarry uninstall {esc(name)}</code> runs that skill's own
+       uninstaller and needs no checkout either.</p>
+    <details class="alt"><summary>From a checkout instead</summary>
     <div class="code"><div class="head">shell</div><pre><code>git clone {esc(SOURCE_URL)}.git
 cd SkillQuarry/cli &amp;&amp; ./install.sh
-skillquarry info {esc(name)}
-skillquarry install {esc(name)}</code></pre></div>
-    <p>Installation verifies the checksum in the sidebar before running the skill's own installer.</p>
+skillquarry install {esc(name)}</code></pre></div></details>
 {quickstart_block}{relations}{verified}{history_block}    <h2>Read next</h2>
     <p>{' · '.join(links)}</p>
     </div>
@@ -1151,7 +1222,7 @@ def render() -> dict[str, str]:
         "api/v1/skills.json": json.dumps(api, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         ".well-known/skillquarry.json": json.dumps({
             "name": "SkillQuarry",
-            "registry": "https://beko2210.github.io/SkillQuarry/api/v1/skills.json",
+            "registry": REGISTRY_URL,
             "archive_base": f"{SOURCE_URL}/releases/latest/download",
             "documentation": f"{SOURCE_URL}/blob/main/docs/REGISTRY-API.md",
             "client": f"{SOURCE_URL}/tree/main/cli",
