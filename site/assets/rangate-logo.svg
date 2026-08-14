@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="RanGate">
+  <title>RanGate</title>
+  <desc>A membrane with a narrow gate: raw material stays on the left, one typed capability crosses to the safe side.</desc>
+  <defs>
+    <linearGradient id="rg-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="rg-token" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="rg-frame">
+      <rect x="4" y="4" width="120" height="120" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#rg-ground)"/>
+
+  <g clip-path="url(#rg-frame)">
+    <!-- Safe domain: open, ordered. -->
+    <rect x="76" y="4" width="48" height="120" fill="#5b8298"/>
+    <g fill="#6e9bb0">
+      <rect x="86" y="26" width="30" height="6" rx="3"/>
+      <rect x="86" y="90" width="30" height="6" rx="3"/>
+    </g>
+
+    <!-- Raw domain: dark, unordered fragments that never cross. -->
+    <rect x="4" y="4" width="48" height="120" fill="#233140"/>
+    <g fill="#3d5568">
+      <rect x="14" y="24" width="22" height="6" rx="3"/>
+      <rect x="20" y="40" width="16" height="6" rx="3"/>
+      <rect x="12" y="86" width="18" height="6" rx="3"/>
+      <rect x="22" y="100" width="14" height="6" rx="3"/>
+    </g>
+
+    <!-- The membrane, with one narrow pore. -->
+    <rect x="52" y="4" width="24" height="46" fill="#4a6a80" stroke="#0b1219" stroke-width="2"/>
+    <rect x="52" y="78" width="24" height="46" fill="#4a6a80" stroke="#0b1219" stroke-width="2"/>
+
+    <!-- The typed capability crossing the pore. -->
+    <rect x="40" y="56" width="56" height="16" rx="8" fill="url(#rg-token)"/>
+    <circle cx="88" cy="64" r="4" fill="#0d141b" opacity="0.35"/>
+  </g>
+
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="25.25" fill="none" stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
+</svg>

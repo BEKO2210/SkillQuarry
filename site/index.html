@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillQuarry — the open marketplace for agent skills</title>
+<meta name="description" content="Discover, inspect and install reusable capabilities for AI coding agents.">
+<link rel="icon" href="assets/skillquarry-logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <img src="assets/skillquarry-banner.svg" alt="SkillQuarry — the open marketplace for agent skills">
+  <p class="lede">Reusable capabilities for AI coding agents: inspectable, tested, versioned, and installable with one command.</p>
+  <ul class="stats">
+    <li><b>3</b> skills</li>
+    <li><b>2</b> categories</li>
+    <li><b>178</b> tests passing</li>
+    <li><b>0</b> dependencies</li>
+  </ul>
+</div></header>
+<main class="wrap">
+  <div class="controls">
+    <div><label for="q">Search</label><input id="q" type="search" placeholder="name, description, keyword" autocomplete="off"></div>
+    <div><label for="agent">Agent</label><select id="agent"><option value="">Any agent</option><option value="agent-neutral-manual-mode">Any agent (manual mode)</option><option value="claude-code">Claude Code</option></select></div>
+    <div><label for="platform">Platform</label><select id="platform"><option value="">Any platform</option><option value="linux">linux</option><option value="macos">macos</option></select></div>
+    <div><label for="category">Category</label><select id="category"><option value="">Any category</option><option value="autonomous">Autonomous agents</option><option value="security">Security</option></select></div>
+    <div><label for="quality">Quality</label><select id="quality"><option value="">Any level</option><option value="tested">tested</option></select></div>
+  </div>
+  <div class="toggles">
+    <label><input type="checkbox" id="offline"> needs no network of its own</label>
+    <label><input type="checkbox" id="nosecrets"> needs no credentials</label>
+  </div>
+  <p class="count" id="count">3 skills</p>
+  <div class="grid" id="grid">
+      <article class="card" data-name="strata">
+        <h2><a href="skills/strata.html">Strata</a></h2>
+        <p class="tagline">Every generation is a fresh context. Only a validated core sample crosses the boundary.</p>
+        <p>Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.</p>
+        <div class="tags"><span class="tag accent">Autonomous agents</span><span class="tag ok">100 tests</span><span class="tag">Claude Code</span></div>
+      </article>
+      <article class="card" data-name="cordon">
+        <h2><a href="skills/cordon.html">Cordon</a></h2>
+        <p class="tagline">Limit the blast radius. Verify the result.</p>
+        <p>Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent&#x27;s success claim.</p>
+        <div class="tags"><span class="tag accent">Security</span><span class="tag ok">64 tests</span><span class="tag">Claude Code</span><span class="tag">Any agent (manual mode)</span></div>
+      </article>
+      <article class="card" data-name="rangate">
+        <h2><a href="skills/rangate.html">RanGate</a></h2>
+        <p class="tagline">Unsafe stays behind the membrane. Safe Rust gets typed capabilities.</p>
+        <p>Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.</p>
+        <div class="tags"><span class="tag accent">Security</span><span class="tag ok">14 tests</span><span class="tag ok">offline</span><span class="tag warn">destructive</span><span class="tag">Claude Code</span></div>
+      </article>
+  </div>
+  <p class="empty" id="empty" hidden>No skill matches those filters.</p>
+</main>
+<script type="application/json" id="skill-data">[{"category": "autonomous", "checksum": "sha256:165f933f64dcf61d80569826365baba0c3f105abc351a493885b27b5762f280e", "compatibility": ["claude-code"], "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.", "displayName": "Strata", "license": "Apache-2.0", "name": "strata", "path": "skills/autonomous/strata", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["git", "claude"], "packages": [], "python": ">=3.10"}, "security": {"destructive_operations": [], "network_access": "indirect", "requires_secrets": false, "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.", "runs_external_commands": true, "threat_model": "TEST_REPORT.md", "writes_outside_repository": false}, "tests": {"count": 100, "coverage": "100% of runner.py executable lines"}, "version": "1.0.0", "workflow": "strata-tests.yml"}, {"category": "security", "checksum": "sha256:3f97b55471397b7e6e55f53cc4a8cd4c08ad5c1049adfc0ecf9e1975b22765e5", "compatibility": ["claude-code", "agent-neutral-manual-mode"], "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.", "displayName": "Cordon", "license": "Apache-2.0", "name": "cordon", "path": "skills/security/cordon", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["git"], "packages": [], "python": ">=3.10"}, "security": {"destructive_operations": [], "network_access": "indirect", "requires_secrets": false, "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.", "runs_external_commands": true, "threat_model": "README.md", "writes_outside_repository": false}, "tests": {"count": 64, "coverage": "100% of core.py executable lines (989/989)"}, "version": "1.0.0", "workflow": "cordon-tests.yml"}, {"category": "security", "checksum": "sha256:e6aad308504e5163c0f28d2011ea7618c9d48ae571f69cf0cd1fbb2a24e59202", "compatibility": ["claude-code"], "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.", "displayName": "RanGate", "license": "Apache-2.0", "name": "rangate", "path": "skills/security/rangate", "platforms": ["linux", "macos"], "quality": "tested", "requires": {"binaries": ["cargo", "rustc"], "packages": [], "python": ">=3.10 (test harness only)"}, "security": {"destructive_operations": ["rewrites Rust source files in the target project in place; review the diff before committing"], "network_access": "none", "requires_secrets": false, "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.", "runs_external_commands": true, "threat_model": "TEST_REPORT.md", "writes_outside_repository": false}, "tests": {"count": 14, "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"}, "version": "1.0.0", "workflow": "rangate-tests.yml"}]</script>
+<script>const skills = JSON.parse(document.getElementById('skill-data').textContent);
+const controls = ['q', 'agent', 'platform', 'category', 'quality'].map((id) => document.getElementById(id));
+const toggles = ['offline', 'nosecrets'].map((id) => document.getElementById(id));
+const grid = document.getElementById('grid');
+const count = document.getElementById('count');
+
+function matches(skill) {
+  const [q, agent, platform, category, quality] = controls.map((el) => el.value);
+  const [offline, noSecrets] = toggles.map((el) => el.checked);
+  if (agent && !(skill.compatibility || []).includes(agent)) return false;
+  if (platform && !(skill.platforms || []).includes(platform)) return false;
+  if (category && skill.category !== category) return false;
+  if (quality && skill.quality !== quality) return false;
+  if (offline && (skill.security || {}).network_access !== 'none') return false;
+  if (noSecrets && (skill.security || {}).requires_secrets !== false) return false;
+  if (q) {
+    const needle = q.toLowerCase();
+    const hay = [skill.name, skill.displayName, skill.description, (skill.keywords || []).join(' ')]
+      .join(' ').toLowerCase();
+    if (!hay.includes(needle)) return false;
+  }
+  return true;
+}
+
+function apply() {
+  let shown = 0;
+  for (const card of grid.children) {
+    const skill = skills.find((item) => item.name === card.dataset.name);
+    const visible = matches(skill);
+    card.hidden = !visible;
+    if (visible) shown += 1;
+  }
+  count.textContent = shown === skills.length
+    ? `${skills.length} skills`
+    : `${shown} of ${skills.length} skills`;
+  document.getElementById('empty').hidden = shown !== 0;
+}
+
+for (const el of [...controls, ...toggles]) {
+  el.addEventListener(el.tagName === 'INPUT' && el.type !== 'checkbox' ? 'input' : 'change', apply);
+}
+apply();</script>
+<footer><div class="wrap">
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+· <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
+</div></footer>
+</body>
+</html>

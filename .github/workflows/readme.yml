@@ -8,6 +8,7 @@ on:
       - "tools/**"
       - "templates/**"
       - "cli/**"
+      - "site/**"
       - "README.md"
       - "registry/**"
       - "docs/**"
@@ -18,6 +19,7 @@ on:
       - "tools/**"
       - "templates/**"
       - "cli/**"
+      - "site/**"
       - "README.md"
       - "registry/**"
       - "docs/**"
@@ -43,6 +45,7 @@ jobs:
           python3 tools/test_validate_skills.py
           python3 tools/test_new_skill.py
           python3 tools/test_registry.py
+          python3 tools/test_build_site.py
 
       # The template is the example every contribution is copied from, so its own
       # suite runs here; a rotten example would be inherited by every new skill.
@@ -64,21 +67,25 @@ jobs:
       # workflow cannot push to a fork.
       - name: Verify generated files are current
         if: github.event_name == 'pull_request'
-        run: python3 tools/render_readme.py --check
+        run: |
+          python3 tools/render_readme.py --check
+          python3 tools/build_site.py --check
 
-      - name: Regenerate README and registry
+      - name: Regenerate README, registry and site
         if: github.event_name != 'pull_request'
-        run: python3 tools/render_readme.py
+        run: |
+          python3 tools/render_readme.py
+          python3 tools/build_site.py
 
       - name: Commit if the manifests moved ahead of the README
         if: github.event_name != 'pull_request'
         run: |
-          if git diff --quiet -- README.md registry/skills.json; then
-            echo "README and registry already match the manifests."
+          if git diff --quiet -- README.md registry/skills.json site; then
+            echo "README, registry and site already match the manifests."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md registry/skills.json
-          git commit -m "docs: regenerate README and registry from skill manifests [skip ci]"
+          git add README.md registry/skills.json site
+          git commit -m "docs: regenerate README, registry and site from skill manifests [skip ci]"
           git push

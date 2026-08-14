@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Cordon logo</title>
+  <desc id="desc">A compact shield formed by two boundary brackets around a verified check.</desc>
+  <style>
+    .plate{fill:#111827}.edge{fill:none;stroke:#2DD4BF;stroke-width:8;stroke-linecap:round;stroke-linejoin:round}.check{fill:none;stroke:#A78BFA;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+    @media (prefers-color-scheme: dark){.plate{fill:#F8FAFC}.edge{stroke:#0F766E}.check{stroke:#6D28D9}}
+  </style>
+  <rect class="plate" x="18" y="18" width="92" height="92" rx="26"/>
+  <path class="edge" d="M47 36H37a7 7 0 0 0-7 7v42a7 7 0 0 0 7 7h10M81 36h10a7 7 0 0 1 7 7v42a7 7 0 0 1-7 7H81"/>
+  <path class="check" d="m45 65 13 13 27-31"/>
+</svg>

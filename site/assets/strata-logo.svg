@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Strata">
+  <title>Strata</title>
+  <desc>Stacked rock layers with a bright core sample carried straight through them.</desc>
+  <defs>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="frame">
+      <rect x="4" y="4" width="120" height="120" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#ground)"/>
+
+  <g clip-path="url(#frame)">
+    <!-- Sediment layers: each generation leaves one behind. -->
+    <path d="M4 40 q22 -9 40 -2 q20 8 40 1 q22 -8 44 0 V60 H4 Z" fill="#3d5568" stroke="#0b1219" stroke-width="1.6"/>
+    <path d="M4 60 q24 8 44 1 q20 -7 38 1 q20 8 42 -1 V78 H4 Z" fill="#4a6a80" stroke="#0b1219" stroke-width="1.6"/>
+    <path d="M4 78 q20 -8 42 -1 q22 7 42 -1 q20 -7 40 2 V96 H4 Z" fill="#5b8298" stroke="#0b1219" stroke-width="1.6"/>
+    <path d="M4 96 q22 8 42 0 q22 -8 42 1 q20 8 38 -1 V124 H4 Z" fill="#6e9bb0" stroke="#0b1219" stroke-width="1.6"/>
+
+    <!-- Overburden: the context that is discarded. -->
+    <path d="M4 4 h120 v34 q-22 -9 -44 -1 q-20 8 -40 0 q-18 -6 -36 2 Z" fill="#233140"/>
+
+    <!-- Core sample: the only thing carried from layer to layer. -->
+    <rect x="57" y="14" width="14" height="104" rx="7" fill="url(#core)"/>
+    <g fill="#0d141b" opacity="0.38">
+      <rect x="57" y="41" width="14" height="3"/>
+      <rect x="57" y="61" width="14" height="3"/>
+      <rect x="57" y="79" width="14" height="3"/>
+      <rect x="57" y="97" width="14" height="3"/>
+    </g>
+    <rect x="57" y="14" width="5" height="104" rx="2.5" fill="#ffffff" opacity="0.28"/>
+  </g>
+
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="25.25" fill="none" stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
+</svg>

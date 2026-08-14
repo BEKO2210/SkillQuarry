@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="SkillQuarry">
+  <title>SkillQuarry</title>
+  <desc>A stepped quarry cut into rock, with an exposed seam of ore at the base.</desc>
+  <defs>
+    <linearGradient id="sq-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="sq-ore" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="sq-frame">
+      <rect x="4" y="4" width="120" height="120" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#sq-ground)"/>
+
+  <g clip-path="url(#sq-frame)">
+    <!-- Terraces: the quarry is cut in steps, each one wider than the last. -->
+    <path d="M4 44 H60 V64 H86 V84 H112 V104 H124 V124 H4 Z" fill="#3d5568"/>
+    <path d="M4 60 H44 V80 H72 V100 H104 V124 H4 Z" fill="#4a6a80"/>
+    <path d="M4 80 H30 V100 H62 V124 H4 Z" fill="#5b8298"/>
+    <path d="M4 102 H20 V124 H4 Z" fill="#6e9bb0"/>
+
+    <!-- Bench edges. -->
+    <g stroke="#0b1219" stroke-width="2.2" fill="none" stroke-linecap="square">
+      <path d="M4 44 H60 V64 H86 V84 H112 V104 H124"/>
+      <path d="M4 60 H44 V80 H72 V100 H104 V124"/>
+      <path d="M4 80 H30 V100 H62 V124"/>
+    </g>
+
+    <!-- Exposed ore seam: the reusable capability worth digging out. -->
+    <g transform="translate(86 44) rotate(12)">
+      <path d="M0 -18 L15 0 L0 18 L-15 0 Z" fill="url(#sq-ore)"/>
+      <path d="M0 -18 L15 0 L0 0 Z" fill="#ffffff" opacity="0.3"/>
+      <path d="M0 18 L-15 0 L0 0 Z" fill="#0d141b" opacity="0.25"/>
+    </g>
+  </g>
+
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="25.25" fill="none" stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
+</svg>

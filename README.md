@@ -684,6 +684,8 @@ SkillQuarry/
 ├── cli/
 │   └── skillquarry.py          the client: search, install, update, doctor
 │
+├── site/                       generated static marketplace (GitHub Pages)
+│
 ├── templates/
 │   └── example-skill/          the reference skill; scaffold from it
 │
@@ -791,6 +793,22 @@ is usable in a script.
 recomputes every checksum in CI. The client is for users of a quarry; the tools
 are for people changing one.
 
+### The marketplace site
+
+`site/` is a static marketplace generated from the same registry by
+`tools/build_site.py`: an overview with browser-side search and filtering, one
+detail page per skill with its full security surface, and `registry.json` for
+tooling. No framework, no build step, no external request at runtime — the pages
+load nothing but their own files.
+
+```bash
+python3 tools/build_site.py           # regenerate site/
+python3 tools/build_site.py --check   # fail if it is out of date
+```
+
+It is published to GitHub Pages on every change, and because it is plain files it
+can just as well be served from any web server pointed at `site/`.
+
 ### Still planned
 
 A published package so `skillquarry` can be installed without cloning, remote
@@ -845,14 +863,14 @@ registries and signed releases.
 
 ## Phase 5 — Marketplace
 
-- [ ] Web marketplace
-- [ ] Search and filtering
-- [ ] Skill detail pages
+- [x] Web marketplace (static, generated from the registry, published on GitHub Pages)
+- [x] Search and filtering (in the browser, no backend)
+- [x] Skill detail pages
 - [ ] Maintainer profiles
 - [ ] Version history
-- [ ] Compatibility information
-- [ ] Security information
-- [ ] Install statistics
+- [x] Compatibility information
+- [x] Security information
+- [ ] Install statistics — needs a backend; deliberately not built
 - [ ] Community discovery
 
 ## Phase 6 — Ecosystem

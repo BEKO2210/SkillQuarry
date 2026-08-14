@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Cordon — deterministic change envelopes</title>
+  <desc id="desc">An agent change flows through path and budget checks plus independent verification before acceptance.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0B1220"/><stop offset="1" stop-color="#172033"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2DD4BF"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient>
+  </defs>
+  <rect width="1200" height="360" rx="32" fill="url(#bg)"/>
+  <g transform="translate(66 64)">
+    <rect width="112" height="112" rx="30" fill="#F8FAFC"/>
+    <path d="M38 28H27a8 8 0 0 0-8 8v40a8 8 0 0 0 8 8h11M74 28h11a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8H74" fill="none" stroke="#0F766E" stroke-width="8" stroke-linecap="round"/>
+    <path d="m37 56 13 13 27-31" fill="none" stroke="#6D28D9" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="208" y="105" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="54" font-weight="750">Cordon</text>
+  <text x="208" y="151" fill="#A7B2C6" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="23">Deterministic Git change envelopes for coding agents</text>
+  <g font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="18" font-weight="650">
+    <rect x="66" y="228" width="170" height="58" rx="16" fill="#172C35" stroke="#2DD4BF"/><text x="151" y="264" text-anchor="middle" fill="#D5FFFA">ARM</text>
+    <path d="M246 257h54" stroke="#53617A" stroke-width="3"/><path d="m292 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
+    <rect x="314" y="228" width="170" height="58" rx="16" fill="#20253A" stroke="#8B5CF6"/><text x="399" y="264" text-anchor="middle" fill="#EDE9FE">AGENT</text>
+    <path d="M494 257h54" stroke="#53617A" stroke-width="3"/><path d="m540 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
+    <rect x="562" y="228" width="170" height="58" rx="16" fill="#172C35" stroke="#2DD4BF"/><text x="647" y="264" text-anchor="middle" fill="#D5FFFA">AUDIT</text>
+    <path d="M742 257h54" stroke="#53617A" stroke-width="3"/><path d="m788 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
+    <rect x="810" y="228" width="170" height="58" rx="16" fill="#20253A" stroke="#8B5CF6"/><text x="895" y="264" text-anchor="middle" fill="#EDE9FE">VERIFY</text>
+    <path d="M990 257h54" stroke="#53617A" stroke-width="3"/><path d="m1036 250 10 7-10 7" fill="none" stroke="#53617A" stroke-width="3"/>
+    <rect x="1058" y="228" width="100" height="58" rx="16" fill="url(#accent)"/><text x="1108" y="264" text-anchor="middle" fill="#07131B">PASS</text>
+  </g>
+  <text x="1134" y="327" text-anchor="end" fill="#65738D" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14">evidence &gt; claim</text>
+</svg>

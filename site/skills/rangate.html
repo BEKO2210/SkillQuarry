@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RanGate — SkillQuarry</title>
+<meta name="description" content="Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.">
+<link rel="icon" href="../assets/skillquarry-logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="../index.html">&larr; all skills</a>
+  <img class="banner" src="../assets/rangate-banner.svg" alt="RanGate">
+  <h1 class="title">RanGate</h1>
+  <p class="subtitle">Unsafe stays behind the membrane. Safe Rust gets typed capabilities.</p>
+  <p>Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.</p>
+  <h2>What it does</h2>
+  <ul class="plain">
+    <li>Maps the unsafe blast radius before editing, so the refactor has a measurable baseline.</li>
+    <li>Converts raw representation at one boundary instead of exporting pointer validity and ownership obligations to callers.</li>
+    <li>Uses compile-fail proofs for ownership, aliasing and thread-transport constraints — invalid safe programs must fail to compile.</li>
+    <li>Adds independent stable, release and pinned-nightly Miri verification without installing toolchains at skill runtime.</li>
+  </ul>
+  <h2>Install</h2>
+  <pre><code>git clone https://github.com/BEKO2210/SkillQuarry.git
+cd SkillQuarry/cli &amp;&amp; ./install.sh
+skillquarry info rangate
+skillquarry install rangate</code></pre>
+  <p>Installation verifies the checksum below before running the skill's own installer.</p>
+  <h2>Quickstart</h2>
+  <pre><code>cd skills/security/rangate &amp;&amp; ./install.sh
+
+# In Claude Code, from the target Rust repository:
+/rangate Refactor this unsafe/FFI boundary so raw invariants stop leaking into callers. Prove the result with compiler and test evidence.</code></pre>
+  <h2>Facts</h2>
+  <table>
+    <tr><th>Category</th><td>Security</td></tr>
+    <tr><th>Version</th><td>1.0.0</td></tr>
+    <tr><th>Quality</th><td>tested</td></tr>
+    <tr><th>License</th><td>Apache-2.0</td></tr>
+    <tr><th>Agents</th><td>Claude Code</td></tr>
+    <tr><th>Platforms</th><td>linux, macos</td></tr>
+    <tr><th>Tests</th><td>14 — N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs</td></tr>
+    <tr><th>Needs installed</th><td>cargo, rustc</td></tr>
+    <tr><th>Network access</th><td>none</td></tr>
+    <tr><th>Credentials</th><td>none</td></tr>
+    <tr><th>Writes outside the repository</th><td>no</td></tr>
+    <tr><th>Irreversible operations</th><td>rewrites Rust source files in the target project in place; review the diff before committing</td></tr>
+    <tr><th>Independently reviewed</th><td>Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.</td></tr>
+    <tr><th>Checksum</th><td>sha256:e6aad308504e5163c0f28d2011ea7618c9d48ae571f69cf0cd1fbb2a24e59202</td></tr>
+  </table>
+  <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/security/rangate/SKILL.md">SKILL.md</a></p>
+</main>
+<footer><div class="wrap">
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+· <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
+</div></footer>
+</body>
+</html>

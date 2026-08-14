@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "skills": [
+    {
+      "category": "autonomous",
+      "checksum": "sha256:165f933f64dcf61d80569826365baba0c3f105abc351a493885b27b5762f280e",
+      "compatibility": [
+        "claude-code"
+      ],
+      "description": "Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.",
+      "displayName": "Strata",
+      "license": "Apache-2.0",
+      "name": "strata",
+      "path": "skills/autonomous/strata",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "requires": {
+        "binaries": [
+          "git",
+          "claude"
+        ],
+        "packages": [],
+        "python": ">=3.10"
+      },
+      "security": {
+        "destructive_operations": [],
+        "network_access": "indirect",
+        "requires_secrets": false,
+        "reviewed_by": "Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.",
+        "runs_external_commands": true,
+        "threat_model": "TEST_REPORT.md",
+        "writes_outside_repository": false
+      },
+      "tests": {
+        "count": 100,
+        "coverage": "100% of runner.py executable lines"
+      },
+      "version": "1.0.0",
+      "workflow": "strata-tests.yml"
+    },
+    {
+      "category": "security",
+      "checksum": "sha256:3f97b55471397b7e6e55f53cc4a8cd4c08ad5c1049adfc0ecf9e1975b22765e5",
+      "compatibility": [
+        "claude-code",
+        "agent-neutral-manual-mode"
+      ],
+      "description": "Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim.",
+      "displayName": "Cordon",
+      "license": "Apache-2.0",
+      "name": "cordon",
+      "path": "skills/security/cordon",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "requires": {
+        "binaries": [
+          "git"
+        ],
+        "packages": [],
+        "python": ">=3.10"
+      },
+      "security": {
+        "destructive_operations": [],
+        "network_access": "indirect",
+        "requires_secrets": false,
+        "reviewed_by": "Independent review, 2026-08-14: audit-bypass defect C11 found and fixed; live smoke test against Claude Code 2.1.231.",
+        "runs_external_commands": true,
+        "threat_model": "README.md",
+        "writes_outside_repository": false
+      },
+      "tests": {
+        "count": 64,
+        "coverage": "100% of core.py executable lines (989/989)"
+      },
+      "version": "1.0.0",
+      "workflow": "cordon-tests.yml"
+    },
+    {
+      "category": "security",
+      "checksum": "sha256:e6aad308504e5163c0f28d2011ea7618c9d48ae571f69cf0cd1fbb2a24e59202",
+      "compatibility": [
+        "claude-code"
+      ],
+      "description": "Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks.",
+      "displayName": "RanGate",
+      "license": "Apache-2.0",
+      "name": "rangate",
+      "path": "skills/security/rangate",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "quality": "tested",
+      "requires": {
+        "binaries": [
+          "cargo",
+          "rustc"
+        ],
+        "packages": [],
+        "python": ">=3.10 (test harness only)"
+      },
+      "security": {
+        "destructive_operations": [
+          "rewrites Rust source files in the target project in place; review the diff before committing"
+        ],
+        "network_access": "none",
+        "requires_secrets": false,
+        "reviewed_by": "Independent review, 2026-08-14: defects D5 (compile-fail proofs) and D6 (toolchain handling) found and fixed.",
+        "runs_external_commands": true,
+        "threat_model": "TEST_REPORT.md",
+        "writes_outside_repository": false
+      },
+      "tests": {
+        "count": 14,
+        "coverage": "N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs"
+      },
+      "version": "1.0.0",
+      "workflow": "rangate-tests.yml"
+    }
+  ]
+}

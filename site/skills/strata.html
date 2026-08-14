@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strata — SkillQuarry</title>
+<meta name="description" content="Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.">
+<link rel="icon" href="../assets/skillquarry-logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="../index.html">&larr; all skills</a>
+  <img class="banner" src="../assets/strata-banner.svg" alt="Strata">
+  <h1 class="title">Strata</h1>
+  <p class="subtitle">Every generation is a fresh context. Only a validated core sample crosses the boundary.</p>
+  <p>Generational handoff runner: executes a long coding task as a chain of fresh Claude Code processes that pass a validated, compacted handoff forward, with independent verification of completion and crash-safe state.</p>
+  <h2>What it does</h2>
+  <ul class="plain">
+    <li>Each generation is its own `claude -p` process — context never accumulates.</li>
+    <li>Independent `--verify` commands overrule the agent&#x27;s own completion claim.</li>
+    <li>Atomic state: a killed host resumes from the last validated handoff.</li>
+    <li>Stall detector, generation ceiling, turn cap and cost ceiling stop runaway loops.</li>
+  </ul>
+  <h2>Install</h2>
+  <pre><code>git clone https://github.com/BEKO2210/SkillQuarry.git
+cd SkillQuarry/cli &amp;&amp; ./install.sh
+skillquarry info strata
+skillquarry install strata</code></pre>
+  <p>Installation verifies the checksum below before running the skill's own installer.</p>
+  <h2>Quickstart</h2>
+  <pre><code>cd skills/autonomous/strata &amp;&amp; ./install.sh
+
+strata start &quot;Fix the repository so lint and build pass without weakening checks.&quot; \
+  --verify &quot;npm run lint&quot; \
+  --verify &quot;npm run build&quot; \
+  --max-generations 20 \
+  --max-budget-usd 3</code></pre>
+  <h2>Facts</h2>
+  <table>
+    <tr><th>Category</th><td>Autonomous agents</td></tr>
+    <tr><th>Version</th><td>1.0.0</td></tr>
+    <tr><th>Quality</th><td>tested</td></tr>
+    <tr><th>License</th><td>Apache-2.0</td></tr>
+    <tr><th>Agents</th><td>Claude Code</td></tr>
+    <tr><th>Platforms</th><td>linux, macos</td></tr>
+    <tr><th>Tests</th><td>100 — 100% of runner.py executable lines</td></tr>
+    <tr><th>Needs installed</th><td>git, claude</td></tr>
+    <tr><th>Network access</th><td>indirect</td></tr>
+    <tr><th>Credentials</th><td>none</td></tr>
+    <tr><th>Writes outside the repository</th><td>no</td></tr>
+    <tr><th>Irreversible operations</th><td>none declared</td></tr>
+    <tr><th>Independently reviewed</th><td>Repository owner, 2026-08-13: live run against Claude Code 2.1.231, seven defects fixed before release.</td></tr>
+    <tr><th>Checksum</th><td>sha256:165f933f64dcf61d80569826365baba0c3f105abc351a493885b27b5762f280e</td></tr>
+  </table>
+  <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/autonomous/strata/SKILL.md">SKILL.md</a></p>
+</main>
+<footer><div class="wrap">
+Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>. No tracking, no external requests.
+· <a href="https://github.com/BEKO2210/SkillQuarry">Source on GitHub</a>
+</div></footer>
+</body>
+</html>
