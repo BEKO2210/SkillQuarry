@@ -222,19 +222,31 @@ class DiscoveryTests(unittest.TestCase):
             self.assertIn(name, bs.binary_files())
         self.assertIn("assets/img/hero-2400.webp", self.index)
 
+    @staticmethod
+    def mp4_dimensions(blob: bytes) -> tuple[int, int]:
+        """Read the coded width/height straight out of the MP4 sample entry.
+
+        Parsing 8 bytes ourselves beats depending on ffprobe, which is not
+        installed on a clean CI runner — and the rule "4K only" is worth a test
+        that always runs.
+        """
+        # `avc1` also appears in the ftyp brand list, so start from the sample
+        # description box; the first entry after it is the real one.
+        table = blob.find(b"stsd")
+        marker = blob.find(b"avc1", table) if table >= 0 else -1
+        if marker < 0:
+            raise AssertionError("no H.264 sample entry found in the hero video")
+        import struct
+        width, height = struct.unpack(">HH", blob[marker + 28:marker + 32])
+        return width, height
+
     def test_the_hero_video_is_4k_and_loads_only_where_it_belongs(self):
-        import subprocess
         blobs = bs.binary_files()
         self.assertIn("assets/video/hero-4k.mp4", blobs)
-        size_mb = len(blobs["assets/video/hero-4k.mp4"]) / 1024 / 1024
+        video = blobs["assets/video/hero-4k.mp4"]
+        size_mb = len(video) / 1024 / 1024
         self.assertLess(size_mb, 15, f"hero video is {size_mb:.1f} MB")
-        probe = subprocess.run(
-            ["ffprobe", "-v", "error", "-select_streams", "v:0",
-             "-show_entries", "stream=width,height", "-of", "csv=p=0",
-             str(bs.ASSETS / "video" / "hero-4k.mp4")],
-            stdout=subprocess.PIPE, text=True, check=False,
-        )
-        self.assertEqual(probe.stdout.strip(), "3840,2160", "the hero video must be true 4K")
+        self.assertEqual(self.mp4_dimensions(video), (3840, 2160), "the hero video must be true 4K")
         index = self.index
         self.assertIn('preload="none"', index)
         self.assertIn("prefers-reduced-motion", index)
