@@ -335,7 +335,7 @@ PYTHONPATH=src:tests python3 -m unittest -v test_hardening -k IndexFlagTests
 ## Known limits — no claims beyond these
 
 1. ~~**No live Claude Code execution in this sandbox.**~~ **Closed by review:** the smoke test from `REVIEW.md` ran against Claude Code 2.1.231 on Linux — exit `0`, `"passed": true`, only the requested one-line diff, no `.cordon` path in `git status`. Every flag Cordon emits exists in that release.
-2. **No Python 3.10 runtime yet.** Still open: the review machine had only CPython 3.12.3. Every source file parses against the 3.10 grammar and no post-3.10 standard-library API is imported, but the suite has not run on 3.10 outside CI.
+2. ~~**No Python 3.10 runtime yet.**~~ **Closed by CI:** the suite is green on CPython 3.10, 3.11, 3.12 and 3.13 (Linux) and 3.11–3.13 (macOS).
 3. **macOS is covered by CI, with one filesystem difference.** The macOS jobs exposed that APFS rejects non-UTF-8 filenames outright (`OSError: [Errno 92] Illegal byte sequence`), which ext4 accepts. The two byte-path tests now detect that at runtime: where such a name cannot exist, they assert the decoding/reporting logic directly and skip the Git part instead of failing. Cordon itself is unchanged; the difference belongs to the filesystem.
 4. **Ignored files are not audited in v1.** `git ls-files --others --exclude-standard` intentionally excludes ignored untracked files. Changes to ignored files can be invisible to Cordon.
 5. **External symlink targets are outside the Git evidence model.** Cordon can account for the symlink object, but a write performed through a repository symlink to a target outside the repository is not a Git-visible target-repository change.

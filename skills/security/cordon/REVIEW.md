@@ -55,5 +55,5 @@ Expected acceptance criteria, not an invented transcript: process exit `0`; audi
 ## Three places I am least certain — please target these
 
 1. ~~**Real Claude Code on the review machine.**~~ **Done:** the smoke test ran against Claude Code 2.1.231 on Linux — exit `0`, `"passed": true`, only the requested diff, no `.cordon` path in `git status`. Every emitted flag exists in that release.
-2. **Python 3.10 specifically.** Still open — the review machine had 3.12.3 only; grammar parses against 3.10 and no post-3.10 stdlib API is used. Run the full suite under the oldest supported interpreter: `python3.10 tests/run_tests.py --min 100`.
-3. **macOS process groups/filesystem durability.** Linux exercised POSIX TERM→KILL and `fsync` behavior. Run the full suite on macOS and specifically repeat timeout/output-limit tests plus installer/uninstaller tests.
+2. ~~**Python 3.10 specifically.**~~ **Done:** GitHub Actions ran the full suite on CPython 3.10, 3.11, 3.12 and 3.13 — all green. Run the full suite under the oldest supported interpreter: `python3.10 tests/run_tests.py --min 100`.
+3. ~~**macOS process groups/filesystem durability.**~~ **Done:** macOS jobs on 3.11, 3.12 and 3.13 are green. They surfaced one genuine platform difference — APFS rejects non-UTF-8 filenames — which the byte-path tests now detect instead of assuming ext4 semantics.
