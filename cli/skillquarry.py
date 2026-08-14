@@ -40,7 +40,7 @@ EXIT_ERROR = 2
 EXIT_MISMATCH = 3
 
 # Commands a remote registry can serve on its own; the rest need local files.
-REMOTE_COMMANDS = {"search", "list", "info", "install"}
+REMOTE_COMMANDS = {"search", "list", "info", "install", "uninstall", "update"}
 
 IGNORED_DIRECTORIES = {"__pycache__", "target", "node_modules", ".git"}
 IGNORED_SUFFIXES = {".pyc", ".pyo"}
@@ -48,6 +48,10 @@ IGNORED_SUFFIXES = {".pyc", ".pyo"}
 STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
 STATE_FILE = Path(os.environ.get("SKILLQUARRY_STATE", STATE_HOME / "skillquarry" / "installed.json"))
 STATE_VERSION = 1
+# The client keeps a copy of the files it installed from, so that a skill can
+# always be removed or replaced later — including on a machine that never had a
+# checkout and installed everything from a remote registry.
+SOURCE_CACHE = Path(os.environ.get("SKILLQUARRY_CACHE", STATE_FILE.parent / "sources"))
 
 # A remote quarry is just a registry.json reachable over HTTPS — GitHub Pages,
 # a company server on a private network, anything that can serve a file.
@@ -180,6 +184,7 @@ def install_remote(url: str, name: str, prefix: str | None, *, force: bool = Fal
             )
         manifest = json.loads((root / "skill.json").read_text("utf-8"))
         result = run_installer(root.parent, {"name": name, "path": root.name}, manifest, "install", prefix)
+        source = remember_source(name, str(skill.get("version")), root)
     if result.returncode != 0:
         raise QuarryError(f"{name}: installer failed with exit {result.returncode}:\n{result.stdout.strip()}")
 
@@ -187,6 +192,7 @@ def install_remote(url: str, name: str, prefix: str | None, *, force: bool = Fal
         "version": skill.get("version"),
         "checksum": skill.get("checksum"),
         "quarry": url,
+        "source": str(source),
         "prefix": str(Path(prefix).expanduser()) if prefix else None,
         "output": result.stdout.strip()[-2000:],
     }
@@ -325,6 +331,28 @@ def verify_skill(root: Path, skill: dict[str, Any]) -> None:
         )
 
 
+def remember_source(name: str, version: str, directory: Path) -> Path:
+    """Keep the installed skill's own files, and return where they now live.
+
+    Without this the client could install a skill from a URL and then have no way
+    to run its uninstaller: the download is unpacked into a temporary directory
+    that is gone by the time anyone asks to remove it.
+    """
+    destination = SOURCE_CACHE / name / version
+    if destination.exists():
+        shutil.rmtree(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(directory, destination, ignore=shutil.ignore_patterns(*IGNORED_DIRECTORIES))
+    return destination
+
+
+def forget_source(name: str) -> None:
+    """Drop every cached copy of a skill once it is no longer installed."""
+    cached = SOURCE_CACHE / name
+    if cached.exists():
+        shutil.rmtree(cached)
+
+
 def run_installer(root: Path, skill: dict[str, Any], manifest: dict[str, Any], script: str,
                   prefix: str | None) -> subprocess.CompletedProcess[str]:
     directory = root / str(skill["path"])
@@ -364,10 +392,12 @@ def install(root: Path, name: str, prefix: str | None, *, force: bool = False) -
     if result.returncode != 0:
         raise QuarryError(f"{name}: installer failed with exit {result.returncode}:\n{result.stdout.strip()}")
 
+    source = remember_source(name, str(skill.get("version")), root / str(skill["path"]))
     state["installed"][name] = {
         "version": skill.get("version"),
         "checksum": skill.get("checksum"),
         "quarry": str(root),
+        "source": str(source),
         "prefix": str(Path(prefix).expanduser()) if prefix else None,
         "output": result.stdout.strip()[-2000:],
     }
@@ -375,23 +405,54 @@ def install(root: Path, name: str, prefix: str | None, *, force: bool = False) -
     return state["installed"][name]
 
 
-def uninstall(root: Path, name: str) -> None:
+def uninstall(root: Path | None, name: str) -> None:
+    """Run the skill's own uninstaller and forget it.
+
+    The cached copy kept at install time is used first, so a skill installed from
+    a URL can be removed on a machine that has no checkout at all. Records
+    written before the cache existed still fall back to the checkout.
+    """
     state = load_state()
     if name not in state["installed"]:
         raise QuarryError(f"{name} is not recorded as installed")
-    skill = find_skill(load_registry(root), name)
-    manifest = load_manifest(root, skill)
-    prefix = state["installed"][name].get("prefix")
-    result = run_installer(root, skill, manifest, "uninstall", prefix)
+    record = state["installed"][name]
+    cached = Path(record["source"]) if record.get("source") else None
+    if cached and cached.is_dir():
+        manifest = json.loads((cached / "skill.json").read_text("utf-8"))
+        skill = {"name": name, "path": cached.name}
+        directory = cached.parent
+    elif root is not None:
+        skill = find_skill(load_registry(root), name)
+        manifest = load_manifest(root, skill)
+        directory = root
+    else:
+        raise QuarryError(
+            f"{name}: the files it was installed from are gone and there is no checkout to fall back on.\n"
+            f"Pass --quarry /path/to/SkillQuarry, or remove it by hand."
+        )
+    result = run_installer(directory, skill, manifest, "uninstall", record.get("prefix"))
     if result.returncode != 0:
         raise QuarryError(f"{name}: uninstaller failed with exit {result.returncode}:\n{result.stdout.strip()}")
     del state["installed"][name]
     save_state(state)
+    forget_source(name)
 
 
-def outdated(root: Path) -> list[tuple[str, dict[str, Any], dict[str, Any]]]:
-    """Installed skills whose registry entry has moved on."""
-    skills = {str(item.get("name")): item for item in load_registry(root)}
+def outdated(root: Path | None) -> list[tuple[str, dict[str, Any], dict[str, Any]]]:
+    """Installed skills whose registry entry has moved on.
+
+    Without a checkout each skill is compared against the registry it was
+    installed from, which is the only description of it this machine has.
+    """
+    if root is not None:
+        skills = {str(item.get("name")): item for item in load_registry(root)}
+    else:
+        skills = {}
+        sources = {str(record.get("quarry")) for record in load_state()["installed"].values()
+                   if str(record.get("quarry", "")).startswith("http")}
+        for url in sorted(sources):
+            for item in load_remote_registry(url)[0]:
+                skills.setdefault(str(item.get("name")), item)
     stale = []
     for name, record in sorted(load_state()["installed"].items()):
         skill = skills.get(name)
@@ -628,7 +689,10 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"{name}: {record.get('version')} -> {skill.get('version')}")
                 if args.dry_run:
                     continue
-                install(root, name, record.get("prefix"), force=True)
+                if root is None:
+                    install_remote(str(record.get("quarry")), name, record.get("prefix"), force=True)
+                else:
+                    install(root, name, record.get("prefix"), force=True)
                 print(f"  updated {name}")
             return EXIT_OK
 

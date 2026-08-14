@@ -834,12 +834,25 @@ rebuilds the archives and uploads them.
 
 ### Install from anywhere
 
+No checkout is needed. Fetch the client, point it at a registry, and install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BEKO2210/SkillQuarry/main/cli/skillquarry.py \
+  -o ~/.local/bin/skillquarry && chmod +x ~/.local/bin/skillquarry
+
+export SKILLQUARRY_REGISTRY=https://beko2210.github.io/SkillQuarry/api/v1/skills.json
+
+skillquarry search
+skillquarry install cordon --prefix ~/.local
+skillquarry update
+skillquarry uninstall cordon
+```
+
 The client reads any registry that answers with the same shape — this one, or your
 own:
 
 ```bash
-skillquarry --registry https://beko2210.github.io/SkillQuarry/api/v1/skills.json install cordon
-export SKILLQUARRY_REGISTRY=https://skills.example.internal/api/v1/skills.json
+skillquarry --registry https://skills.example.internal/api/v1/skills.json install cordon
 export SKILLQUARRY_TOKEN=…      # sent as Authorization: Bearer …
 ```
 
@@ -847,6 +860,11 @@ A remote install downloads the archive, unpacks it to a temporary directory,
 hashes it exactly as the registry hashes a skill, and only runs the installer when
 the two match. HTTPS is required — a registry decides what code lands on a
 machine.
+
+The files a skill was installed from are kept under
+`~/.local/state/skillquarry/sources/`, so `uninstall` and `update` keep working on
+a machine that never had a checkout — the download itself is temporary and would
+otherwise be gone by the time you want the skill removed.
 
 Dependencies are installed first, in order; the validator rejects a cycle or a
 missing name before anything is published.

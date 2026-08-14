@@ -11,6 +11,7 @@ import collections
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -34,6 +35,11 @@ class Base(unittest.TestCase):
         self.state_patch = mock.patch.object(sq, "STATE_FILE", state)
         self.state_patch.start()
         self.addCleanup(self.state_patch.stop)
+        # The cache of installed sources follows the state file, or a test run
+        # would write into the real home directory.
+        self.cache_patch = mock.patch.object(sq, "SOURCE_CACHE", state.parent / "sources")
+        self.cache_patch.start()
+        self.addCleanup(self.cache_patch.stop)
 
     def run_cli(self, *argv: str) -> tuple[int, str, str]:
         out, err = io.StringIO(), io.StringIO()
@@ -226,6 +232,38 @@ class InstallTests(Base):
         code, _, err = self.run_cli("install", "rangate", "--prefix", str(self.prefix))
         self.assertEqual(code, sq.EXIT_OK, err)
         self.assertTrue((self.prefix / "rangate" / "SKILL.md").is_file())
+
+
+class RemovalWithoutACheckoutTests(Base):
+    """A skill installed from a URL must be removable on a machine without one."""
+
+    def test_the_installer_files_are_kept_so_the_skill_can_be_removed(self):
+        self.run_cli("install", "cordon", "--prefix", str(self.prefix))
+        record = sq.load_state()["installed"]["cordon"]
+        kept = Path(record["source"])
+        self.assertTrue((kept / "skill.json").is_file())
+        # No checkout is passed here: the cached copy has to carry the removal.
+        sq.uninstall(None, "cordon")
+        self.assertFalse((self.prefix / "bin" / "cordon").exists())
+        self.assertNotIn("cordon", sq.load_state()["installed"])
+        self.assertFalse(kept.exists())
+
+    def test_an_older_record_without_a_copy_falls_back_to_the_checkout(self):
+        self.run_cli("install", "cordon", "--prefix", str(self.prefix))
+        state = sq.load_state()
+        kept = Path(state["installed"]["cordon"].pop("source"))
+        shutil.rmtree(kept.parent)
+        sq.save_state(state)
+        sq.uninstall(QUARRY, "cordon")
+        self.assertFalse((self.prefix / "bin" / "cordon").exists())
+
+    def test_removal_says_so_when_neither_copy_nor_checkout_is_left(self):
+        self.run_cli("install", "cordon", "--prefix", str(self.prefix))
+        state = sq.load_state()
+        shutil.rmtree(Path(state["installed"]["cordon"]["source"]).parent)
+        sq.save_state(state)
+        with self.assertRaisesRegex(sq.QuarryError, "no checkout to fall back on"):
+            sq.uninstall(None, "cordon")
 
 
 class UpdateTests(Base):
@@ -505,6 +543,47 @@ class RemoteRegistryTests(Base):
     def test_an_archive_with_a_foreign_root_is_refused(self):
         with self.assertRaisesRegex(sq.QuarryError, "unexpected root"):
             sq.unpack_archive(self._archive(), self.root, "something-else-1.0.0")
+
+
+class RemoteUpdateTests(RemoteRegistryTests):
+    """Updating without a checkout goes back to the registry it came from."""
+
+    def install_once(self, version="1.0.0"):
+        document = self.registry_document()
+        with mock.patch.object(sq, "fetch", side_effect=[json.dumps(document).encode("utf-8"), self._archive()]):
+            sq.install_remote("https://example.invalid/registry.json", "cordon", str(self.prefix))
+
+    def test_a_remote_skill_is_compared_against_its_own_registry(self):
+        self.install_once()
+        moved = self.registry_document()
+        for skill in moved["skills"]:
+            if skill["name"] == "cordon":
+                skill["version"], skill["checksum"] = "1.1.0", "0" * 64
+        with mock.patch.object(sq, "fetch", return_value=json.dumps(moved).encode("utf-8")):
+            stale = sq.outdated(None)
+        self.assertEqual([name for name, _, _ in stale], ["cordon"])
+
+    def test_update_reinstalls_from_the_registry_it_came_from(self):
+        self.install_once()
+        moved = self.registry_document()
+        for skill in moved["skills"]:
+            if skill["name"] == "cordon":
+                skill["checksum"] = "0" * 64
+        current = json.dumps(self.registry_document()).encode("utf-8")
+        # outdated() reads the moved registry; the reinstall then fetches the
+        # unchanged one, so the archive still matches its checksum.
+        with mock.patch.object(sq, "fetch", side_effect=[
+            json.dumps(moved).encode("utf-8"), current, self._archive()
+        ]):
+            code, out, err = self.run_remote("update")
+        self.assertEqual(code, sq.EXIT_OK, err)
+        self.assertIn("updated cordon", out)
+
+    def run_remote(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = sq.main(["--registry", "https://example.invalid/registry.json", *argv])
+        return code, out.getvalue(), err.getvalue()
 
 
 class FetchTests(Base):
