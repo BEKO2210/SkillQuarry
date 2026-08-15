@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" role="img" aria-labelledby="hitmap-title hitmap-desc">
+  <title id="hitmap-title">HITMAP — browser hit-test reachability</title>
+  <desc id="hitmap-desc">A visible browser control sits beneath an intercepting overlay while a pointer ray stops at the blocking layer.</desc>
+
+  <defs>
+    <linearGradient id="hm-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#131c25"/>
+      <stop offset="1" stop-color="#0a1015"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="260" fill="url(#hm-bg)"/>
+
+  <g opacity="0.12">
+    <path d="M0 209H960" stroke="#5b8298" stroke-width="2"/>
+    <path d="M64 209H192" stroke="#65d7e5" stroke-width="2"/>
+  </g>
+
+  <g id="mark">
+    <rect x="64" y="66" width="128" height="128" rx="28" fill="#0f1820" stroke="#3c5666" stroke-width="1.5"/>
+
+    <g id="target">
+      <rect x="83" y="116" width="91" height="40" rx="13" fill="#17343c" stroke="#65d7e5" stroke-width="4"/>
+    </g>
+
+    <g id="occluder">
+      <path d="M76 91L181 106L172 137L67 122Z" fill="#f0932b" fill-opacity="0.20" stroke="#ffd479" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+
+    <g id="pointer">
+      <path d="M147 171L135 150" stroke="#f4f8fb" stroke-width="4" stroke-linecap="round"/>
+      <path d="M129 145L142 154L134 159Z" fill="#f4f8fb"/>
+      <rect x="128" y="133" width="13" height="4" rx="2" fill="#ff7373" transform="rotate(28 134.5 135)"/>
+    </g>
+  </g>
+
+  <g id="wordmark" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+    <text x="236" y="124" fill="#f4f8fb" font-size="64" font-weight="700" letter-spacing="7">HITMAP</text>
+    <text x="240" y="160" fill="#9fb8c9" font-size="21" letter-spacing="2.1">Find controls the browser cannot actually hit</text>
+
+    <g id="proof-line" font-size="16" letter-spacing="1.2">
+      <text x="240" y="197" fill="#65d7e5">Visible</text>
+      <text x="300" y="197" fill="#5b8298">≠</text>
+      <text x="321" y="197" fill="#ffd479">Reachable</text>
+      <text x="407" y="197" fill="#5b8298">·</text>
+      <text x="426" y="197" fill="#f4f8fb">Chromium oracle</text>
+      <text x="557" y="197" fill="#5b8298">·</text>
+      <text x="576" y="197" fill="#f4f8fb">No screenshot judgement</text>
+    </g>
+  </g>
+</svg>
