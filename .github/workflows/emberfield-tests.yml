@@ -1,0 +1,56 @@
+name: Emberfield tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/ui-ux/emberfield/**"
+      - ".github/workflows/emberfield-tests.yml"
+  pull_request:
+    paths:
+      - "skills/ui-ux/emberfield/**"
+      - ".github/workflows/emberfield-tests.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: emberfield-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: skills/ui-ux/emberfield
+
+jobs:
+  # Both platforms the skill claims. GitHub's runners ship Chrome and node, so
+  # the rendering suite runs everywhere and a skip is treated as a failure.
+  tests:
+    name: tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Full suite, skips are failures
+        env:
+          EMBERFIELD_REQUIRE: "1"
+        run: python3 tests/run_tests.py
+
+  install:
+    name: installer round-trip (ubuntu)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install, verify, uninstall, verify gone
+        run: |
+          export EMBERFIELD_PREFIX="$RUNNER_TEMP/claude"
+          ./install.sh
+          test -f "$RUNNER_TEMP/claude/skills/emberfield/SKILL.md"
+          test -f "$RUNNER_TEMP/claude/skills/emberfield/LICENSE.txt"
+          test -f "$RUNNER_TEMP/claude/skills/emberfield/templates/viewer.html"
+          ./uninstall.sh
+          test ! -d "$RUNNER_TEMP/claude/skills/emberfield"

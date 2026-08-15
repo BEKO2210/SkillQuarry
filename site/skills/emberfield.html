@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emberfield — SkillQuarry</title>
+<meta name="description" content="Generative art with p5.js: an algorithmic philosophy first, then its expression as seeded, reproducible code in an interactive viewer with parameter exploration.">
+<meta name="color-scheme" content="dark light">
+<meta property="og:title" content="Emberfield — SkillQuarry">
+<meta property="og:description" content="Generative art with p5.js: an algorithmic philosophy first, then its expression as seeded, reproducible code in an interactive viewer with parameter exploration.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://beko2210.github.io/SkillQuarry/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-quarry.webp">
+<link rel="stylesheet" href="../style.css?v=a29e473528">
+<script>(function () {
+  const stored = localStorage.getItem('skillquarry-theme');
+  const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const root = document.documentElement;
+  root.dataset.theme = stored || system;
+  window.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('theme');
+    if (!button) return;
+    const label = () => { button.textContent = root.dataset.theme === 'light' ? 'Dark' : 'Light'; };
+    label();
+    button.addEventListener('click', function () {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('skillquarry-theme', root.dataset.theme);
+      label();
+    });
+  });
+})();</script>
+</head>
+<body>
+<div class="bar"><div class="wrap">
+  <a class="mark" href="../index.html">
+    <img src="../assets/img/icon-quarry.webp" alt="">
+    <span>Skill<i>Quarry</i></span>
+  </a>
+  <nav>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../maintainers/index.html">Maintainers</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/docs/SKILL-SPEC.md">Spec</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry">GitHub</a>
+    <button class="ghost" id="theme" type="button">Light</button>
+  </nav>
+</div></div>
+<header class="detail-hero"><div class="wrap">
+  <p class="crumbs"><a href="../index.html">Skills</a> / Emberfield</p>
+  <div class="top">
+    <img class="icon" src="../assets/img/icon-emberfield.webp" alt="">
+    <div>
+      <h1>Emberfield</h1>
+      <p class="subtitle">One seed, one field, forever repeatable.</p>
+    </div>
+  </div>
+  <p class="who">Maintained by <a href="../maintainers/BEKO2210.html">Belkis Aslani</a> · <span class="installs" data-installs="emberfield"></span></p>
+</div></header>
+<main class="wrap">
+  <div class="layout">
+    <div class="content">
+      <img class="banner" src="../assets/emberfield-banner.svg" alt="Emberfield" style="width:100%;border-radius:14px;border:1px solid var(--edge);margin:0 0 26px">
+      <h2>Overview</h2>
+      <p>Generative art with p5.js: an algorithmic philosophy first, then its expression as seeded, reproducible code in an interactive viewer with parameter exploration.</p>
+    <h2>What it does</h2>
+    <ul>
+      <li>Art begins as a written algorithmic philosophy; every parameter must trace back to one of its principles.</li>
+      <li>The seeding law makes every piece reproducible: the same seed renders the same pixels, verified headlessly.</li>
+      <li>The viewer ships seed navigation, parameter sliders, colour pickers and PNG export in one self-contained file.</li>
+      <li>A derivative of Anthropic&#x27;s algorithmic-art under Apache-2.0, restyled and tested; provenance in NOTICE.md.</li>
+    </ul>
+    <h2>Install</h2>
+    <p>From this quarry, without a checkout:</p>
+    <div class="code"><div class="head">shell</div><pre><code>mkdir -p ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/BEKO2210/SkillQuarry/main/cli/skillquarry.py -o ~/.local/bin/skillquarry
+chmod +x ~/.local/bin/skillquarry
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;   # if it is not already
+export SKILLQUARRY_REGISTRY=https://beko2210.github.io/SkillQuarry/api/v1/skills.json
+
+skillquarry info emberfield
+skillquarry install emberfield --prefix ~/.local</code></pre></div>
+    <p>Installation verifies the checksum in the sidebar before running the skill's own
+       installer. <code>skillquarry uninstall emberfield</code> runs that skill's own
+       uninstaller and needs no checkout either.</p>
+    <details class="alt"><summary>From a checkout instead</summary>
+    <div class="code"><div class="head">shell</div><pre><code>git clone https://github.com/BEKO2210/SkillQuarry.git
+cd SkillQuarry/cli &amp;&amp; ./install.sh
+skillquarry install emberfield</code></pre></div></details>
+    <h2>Quickstart</h2>
+    <div class="code"><div class="head">shell</div><pre><code>cd skills/ui-ux/emberfield &amp;&amp; ./install.sh
+
+# In Claude Code:
+#   &quot;Create generative art of slow rivers of light&quot; — the skill answers with
+#   a philosophy .md and a seeded .html artwork you can explore.
+open examples/emberflow.html   # the worked example</code></pre></div>
+    <h2>Independent verification</h2>
+    <table>
+      <tr><th><time>2026-08-15</time></th><td><strong>passed</strong> — Port review (Claude Opus 5, on the maintainer&#x27;s machine)<br>Audited the upstream skill, rebuilt the viewer without upstream branding, pinned p5.js by SRI and SHA-256, and verified the seeding promise by rendering seed 12345 twice headlessly (identical hashes) and seed 512144 once (different hash).<br>Derivative of anthropics/skills algorithmic-art (Apache-2.0). Changes and non-claims are recorded in NOTICE.md. · <a href='https://github.com/BEKO2210/SkillQuarry/blob/main/skills/ui-ux/emberfield/TEST_REPORT.md'>evidence</a></td></tr>
+    </table>
+    <h2>Version history</h2>
+    <table>
+      <tr><th>v1.0.0</th><td><time>2026-08-15</time></td></tr>
+    </table>
+    <p><a href="https://github.com/BEKO2210/SkillQuarry/commits/main/skills/ui-ux/emberfield">Full commit history &rarr;</a></p>
+    <h2>Read next</h2>
+    <p><a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/ui-ux/emberfield">Source</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/ui-ux/emberfield/README.md">Documentation</a> · <a href="https://github.com/BEKO2210/SkillQuarry/tree/main/skills/ui-ux/emberfield/SKILL.md">SKILL.md</a></p>
+    </div>
+    <aside>
+      <div class="box">
+        <h2>Facts</h2>
+        <dl>
+      <div><dt>Version</dt><dd>1.0.0</dd></div>
+      <div><dt>Category</dt><dd>UI / UX</dd></div>
+      <div><dt>Quality</dt><dd>tested</dd></div>
+      <div><dt>License</dt><dd>Apache-2.0</dd></div>
+      <div><dt>Agents</dt><dd>Claude Code, Any agent (manual mode)</dd></div>
+      <div><dt>Platforms</dt><dd>linux, macos</dd></div>
+      <div><dt>Tests</dt><dd>14 — 14 tests: the viewer&#x27;s control contract, the seeding law, provenance (licence and notice), template syntax, and pixel-identical headless rendering of the same seed twice against a hash-pinned p5.js</dd></div>
+      <div><dt>Needs installed</dt><dd>nothing extra</dd></div>
+      <div><dt>Network access</dt><dd>none</dd></div>
+      <div><dt>Credentials</dt><dd>none</dd></div>
+      <div><dt>Writes outside the repository</dt><dd>yes</dd></div>
+      <div><dt>Irreversible operations</dt><dd>none declared</dd></div>
+      <div><dt>Independently reviewed</dt><dd>Ported and reviewed 2026-08-15: upstream code audited, trademarks removed, CDN reference pinned with subresource integrity, determinism proven by rendering.</dd></div>
+          <div><dt>Checksum</dt><dd class="checksum">sha256:9493c23985a5a22962d6f7d17869ad7ca0e6632f7213f7f5c43138b839c0cec7</dd></div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</main>
+<footer><div class="wrap cols">
+  <p class="note">Generated from <code>registry/skills.json</code> by <code>tools/build_site.py</code>.
+  Download counts come from GitHub's public release API — no cookies, no identifiers,
+  nothing recorded about you.</p>
+  <div class="links">
+    <a href="https://github.com/BEKO2210/SkillQuarry">Source</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/CONTRIBUTING.md">Contributing</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/blob/main/SECURITY.md">Security</a>
+    <a href="https://github.com/BEKO2210/SkillQuarry/discussions">Discussions</a>
+    <a href="../registry.json">registry.json</a>
+  </div>
+</div></footer>
+<script>// Entrance animation and stat count-up. Both are progressive: without JavaScript,
+// or with reduced motion requested, everything is simply visible immediately.
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.card, .section-head, .strip, .cloud, .cta, .panel, .content h2, aside .box');
+  if (reduced || !('IntersectionObserver' in window)) {
+    targets.forEach((element) => element.classList.add('in'));
+    return;
+  }
+  document.querySelectorAll('.grid').forEach((grid) => {
+    [...grid.children].forEach((card, index) => card.style.setProperty('--i', index));
+  });
+  targets.forEach((element) => element.classList.add('reveal'));
+  // Failsafe: whatever happens to the observer, nothing stays invisible.
+  const showEverything = () => targets.forEach((element) => element.classList.add('in'));
+  setTimeout(showEverything, 1500);
+  window.addEventListener('beforeprint', showEverything);
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  targets.forEach((element) => observer.observe(element));
+
+  for (const number of document.querySelectorAll('.stats b')) {
+    const final = parseInt(number.textContent, 10);
+    if (!Number.isFinite(final) || final === 0) continue;
+    const started = performance.now();
+    const duration = 900;
+    const step = (now) => {
+      const progress = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      number.textContent = Math.round(final * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    number.textContent = '0';
+    requestAnimationFrame(step);
+  }
+})();</script>
+<script>// Same public source as the overview: GitHub's own per-asset download counter.
+fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
+  .then((response) => (response.ok ? response.json() : []))
+  .then((releases) => {
+    const counts = new Map();
+    for (const release of releases) {
+      for (const asset of release.assets || []) {
+        const match = /^([a-z0-9-]+)-\d+\.\d+\.\d+\.tar\.gz$/.exec(asset.name);
+        if (match) counts.set(match[1], (counts.get(match[1]) || 0) + (asset.download_count || 0));
+      }
+    }
+    for (const element of document.querySelectorAll('[data-installs]')) {
+      const value = counts.get(element.dataset.installs);
+      if (value !== undefined) {
+        element.innerHTML = '<b>' + value.toLocaleString() + '</b> download' + (value === 1 ? '' : 's');
+      }
+    }
+  })
+  .catch(() => {});</script>
+</body>
+</html>

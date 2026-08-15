@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emberfield — generative artwork</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"
+        integrity="sha384-Mhzoc5EVkjFUVtIW2M3h8BgXtFlUsUpu9lTCThPrV7+k6MN6vTi079rew0LkvgFb"
+        crossorigin="anonymous"></script>
+<style>
+  /*
+    Emberfield viewer.
+
+    The contract an artwork must keep, because the tests read it:
+      #seed-input        the seed the sketch renders from
+      #regenerate        re-renders with the current seed
+      #seed-prev/#seed-next/#seed-random   seed navigation
+      #save-png          exports the canvas
+      #canvas-container  where p5 mounts
+    Everything inside the Parameters section is the artwork's own.
+
+    One artwork = one file: the algorithm replaces the DEMO block below, the
+    frame stays. Colours follow the quarry: dark stone, one amber seam.
+  */
+  :root {
+    --bg: #0a1016; --raised: #121a23; --edge: #24303c;
+    --ink: #f2f7fa; --muted: #a8c0cf; --dim: #6f8798;
+    --accent: #ffd479; --accent-deep: #f0932b;
+    --accent-soft: rgba(240, 147, 43, 0.14);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink); min-height: 100vh;
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: grid; grid-template-columns: 300px minmax(0, 1fr);
+  }
+  aside {
+    padding: 22px; border-right: 1px solid var(--edge); background: var(--raised);
+    display: flex; flex-direction: column; gap: 22px; overflow-y: auto; max-height: 100vh;
+  }
+  h1 { font-size: 17px; letter-spacing: -0.01em; }
+  h1 span { color: var(--accent); }
+  .tagline { color: var(--dim); font-size: 12.5px; margin-top: 2px; }
+  h2 {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 10px;
+  }
+  .seed-row { display: flex; gap: 8px; }
+  #seed-input {
+    flex: 1; min-width: 0; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--edge); border-radius: 8px; padding: 8px 10px;
+    font: inherit; font-variant-numeric: tabular-nums;
+  }
+  #seed-input:focus { outline: 2px solid var(--accent-deep); outline-offset: 1px; }
+  button {
+    font: inherit; font-size: 13.5px; cursor: pointer; border-radius: 8px;
+    border: 1px solid var(--edge); background: var(--bg); color: var(--muted);
+    padding: 8px 12px; transition: border-color .15s, color .15s;
+  }
+  button:hover { border-color: var(--accent-deep); color: var(--ink); }
+  button.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #221503; border: 0; font-weight: 600;
+  }
+  button.primary:hover { filter: brightness(1.06); }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .param { margin-bottom: 14px; }
+  .param label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+  .param output { color: var(--accent); font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: var(--accent-deep); }
+  input[type="color"] {
+    width: 34px; height: 26px; padding: 0; border: 1px solid var(--edge);
+    border-radius: 6px; background: none;
+  }
+  .colors { display: flex; gap: 10px; align-items: center; }
+  main { display: grid; place-items: center; padding: 24px; }
+  #canvas-container { box-shadow: 0 24px 70px rgba(0,0,0,.5); border-radius: var(--radius); overflow: hidden; line-height: 0; }
+  footer { margin-top: auto; color: var(--dim); font-size: 11.5px; }
+  footer a { color: var(--dim); }
+  @media (max-width: 760px) {
+    body { grid-template-columns: 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--edge); max-height: none; }
+    main { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<aside>
+  <div>
+    <h1>Ember<span>field</span></h1>
+    <p class="tagline">TITLE OF THE PHILOSOPHY — replace me</p>
+  </div>
+
+  <section>
+    <h2>Seed</h2>
+    <div class="seed-row">
+      <input type="number" id="seed-input" value="12345" aria-label="Seed">
+      <button id="regenerate" class="primary">Render</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="seed-prev" aria-label="Previous seed">&#8592; Prev</button>
+      <button id="seed-random" aria-label="Random seed">&#8635; Random</button>
+      <button id="seed-next" aria-label="Next seed">Next &#8594;</button>
+    </div>
+  </section>
+
+  <section id="parameters">
+    <h2>Parameters</h2>
+    <!-- ARTWORK PARAMETERS — one .param block per tunable value.
+         The DEMO below shows the shape; replace them with your algorithm's. -->
+    <div class="param">
+      <label for="p-count">Particles <output id="p-count-value">4000</output></label>
+      <input type="range" id="p-count" min="500" max="9000" step="500" value="4000">
+    </div>
+    <div class="param">
+      <label for="p-scale">Noise scale <output id="p-scale-value">0.004</output></label>
+      <input type="range" id="p-scale" min="0.001" max="0.02" step="0.001" value="0.004">
+    </div>
+    <div class="param colors">
+      <input type="color" id="p-color1" value="#ffd479" aria-label="Colour one">
+      <input type="color" id="p-color2" value="#f0932b" aria-label="Colour two">
+      <input type="color" id="p-color3" value="#5b8298" aria-label="Colour three">
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <button id="reset">Reset</button>
+      <button id="save-png">Save PNG</button>
+    </div>
+  </section>
+
+  <footer>
+    Seeded and reproducible: the same seed always renders the same field.
+    Built with <a href="https://p5js.org" rel="noopener">p5.js</a>.
+  </footer>
+</aside>
+
+<main><div id="canvas-container"></div></main>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   FRAME — keep. Wires the seed and the buttons to the sketch below.
+   ══════════════════════════════════════════════════════════════════════ */
+const frame = {
+  seed() { return Number(document.getElementById('seed-input').value) || 0; },
+  setSeed(v) { document.getElementById('seed-input').value = v; regenerate(); },
+};
+function regenerate() { if (window.emberfield?.rebuild) window.emberfield.rebuild(); }
+document.getElementById('regenerate').addEventListener('click', regenerate);
+document.getElementById('seed-input').addEventListener('change', regenerate);
+document.getElementById('seed-prev').addEventListener('click', () => frame.setSeed(frame.seed() - 1));
+document.getElementById('seed-next').addEventListener('click', () => frame.setSeed(frame.seed() + 1));
+document.getElementById('seed-random').addEventListener('click', () => frame.setSeed(Math.floor(Math.random() * 1e6)));
+document.getElementById('save-png').addEventListener('click', () => window.saveCanvas && saveCanvas('emberfield-' + frame.seed(), 'png'));
+
+/* ══════════════════════════════════════════════════════════════════════
+   DEMO ALGORITHM — replace. Everything below is the artwork:
+   read the seed through frame.seed(), never call random() unseeded,
+   expose window.emberfield.rebuild() so the frame can re-render.
+   ══════════════════════════════════════════════════════════════════════ */
+let params = { count: 4000, scale: 0.004, colors: ['#ffd479', '#f0932b', '#5b8298'] };
+
+function bind(id, key, parse) {
+  document.getElementById(id).addEventListener('input', (event) => {
+    params[key] = parse(event.target.value);
+    const out = document.getElementById(id + '-value');
+    if (out) out.textContent = event.target.value;
+    regenerate();
+  });
+}
+bind('p-count', 'count', Number);
+bind('p-scale', 'scale', Number);
+for (const [index, id] of ['p-color1', 'p-color2', 'p-color3'].entries()) {
+  document.getElementById(id).addEventListener('input', (event) => {
+    params.colors[index] = event.target.value; regenerate();
+  });
+}
+document.getElementById('reset').addEventListener('click', () => location.reload());
+
+function setup() {
+  const canvas = createCanvas(900, 620);
+  canvas.parent('canvas-container');
+  noLoop();
+  window.emberfield = { rebuild: () => redraw() };
+}
+
+function draw() {
+  randomSeed(frame.seed());
+  noiseSeed(frame.seed());
+  background(10, 16, 22);
+  strokeWeight(1);
+  for (let i = 0; i < params.count; i += 1) {
+    let x = random(width);
+    let y = random(height);
+    const tone = color(params.colors[i % params.colors.length]);
+    tone.setAlpha(34);
+    stroke(tone);
+    for (let step = 0; step < 40; step += 1) {
+      const angle = noise(x * params.scale, y * params.scale) * TWO_PI * 2;
+      const nx = x + cos(angle) * 2.4;
+      const ny = y + sin(angle) * 2.4;
+      line(x, y, nx, ny);
+      x = nx; y = ny;
+      if (x < 0 || y < 0 || x > width || y > height) break;
+    }
+  }
+}
+</script>
+</body>
+</html>

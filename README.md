@@ -6,9 +6,9 @@
 <br>
 
 <!-- SKILLS:STATS:START -->
-![Skills](https://img.shields.io/badge/skills-4-f0932b?style=for-the-badge)
-![Categories](https://img.shields.io/badge/categories-3-5b8298?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-320%20passing-2ea043?style=for-the-badge)
+![Skills](https://img.shields.io/badge/skills-5-f0932b?style=for-the-badge)
+![Categories](https://img.shields.io/badge/categories-4-5b8298?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-334%20passing-2ea043?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-3d5568?style=for-the-badge)
 <!-- SKILLS:STATS:END -->
 
@@ -19,6 +19,7 @@
 [![LockScope tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/lockscope-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=LockScope)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/lockscope-tests.yml)
 [![Cordon tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/cordon-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Cordon)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/cordon-tests.yml)
 [![RanGate tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/rangate-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=RanGate)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/rangate-tests.yml)
+[![Emberfield tests](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/emberfield-tests.yml?style=flat-square&logo=githubactions&logoColor=white&label=Emberfield)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/emberfield-tests.yml)
 <!-- SKILLS:CI:END -->
 [![Checks](https://img.shields.io/github/actions/workflow/status/BEKO2210/SkillQuarry/readme.yml?style=flat-square&logo=githubactions&logoColor=white&label=checks)](https://github.com/BEKO2210/SkillQuarry/actions/workflows/readme.yml)
 [![License](https://img.shields.io/github/license/BEKO2210/SkillQuarry?style=flat-square)](LICENSE)
@@ -176,6 +177,7 @@ SkillQuarry is intended to become a searchable marketplace for agent capabilitie
 | **[LockScope](skills/coding/lockscope)** | 💻 Coding | Detect and repair dangerous Rust lock lifetimes using structured syntax, rust-analyzer semantics, compiler verification and lock-order analysis. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [142 tests, 142 tests: 82 structural, 45 semantic against rust-analyzer, 5 compiler Send probes and 10 runtime repair proofs; 17 more against three pinned real repositories](skills/coding/lockscope/TEST_REPORT.md) |
 | **[Cordon](skills/security/cordon)** | 🔐 Security | Deterministic Git change envelopes for coding agents: constrain Git-visible paths and change budgets, reject HEAD movement by default, and let independent verifier commands overrule an agent's success claim. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [64 tests, 100% core coverage](skills/security/cordon/TEST_REPORT.md) |
 | **[RanGate](skills/security/rangate)** | 🔐 Security | Compiler-driven Rust unsafe/FFI boundary protocol: concentrate raw-pointer, ownership, lifetime and thread-safety invariants behind the smallest safe typed membrane, then attack it with independent compiler, doctest, release and Miri checks. | Claude Code | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [14 tests, N/A — protocol skill; the Rust fixture is exercised in debug, compile-fail (reason-checked), release and Miri jobs](skills/security/rangate/TEST_REPORT.md) |
+| **[Emberfield](skills/ui-ux/emberfield)** | 🎨 UI / UX | Generative art with p5.js: an algorithmic philosophy first, then its expression as seeded, reproducible code in an interactive viewer with parameter exploration. | Claude Code, Any agent (manual mode) | ![Tested](https://img.shields.io/badge/Tested-2ea043?style=flat-square&label=) [14 tests, 14 tests: the viewer's control contract, the seeding law, provenance (licence and notice), template syntax, and pixel-identical headless rendering of the same seed twice against a hash-pinned p5.js](skills/ui-ux/emberfield/TEST_REPORT.md) |
 <!-- SKILLS:TABLE:END -->
 
 ## Planned categories
@@ -414,6 +416,36 @@ cd skills/security/rangate && ./install.sh
 ```
 
 [Documentation](skills/security/rangate/README.md) · [Skill](skills/security/rangate/SKILL.md) · [Test report](skills/security/rangate/TEST_REPORT.md)
+
+---
+
+### Emberfield
+
+<div align="center">
+
+<img src="assets/emberfield-banner.svg" alt="Emberfield — One seed, one field, forever repeatable." width="720">
+
+</div>
+
+**One seed, one field, forever repeatable.**
+
+Generative art with p5.js: an algorithmic philosophy first, then its expression as seeded, reproducible code in an interactive viewer with parameter exploration.
+
+- Art begins as a written algorithmic philosophy; every parameter must trace back to one of its principles.
+- The seeding law makes every piece reproducible: the same seed renders the same pixels, verified headlessly.
+- The viewer ships seed navigation, parameter sliders, colour pickers and PNG export in one self-contained file.
+- A derivative of Anthropic's algorithmic-art under Apache-2.0, restyled and tested; provenance in NOTICE.md.
+
+```bash
+cd skills/ui-ux/emberfield && ./install.sh
+
+# In Claude Code:
+#   "Create generative art of slow rivers of light" — the skill answers with
+#   a philosophy .md and a seeded .html artwork you can explore.
+open examples/emberflow.html   # the worked example
+```
+
+[Documentation](skills/ui-ux/emberfield/README.md) · [Skill](skills/ui-ux/emberfield/SKILL.md) · [Test report](skills/ui-ux/emberfield/TEST_REPORT.md)
 <!-- SKILLS:CARDS:END -->
 
 ---

@@ -10,6 +10,15 @@
         }
       ]
     },
+    "emberfield": {
+      "released": "2026-08-15T02:08:46Z",
+      "versions": [
+        {
+          "date": "2026-08-15T02:08:46Z",
+          "version": "1.0.0"
+        }
+      ]
+    },
     "lockscope": {
       "released": "2026-08-14T19:14:52Z",
       "versions": [

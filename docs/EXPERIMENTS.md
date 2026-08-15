@@ -15,6 +15,7 @@ after merges, and evidence that disappears is not evidence.
 | CrypticShift | failed final gate | removed on request | not published, removed entirely |
 | PerfForge v1 | `FAIL_PRO` | tags `research/perfforge-v1`, `research/perfforge-small` | not published, kept as research |
 | HitMap v0.1 | failed boundary 1 | tag `research/hitmap-v1` | not published, kept as research |
+| Emberfield | port, tests passed | `skills/ui-ux/emberfield/` | published 1.0.0 — first ported skill |
 
 ---
 
