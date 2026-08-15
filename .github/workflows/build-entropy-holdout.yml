@@ -1,0 +1,61 @@
+name: Build Entropy Unseen Holdout
+
+on:
+  push:
+    branches:
+      - research/build-entropy-probe-v0
+    paths:
+      - experiments/build-entropy/**
+      - .github/workflows/build-entropy-holdout.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-unseen-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout SkillQuarry
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Install pyc system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libgc-dev libpcre3-dev make
+
+      - name: Install DParser with GC support
+        run: |
+          git clone --depth 1 https://github.com/jplevyak/dparser.git /tmp/dparser
+          make -C /tmp/dparser -j2 D_USE_GC=1
+          sudo make -C /tmp/dparser install D_USE_GC=1
+          sudo ldconfig
+
+      - name: Record toolchain
+        run: |
+          python3 --version
+          go version
+          clang++ --version | head -1
+          git --version
+
+      - name: Verify frozen holdout protocol
+        run: |
+          test -s experiments/build-entropy/HOLDOUT_PROTOCOL.md
+          grep -F 'at least 2 of 3 recovered cases' experiments/build-entropy/HOLDOUT_PROTOCOL.md
+          grep -F '**0 of 2 controls flagged**' experiments/build-entropy/HOLDOUT_PROTOCOL.md
+          grep -F '**every recovered case <= 25%**' experiments/build-entropy/HOLDOUT_PROTOCOL.md
+
+      - name: Run frozen unseen holdout
+        run: python3 experiments/build-entropy/holdout.py
