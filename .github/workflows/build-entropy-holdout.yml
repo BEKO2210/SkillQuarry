@@ -58,4 +58,7 @@ jobs:
           grep -F '**every recovered case <= 25%**' experiments/build-entropy/HOLDOUT_PROTOCOL.md
 
       - name: Run frozen unseen holdout
+        env:
+          CXX: clang++
+          AR: llvm-ar
         run: python3 experiments/build-entropy/holdout.py
