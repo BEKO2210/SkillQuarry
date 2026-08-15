@@ -14,6 +14,7 @@ after merges, and evidence that disappears is not evidence.
 | LockScope v2 | `PASS_V2` | tag `research/lockscope-v2` | published 1.0.0 |
 | CrypticShift | failed final gate | removed on request | not published, removed entirely |
 | PerfForge v1 | `FAIL_PRO` | tags `research/perfforge-v1`, `research/perfforge-small` | not published, kept as research |
+| HitMap v0.1 | failed boundary 1 | tag `research/hitmap-v1` | not published, kept as research |
 
 ---
 
@@ -65,6 +66,33 @@ consumed by the cost of verifying the candidates it produced.
 
 Removed from the repository at the maintainer's request, including the
 evaluation workflows and their run history.
+
+---
+
+## HitMap v0.1 — failed pass boundary 1 (2026-08-15)
+
+**Idea.** Discover visible controls whose entire sampled interior loses the
+browser's pointer hit test to another element — dead buttons under overlays —
+with Chromium's rendered hit-test result as the oracle.
+
+**What held.** The three pinned historical fixes are real (verified at the
+source, diffs included). The concept's oracle works: an independent CDP event
+probe reproduced the first historical defect exactly — a click at the canvas
+centre was swallowed by an overlay `div`, the handler never ran.
+
+**Why it failed.** The detector could not see its own witness. Its eligibility
+gate (frozen in the protocol) admits only semantically interactive elements —
+`button`, `a[href]`, ARIA roles, `tabindex` — while the pinned page's only
+interactive surface is a `<canvas>` with a click listener and the occluder is a
+plain `div`. `hitmap scan` returned `PASS, targets 0` on a page whose start
+button provably did not work. Boundary 1 (3/3 known-bad revisions produce the
+witness finding) is unmeetable, and the protocol forbids softening it.
+
+**What a v2 needs.** Listener-based discovery (`DOMDebugger.getEventListeners`)
+so listener-driven surfaces — canvas games, div-click UIs — enter the field of
+view; a re-frozen protocol; the two untouched oracle pairs remain valid.
+
+The full evaluation is `skills/ui-ux/hitmap/EVALUATION.md` on the tagged branch.
 
 ---
 
