@@ -259,7 +259,7 @@
     },
     {
       "category": "ui-ux",
-      "checksum": "sha256:9493c23985a5a22962d6f7d17869ad7ca0e6632f7213f7f5c43138b839c0cec7",
+      "checksum": "sha256:08b5155af3e59ddb8372d497a92a51af835a8adaa66e7cec901de665da654512",
       "compatibility": [
         "claude-code",
         "agent-neutral-manual-mode"
