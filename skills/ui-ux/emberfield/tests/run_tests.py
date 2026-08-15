@@ -150,8 +150,11 @@ class RenderingTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix="emberfield-")
         cls.workdir = Path(cls.temp.name)
 
-        cache = ROOT / "tests" / ".cache"
-        cache.mkdir(exist_ok=True)
+        # Outside the skill directory on purpose: the registry checksum covers
+        # every byte under the skill, and a test artefact that exists on one
+        # machine and not another would make the same commit hash differently.
+        cache = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "emberfield-tests"
+        cache.mkdir(parents=True, exist_ok=True)
         p5 = cache / "p5.min.js"
         if not p5.is_file():
             try:

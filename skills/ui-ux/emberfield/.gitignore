@@ -1,2 +1,0 @@
-# The pinned p5.js is fetched and hash-checked on first test run, not committed.
-tests/.cache/
