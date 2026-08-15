@@ -28,8 +28,7 @@ clone_at() {
 npm_has_witness() {
   python3 - "$1" <<'PY'
 import json, sys
-p = sys.argv[1]
-data = json.load(open(p))
+data = json.load(open(sys.argv[1]))
 print('1' if 'node_modules/@rollup/rollup-linux-x64-gnu' in data.get('packages', {}) else '0')
 PY
 }
@@ -46,10 +45,8 @@ run_npm_revision() {
   local before after rc
   before="$(npm_has_witness package-lock.json)" || { popd >/dev/null; return 2; }
   cp package-lock.json "$ROOT/firecms-$label-before.json"
-  set +e
   npm install --package-lock-only --ignore-scripts --include=optional --no-audit --no-fund >/tmp/firecms-$label.log 2>&1
   rc=$?
-  set -e
   cat /tmp/firecms-$label.log
   if [[ $rc -ne 0 ]]; then
     popd >/dev/null
@@ -86,10 +83,8 @@ run_pnpm_revision() {
   local before after rc
   before="$(pnpm_has_arm_witnesses pnpm-lock.yaml)"
   cp pnpm-lock.yaml "$ROOT/candybar-$label-before.yaml"
-  set +e
   pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile >/tmp/candybar-$label.log 2>&1
   rc=$?
-  set -e
   cat /tmp/candybar-$label.log
   if [[ $rc -ne 0 ]]; then
     popd >/dev/null
@@ -132,10 +127,8 @@ run_bundle_revision() {
   local before after rc
   before="$(bundle_snapshot Gemfile.lock)"
   cp Gemfile.lock "$ROOT/site-$label-before.lock"
-  set +e
   bundle _2.4.6_ lock --add-platform x86_64-linux >/tmp/site-$label.log 2>&1
   rc=$?
-  set -e
   cat /tmp/site-$label.log
   if [[ $rc -ne 0 ]]; then
     popd >/dev/null
@@ -155,10 +148,8 @@ run_bundle_revision() {
 run_pair() {
   local pair="$1" fn="$2" broken="$3" fixed="$4"
   local b_rc f_rc
-  set +e
   "$fn" broken "$broken"; b_rc=$?
   "$fn" fixed "$fixed"; f_rc=$?
-  set -e
 
   if [[ $b_rc -eq 2 || $f_rc -eq 2 ]]; then
     record "$pair" INFRA "broken_rc=$b_rc fixed_rc=$f_rc"
