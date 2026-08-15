@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Emberfield">
+  <title>Emberfield</title>
+  <desc>Ember trails following an invisible flow field through dark stone.</desc>
+  <defs>
+    <linearGradient id="ef-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="ef-line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="ef-frame">
+      <rect x="4" y="4" width="120" height="120" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#ef-ground)"/>
+
+  <g clip-path="url(#ef-frame)" fill="none" stroke-linecap="round">
+    <!-- The field: slate paths the heat has not taken. -->
+    <g stroke="#33475a" stroke-width="3" opacity="0.7">
+      <path d="M8 26 C 40 20, 66 38, 88 30 S 118 14, 126 22"/>
+      <path d="M2 58 C 30 66, 52 48, 80 56 S 114 70, 128 62"/>
+      <path d="M6 106 C 36 112, 60 96, 88 104 S 116 114, 126 108"/>
+    </g>
+    <!-- The seam: three trails that found the fracture. -->
+    <g stroke="url(#ef-line)" stroke-width="5">
+      <path d="M10 42 C 38 34, 58 52, 84 44 S 116 30, 126 38"/>
+      <path d="M2 76 C 28 84, 54 64, 82 72 S 112 86, 128 78"/>
+      <path d="M12 92 C 40 86, 62 100, 90 92"/>
+    </g>
+    <!-- Embers along the trails. -->
+    <g fill="#ffd479">
+      <circle cx="84" cy="44" r="4"/>
+      <circle cx="38" cy="37" r="3"/>
+      <circle cx="82" cy="72" r="4"/>
+      <circle cx="28" cy="82" r="3"/>
+      <circle cx="90" cy="92" r="3.4"/>
+    </g>
+    <circle cx="112" cy="35" r="2.2" fill="#ffd479" opacity="0.8"/>
+    <circle cx="116" cy="81" r="2.2" fill="#ffd479" opacity="0.8"/>
+  </g>
+
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="25.25" fill="none"
+        stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
+</svg>

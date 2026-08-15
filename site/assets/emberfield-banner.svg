@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" width="960" height="260" role="img" aria-label="Emberfield — generative art, seeded and reproducible">
+  <title>Emberfield — generative art, seeded and reproducible</title>
+  <defs>
+    <linearGradient id="efb-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#131c25"/>
+      <stop offset="1" stop-color="#0a1015"/>
+    </linearGradient>
+    <linearGradient id="efb-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2733"/>
+      <stop offset="1" stop-color="#0d141b"/>
+    </linearGradient>
+    <linearGradient id="efb-line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd479"/>
+      <stop offset="1" stop-color="#f0932b"/>
+    </linearGradient>
+    <clipPath id="efb-frame">
+      <rect x="64" y="66" width="128" height="128" rx="28"/>
+    </clipPath>
+  </defs>
+
+  <rect width="960" height="260" fill="url(#efb-bg)"/>
+
+  <!-- A faint field line crossing the whole banner. -->
+  <path d="M0 226 C 160 214, 320 236, 480 224 S 800 210, 960 226"
+        fill="none" stroke="#5b8298" stroke-width="2" stroke-dasharray="10 12" opacity="0.2"/>
+
+  <g>
+    <rect x="64" y="66" width="128" height="128" rx="28" fill="url(#efb-ground)"/>
+    <g clip-path="url(#efb-frame)" fill="none" stroke-linecap="round">
+      <g stroke="#33475a" stroke-width="3" opacity="0.7">
+        <path d="M68 88 C 100 82, 126 100, 148 92 S 178 76, 186 84"/>
+        <path d="M62 168 C 96 174, 120 158, 148 166 S 176 176, 186 170"/>
+      </g>
+      <g stroke="url(#efb-line)" stroke-width="5">
+        <path d="M70 104 C 98 96, 118 114, 144 106 S 176 92, 186 100"/>
+        <path d="M62 138 C 88 146, 114 126, 142 134 S 172 148, 188 140"/>
+        <path d="M72 154 C 100 148, 122 162, 150 154"/>
+      </g>
+      <g fill="#ffd479">
+        <circle cx="144" cy="106" r="4"/>
+        <circle cx="98" cy="99" r="3"/>
+        <circle cx="142" cy="134" r="4"/>
+        <circle cx="88" cy="144" r="3"/>
+        <circle cx="150" cy="154" r="3.4"/>
+      </g>
+    </g>
+    <rect x="64.75" y="66.75" width="126.5" height="126.5" rx="27.25" fill="none"
+          stroke="#ffd479" stroke-opacity="0.45" stroke-width="1.5"/>
+  </g>
+
+  <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+    <text x="236" y="126" fill="#f4f8fb" font-size="58" font-weight="700" letter-spacing="4">EMBERFIELD</text>
+    <text x="240" y="162" fill="#9fb8c9" font-size="21" letter-spacing="2.4">Generative art — one seed, one field, forever repeatable</text>
+    <g font-size="16" fill="#ffd479" letter-spacing="1.4">
+      <text x="240" y="196">Philosophy first</text>
+      <text x="392" y="196" fill="#5b8298">·</text>
+      <text x="410" y="196">Seeded p5.js</text>
+      <text x="536" y="196" fill="#5b8298">·</text>
+      <text x="554" y="196">Pixel-verified</text>
+    </g>
+  </g>
+</svg>
