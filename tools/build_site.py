@@ -299,6 +299,47 @@ main { padding-bottom: 20px; }
   background: var(--raised); color: var(--muted); border: 1px solid var(--edge); transition: all .12s ease;
 }
 .cloud button:hover { color: var(--accent); border-color: var(--accent-deep); background: var(--accent-soft); }
+/* A rail the reader drives: swipe on a phone, drag or arrow on a desktop.
+   Scroll snapping makes a flick land on a card instead of between two. */
+.rail-wrap { position: relative; margin-top: var(--s3); }
+.rail { display: flex; gap: var(--s2); overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 4px 2px var(--s2); margin: 0; list-style: none;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rail::-webkit-scrollbar { display: none; }
+.rail-item { flex: 0 0 auto; scroll-snap-align: start; }
+.rail-item > a { display: flex; align-items: center; gap: 12px; min-width: 232px;
+  padding: 12px 16px; border: 1px solid var(--edge); border-radius: var(--radius-sm);
+  background: var(--raised); color: var(--ink);
+  transition: transform .14s ease, border-color .14s ease; }
+.rail-item > a:hover { transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--edge)); }
+.rail-item img { width: 40px; height: 40px; border-radius: 11px; flex: none; }
+.rail-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rail-name { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.rail-flag { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--edge));
+  background: var(--accent-soft); border-radius: 999px; padding: 2px 7px; }
+.rail .when { color: var(--dim); font-size: 13px; }
+.rail-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%; display: none; place-items: center;
+  border: 1px solid var(--edge); background: var(--raised); color: var(--ink);
+  font-size: 22px; line-height: 1; cursor: pointer; box-shadow: var(--shadow); }
+.rail-nav:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--edge)); color: var(--accent); }
+.rail-nav[hidden] { display: none !important; }
+.rail-nav.prev { left: -14px; }
+.rail-nav.next { right: -14px; }
+/* Shown when the rail actually has somewhere to go — asking the media query
+   whether a mouse exists gets it wrong on touch laptops and in headless runs. */
+.rail-wrap.scrollable .rail-nav { display: grid; }
+@media (max-width: 720px) { .rail-wrap.scrollable .rail-nav { display: none; } }
+
+/* Weighted keywords: what is shared leads and says how often. */
+.cloud-btn { display: inline-flex; align-items: center; gap: 7px; }
+.cloud-btn.strong { color: var(--ink); font-weight: 600; }
+.cloud-count { font-size: 11px; color: var(--accent); background: var(--accent-soft);
+  border-radius: 999px; padding: 1px 6px; font-variant-numeric: tabular-nums; }
+.cloud-more button { color: var(--accent); border-style: dashed; }
+
 /* The wall of published skills: one mark each, laid out on a grid that fills
    itself as skills are added — three across on a phone, six on a desktop. */
 /* Centred rather than packed left: four skills or forty, the wall stays
@@ -446,6 +487,9 @@ time { color: var(--dim); }
   .install .steps > div { text-align: center; align-items: stretch; }
   .install .steps .code, .install .note { text-align: left; }
   .wall-tile { flex: 0 0 calc((100% - var(--s2) * 2) / 3); }
+  .rail { padding-left: var(--s3); padding-right: var(--s3);
+    margin-left: calc(var(--s3) * -1); margin-right: calc(var(--s3) * -1); }
+  .rail-item > a { min-width: 74vw; }
   .built-row { justify-content: center; }
   .built-note { text-align: center; margin-left: auto; margin-right: auto; }
   .cta { text-align: center; padding: var(--s4) var(--s3); }
@@ -514,6 +558,12 @@ HERO_MEDIA = (
 )
 
 HERO_SCRIPT = r"""
+// The page may parse this before or after the elements exist; either way
+// the work happens once the document is there.
+const readyRail = () => {
+};
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', readyRail); else readyRail();
+
 // The 4K hero loop plays on every screen, phones included. It is still skipped
 // when motion is unwelcome or the connection is metered or slow — in those cases
 // the still remains, which is the video's own first frame.
@@ -547,6 +597,47 @@ LAYER_ART = (
 )
 
 SCRIPT = r"""
+// The rail moves only when someone moves it: buttons, keyboard, or a finger.
+// Nothing here starts on its own, so there is nothing to pause.
+for (const wrap of document.querySelectorAll('.rail-wrap')) {
+  const rail = wrap.querySelector('.rail');
+  const step = () => Math.max(240, rail.clientWidth * 0.8);
+  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const update = () => {
+    const max = rail.scrollWidth - rail.clientWidth - 1;
+    wrap.classList.toggle('scrollable', max > 0);
+    wrap.querySelector('[data-rail="prev"]').hidden = rail.scrollLeft <= 0;
+    wrap.querySelector('[data-rail="next"]').hidden = rail.scrollLeft >= max;
+  };
+  for (const button of wrap.querySelectorAll('[data-rail]')) {
+    button.addEventListener('click', () => {
+      const delta = button.dataset.rail === 'next' ? step() : -step();
+      rail.scrollBy({ left: delta, behavior: smooth ? 'smooth' : 'auto' });
+    });
+  }
+  rail.addEventListener('scroll', update, { passive: true });
+  rail.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+    event.preventDefault();
+    rail.scrollBy({ left: event.key === 'ArrowRight' ? step() : -step(),
+                    behavior: smooth ? 'smooth' : 'auto' });
+  });
+  update();
+  window.addEventListener('resize', update);
+}
+
+// The keyword tail stays folded until it is asked for.
+const cloudMore = document.querySelector('[data-cloud-more]');
+if (cloudMore) {
+  cloudMore.addEventListener('click', () => {
+    const open = cloudMore.getAttribute('aria-expanded') === 'true';
+    for (const item of document.querySelectorAll('.cloud li[data-tail]')) item.hidden = open;
+    cloudMore.setAttribute('aria-expanded', String(!open));
+    cloudMore.textContent = open ? cloudMore.dataset.label : 'show less';
+  });
+  cloudMore.dataset.label = cloudMore.textContent;
+}
+
 const skills = JSON.parse(document.getElementById('skill-data').textContent);
 const controls = ['q', 'agent', 'platform', 'category', 'quality'].map((id) => document.getElementById(id));
 const toggles = ['offline', 'nosecrets'].map((id) => document.getElementById(id));
@@ -589,7 +680,10 @@ function apply() {
 for (const el of [...controls, ...toggles]) {
   el.addEventListener(el.tagName === 'INPUT' && el.type !== 'checkbox' ? 'input' : 'change', apply);
 }
-for (const button of document.querySelectorAll('.cloud button')) {
+// Only the keyword buttons filter. The fold control lives in the same list and
+// used to be caught by this selector, which set the search box to `undefined`
+// and emptied the grid.
+for (const button of document.querySelectorAll('.cloud button[data-keyword]')) {
   button.addEventListener('click', () => {
     controls[0].value = button.dataset.keyword;
     apply();
@@ -632,6 +726,7 @@ loadInstalls();
 """.strip()
 
 THEME_SCRIPT = r"""
+
 (function () {
   const stored = localStorage.getItem('skillquarry-theme');
   const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -652,6 +747,7 @@ THEME_SCRIPT = r"""
 """.strip()
 
 MOTION_SCRIPT = r"""
+
 // Entrance animation and stat count-up. Both are progressive: without JavaScript,
 // or with reduced motion requested, everything is simply visible immediately.
 (function () {
@@ -696,6 +792,7 @@ MOTION_SCRIPT = r"""
 """.strip()
 
 INSTALL_SCRIPT = r"""
+
 // Same public source as the overview: GitHub's own per-asset download counter.
 fetch('https://api.github.com/repos/BEKO2210/SkillQuarry/releases')
   .then((response) => (response.ok ? response.json() : []))
@@ -944,32 +1041,83 @@ def built_with(depth: int = 0) -> str:
     )
 
 
-def recently_updated(skills: list[dict[str, Any]], history: dict[str, Any], limit: int = 5) -> str:
+def recently_updated(skills: list[dict[str, Any]], history: dict[str, Any],
+                     manifests: dict[str, dict[str, Any]] | None = None,
+                     limit: int = 12) -> str:
+    """The newest releases as a rail the reader scrolls.
+
+    It scrolls sideways rather than stacking: on a phone the old list pushed
+    everything below it off the screen for information that is a glance, not a
+    task. It does **not** scroll by itself. Nielsen Norman's usability work is
+    blunt about auto-forwarding content — a rotating panel is visible a fraction
+    of the time and gets read as an advert — and WCAG 2.2.2 requires a way to
+    stop motion that runs longer than five seconds. Motion the reader starts
+    costs nothing and needs no escape hatch.
+
+    The first card carries a marker: the most recent release is the one piece of
+    information here that differs from its neighbours, and the eye should find
+    it without reading dates (von Restorff).
+    """
+    manifests = manifests or {}
     rows = sorted(
         ((str(s["name"]), str(s.get("displayName")), str(s.get("version")),
           (history.get(str(s["name"])) or {}).get("released"))
          for s in skills),
         key=lambda row: row[3] or "", reverse=True,
     )[:limit]
-    items = "".join(
-        f'<li><a href="skills/{esc(name)}.html">{esc(display)}</a>'
-        f'<span class="when">v{esc(version)} · {esc(humanise(when))}</span></li>'
-        for name, display, version, when in rows
+    cards = []
+    for index, (name, display, version, when) in enumerate(rows):
+        mark = icon_for(manifests.get(name, {}), name=name)
+        flag = '<span class="rail-flag">newest</span>' if index == 0 else ""
+        cards.append(
+            f'<li class="rail-item"><a href="skills/{esc(name)}.html">'
+            f'{f"<img src=\"{esc(mark)}\" alt=\"\" loading=\"lazy\" decoding=\"async\">" if mark else ""}'
+            f'<span class="rail-body"><span class="rail-name">{esc(display)}{flag}</span>'
+            f'<span class="when">v{esc(version)} · {esc(humanise(when))}</span></span></a></li>'
+        )
+    return (
+        '<div class="rail-wrap">'
+        '<button class="rail-nav prev" type="button" aria-label="Scroll left" data-rail="prev">&#8249;</button>'
+        f'<ul class="rail" tabindex="0" aria-label="Recently updated skills">{"".join(cards)}</ul>'
+        '<button class="rail-nav next" type="button" aria-label="Scroll right" data-rail="next">&#8250;</button>'
+        '</div>'
     )
-    return f'<ul class="strip">{items}</ul>'
 
 
-def keyword_cloud(manifests: dict[str, dict[str, Any]], limit: int = 18) -> str:
+def keyword_cloud(manifests: dict[str, dict[str, Any]], lead: int = 8) -> str:
+    """Keywords, ranked and weighted, with the long tail folded away.
+
+    The previous version printed every keyword at the same size, which is the
+    worst of both worlds: thirty equal options is a decision cost with no signal
+    to pay for it (Hick), and a flat cloud hides which keywords actually connect
+    several skills. Now the ones shared by more than one skill lead, carry their
+    count, and are drawn heavier; the single-use tail sits behind one control,
+    so the section is a glance by default and complete on request.
+    """
     counts: dict[str, int] = {}
     for manifest in manifests.values():
         for keyword in manifest.get("keywords") or []:
             counts[str(keyword)] = counts.get(str(keyword), 0) + 1
-    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:limit]
-    buttons = "".join(
-        f'<li><button type="button" data-keyword="{esc(word)}">{esc(word)}</button></li>'
-        for word, _count in ranked
-    )
-    return f'<ul class="cloud">{buttons}</ul>'
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    # Shared keywords lead because they connect skills, but the head is filled
+    # up either way: with four skills only three words are shared, and a section
+    # that shows three of thirty-three reads as broken rather than curated.
+    shared = [item for item in ranked if item[1] > 1]
+    head = shared + [item for item in ranked if item not in shared]
+    head, tail = head[:lead], head[lead:]
+
+    def button(word: str, count: int, hidden: bool = False) -> str:
+        weight = " strong" if count > 1 else ""
+        badge = f'<span class="cloud-count">{count}</span>' if count > 1 else ""
+        return (f'<li{" data-tail hidden" if hidden else ""}><button type="button" '
+                f'class="cloud-btn{weight}" data-keyword="{esc(word)}">{esc(word)}{badge}'
+                f'</button></li>')
+
+    items = "".join(button(word, count) for word, count in head)
+    items += "".join(button(word, count, hidden=True) for word, count in tail)
+    more = (f'<li class="cloud-more"><button type="button" data-cloud-more '
+            f'aria-expanded="false">+{len(tail)} more</button></li>') if tail else ""
+    return f'<ul class="cloud">{items}{more}</ul>'
 
 
 def maintainer_index(manifests: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -1047,7 +1195,7 @@ def build_index(skills: list[dict[str, Any]], manifests: dict[str, dict[str, Any
   {skill_wall(skills, manifests)}
 
   <div class="section-head"><h2>Recently updated</h2><span>by version date</span></div>
-  {recently_updated(skills, history)}
+  {recently_updated(skills, history, manifests)}
 
   <div class="section-head"><h2>Browse by keyword</h2></div>
   {keyword_cloud(manifests)}

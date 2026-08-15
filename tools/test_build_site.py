@@ -360,6 +360,35 @@ class DiscoveryTests(unittest.TestCase):
         for word in ("sponsored by", "in partnership with", "supported by"):
             self.assertNotIn(word, self.index.lower())
 
+    def test_the_recent_releases_are_a_rail_that_does_not_move_by_itself(self):
+        """Motion the reader did not ask for is a known usability defect.
+
+        Nielsen Norman's study of auto-forwarding content found users miss the
+        largest element on a page when it rotates, and WCAG 2.2.2 requires a way
+        to stop motion that runs longer than five seconds. This rail scrolls
+        only when someone scrolls it, so there is nothing to pause — and this
+        test fails if an interval or animation is ever added to it.
+        """
+        self.assertIn('class="rail"', self.index)
+        self.assertIn('data-rail="next"', self.index)
+        rail_script = self.index.split("readyRail")[1].split("};")[0]
+        for forbidden in ("setInterval", "setTimeout", "requestAnimationFrame"):
+            self.assertNotIn(forbidden, rail_script, "the rail must not move on its own")
+
+    def test_the_fold_control_does_not_filter_anything(self):
+        """It shares a list with the keyword buttons; it must not share their job."""
+        self.assertIn(".cloud button[data-keyword]", self.index)
+        more = self.index.split("data-cloud-more")[1].split("</li>")[0]
+        self.assertNotIn("data-keyword", more)
+
+    def test_the_keyword_head_is_filled_and_the_tail_is_folded(self):
+        cloud = self.index.split('<ul class="cloud">')[1].split("</ul>")[0]
+        shown = cloud.count("<li>")
+        folded = cloud.count("data-tail")
+        self.assertGreaterEqual(shown, 8, "the visible head is too short to be useful")
+        self.assertGreater(folded, 0, "nothing is folded, so the control is pointless")
+        self.assertIn("more</button>", cloud)
+
     def css_rules(self):
         """Every `selector { body }` pair of the stylesheet, at-rules aside."""
         return [

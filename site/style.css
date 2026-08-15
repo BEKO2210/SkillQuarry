@@ -201,6 +201,47 @@ main { padding-bottom: 20px; }
   background: var(--raised); color: var(--muted); border: 1px solid var(--edge); transition: all .12s ease;
 }
 .cloud button:hover { color: var(--accent); border-color: var(--accent-deep); background: var(--accent-soft); }
+/* A rail the reader drives: swipe on a phone, drag or arrow on a desktop.
+   Scroll snapping makes a flick land on a card instead of between two. */
+.rail-wrap { position: relative; margin-top: var(--s3); }
+.rail { display: flex; gap: var(--s2); overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 4px 2px var(--s2); margin: 0; list-style: none;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rail::-webkit-scrollbar { display: none; }
+.rail-item { flex: 0 0 auto; scroll-snap-align: start; }
+.rail-item > a { display: flex; align-items: center; gap: 12px; min-width: 232px;
+  padding: 12px 16px; border: 1px solid var(--edge); border-radius: var(--radius-sm);
+  background: var(--raised); color: var(--ink);
+  transition: transform .14s ease, border-color .14s ease; }
+.rail-item > a:hover { transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--edge)); }
+.rail-item img { width: 40px; height: 40px; border-radius: 11px; flex: none; }
+.rail-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rail-name { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.rail-flag { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--edge));
+  background: var(--accent-soft); border-radius: 999px; padding: 2px 7px; }
+.rail .when { color: var(--dim); font-size: 13px; }
+.rail-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%; display: none; place-items: center;
+  border: 1px solid var(--edge); background: var(--raised); color: var(--ink);
+  font-size: 22px; line-height: 1; cursor: pointer; box-shadow: var(--shadow); }
+.rail-nav:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--edge)); color: var(--accent); }
+.rail-nav[hidden] { display: none !important; }
+.rail-nav.prev { left: -14px; }
+.rail-nav.next { right: -14px; }
+/* Shown when the rail actually has somewhere to go — asking the media query
+   whether a mouse exists gets it wrong on touch laptops and in headless runs. */
+.rail-wrap.scrollable .rail-nav { display: grid; }
+@media (max-width: 720px) { .rail-wrap.scrollable .rail-nav { display: none; } }
+
+/* Weighted keywords: what is shared leads and says how often. */
+.cloud-btn { display: inline-flex; align-items: center; gap: 7px; }
+.cloud-btn.strong { color: var(--ink); font-weight: 600; }
+.cloud-count { font-size: 11px; color: var(--accent); background: var(--accent-soft);
+  border-radius: 999px; padding: 1px 6px; font-variant-numeric: tabular-nums; }
+.cloud-more button { color: var(--accent); border-style: dashed; }
+
 /* The wall of published skills: one mark each, laid out on a grid that fills
    itself as skills are added — three across on a phone, six on a desktop. */
 /* Centred rather than packed left: four skills or forty, the wall stays
@@ -348,6 +389,9 @@ time { color: var(--dim); }
   .install .steps > div { text-align: center; align-items: stretch; }
   .install .steps .code, .install .note { text-align: left; }
   .wall-tile { flex: 0 0 calc((100% - var(--s2) * 2) / 3); }
+  .rail { padding-left: var(--s3); padding-right: var(--s3);
+    margin-left: calc(var(--s3) * -1); margin-right: calc(var(--s3) * -1); }
+  .rail-item > a { min-width: 74vw; }
   .built-row { justify-content: center; }
   .built-note { text-align: center; margin-left: auto; margin-right: auto; }
   .cta { text-align: center; padding: var(--s4) var(--s3); }
