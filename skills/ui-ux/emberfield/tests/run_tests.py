@@ -186,7 +186,12 @@ class RenderingTests(unittest.TestCase):
     def render(self, page: str, shot: str) -> bytes:
         out = self.workdir / shot
         finished = subprocess.run(
+            # --use-mock-keychain and --password-store=basic: on macOS a real
+            # Chrome asks the system keychain for permission, and a headless
+            # run waits forever on a dialog nobody can see. GitHub's macOS
+            # runners hung for the full timeout on exactly this.
             [self.chrome, "--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars",
+             "--use-mock-keychain", "--password-store=basic", "--disable-dev-shm-usage",
              "--window-size=1200,800", "--virtual-time-budget=8000", "--disable-lcd-text",
              f"--screenshot={out}", f"--user-data-dir={self.workdir}/profile-{shot}",
              (self.workdir / page).as_uri()],
