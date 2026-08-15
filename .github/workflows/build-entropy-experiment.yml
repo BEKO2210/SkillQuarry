@@ -1,0 +1,49 @@
+name: Build Entropy Historical Gate
+
+on:
+  push:
+    branches:
+      - research/build-entropy-probe-v0
+    paths:
+      - experiments/build-entropy/**
+      - .github/workflows/build-entropy-experiment.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-historical-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout SkillQuarry
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Record toolchain
+        run: |
+          python3 --version
+          go version
+          rustc --version
+          cargo --version
+          git --version
+
+      - name: Verify frozen protocol is present
+        run: |
+          test -s experiments/build-entropy/FROZEN_PROTOCOL.md
+          grep -F 'at least 2 of 3 cases' experiments/build-entropy/FROZEN_PROTOCOL.md
+          grep -F '**25 executions per revision per case**' experiments/build-entropy/FROZEN_PROTOCOL.md
+
+      - name: Run frozen historical gate
+        run: python3 experiments/build-entropy/run.py
