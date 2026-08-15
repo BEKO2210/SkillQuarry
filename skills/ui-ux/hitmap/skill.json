@@ -13,7 +13,7 @@
     }
   ],
   "tagline": "Measure whether the browser can actually hit the control.",
-  "banner": "assets/hitmap-banner.svg",
+  "banner": "assets/hitmap-banner-v3.svg",
   "agents": [
     "claude-code",
     "agent-neutral-manual-mode"
