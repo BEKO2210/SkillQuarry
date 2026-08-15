@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="../../../assets/hitmap-banner.svg" alt="HITMAP — browser hit-test reachability scanner" width="820">
+<img src="../../../assets/hitmap-banner-v3.svg" alt="HITMAP — browser hit-test reachability scanner" width="820">
 
 <br>
 
