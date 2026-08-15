@@ -10,10 +10,10 @@
   "description": "Generative art with p5.js: an algorithmic philosophy first, then its expression as seeded, reproducible code in an interactive viewer with parameter exploration.",
   "displayName": "Emberfield",
   "history": {
-    "released": "2026-08-15T02:08:46Z",
+    "released": "2026-08-15T02:10:30Z",
     "versions": [
       {
-        "date": "2026-08-15T02:08:46Z",
+        "date": "2026-08-15T02:10:30Z",
         "version": "1.0.0"
       }
     ]
