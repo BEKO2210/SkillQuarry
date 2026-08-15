@@ -45,7 +45,14 @@ run_npm_revision() {
   local before after rc
   before="$(npm_has_witness package-lock.json)" || { popd >/dev/null; return 2; }
   cp package-lock.json "$ROOT/firecms-$label-before.json"
-  npm install --package-lock-only --ignore-scripts --include=optional --no-audit --no-fund >/tmp/firecms-$label.log 2>&1
+
+  # FireCMS' historical workflow used Node 20. Pin Node 20 and npm 10 in an
+  # isolated Linux container so the pnpm case can independently use Node 22.
+  docker run --rm \
+    -v "$dir:/repo" -w /repo \
+    node:20-bookworm \
+    bash -lc 'npm install -g npm@10 >/dev/null 2>&1 && printf "H1_TOOL node=%s npm=%s\n" "$(node --version)" "$(npm --version)" && npm install --package-lock-only --ignore-scripts --include=optional --no-audit --no-fund' \
+    >/tmp/firecms-$label.log 2>&1
   rc=$?
   cat /tmp/firecms-$label.log
   if [[ $rc -ne 0 ]]; then
@@ -83,6 +90,7 @@ run_pnpm_revision() {
   local before after rc
   before="$(pnpm_has_arm_witnesses pnpm-lock.yaml)"
   cp pnpm-lock.yaml "$ROOT/candybar-$label-before.yaml"
+  printf 'H2_TOOL node=%s pnpm=%s\n' "$(node --version)" "$(pnpm --version)"
   pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile >/tmp/candybar-$label.log 2>&1
   rc=$?
   cat /tmp/candybar-$label.log
@@ -127,6 +135,7 @@ run_bundle_revision() {
   local before after rc
   before="$(bundle_snapshot Gemfile.lock)"
   cp Gemfile.lock "$ROOT/site-$label-before.lock"
+  printf 'H3_TOOL ruby=%s bundler=%s\n' "$(ruby --version | awk '{print $2}')" "$(bundle _2.4.6_ --version | awk '{print $3}')"
   bundle _2.4.6_ lock --add-platform x86_64-linux >/tmp/site-$label.log 2>&1
   rc=$?
   cat /tmp/site-$label.log
@@ -164,13 +173,6 @@ run_pair() {
 }
 
 printf '%s\n' '=== Lock Closure Union frozen historical replay ==='
-printf 'TOOL node=%s npm=%s pnpm=%s ruby=%s bundler=%s\n' \
-  "$(node --version 2>/dev/null || true)" \
-  "$(npm --version 2>/dev/null || true)" \
-  "$(pnpm --version 2>/dev/null || true)" \
-  "$(ruby --version 2>/dev/null | awk '{print $2}' || true)" \
-  "$(bundle _2.4.6_ --version 2>/dev/null | awk '{print $3}' || true)"
-
 run_pair npm-firecms run_npm_revision \
   0e8919618a6bcc207e265815cea53ed6c452b5c3 \
   4e2bfb412c65aa3a131ee8d8ef35f28086d79ebe
