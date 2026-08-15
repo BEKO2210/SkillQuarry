@@ -558,12 +558,6 @@ HERO_MEDIA = (
 )
 
 HERO_SCRIPT = r"""
-// The page may parse this before or after the elements exist; either way
-// the work happens once the document is there.
-const readyRail = () => {
-};
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', readyRail); else readyRail();
-
 // The 4K hero loop plays on every screen, phones included. It is still skipped
 // when motion is unwelcome or the connection is metered or slow — in those cases
 // the still remains, which is the video's own first frame.
@@ -575,7 +569,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
   const cheapData = connection.saveData === true ||
     ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
   if (!motionOk || cheapData) return;
-  video.src = 'assets/video/hero-4k.mp4';
+  video.src = 'assets/video/hero-4k.mp4?v=__VIDEO_TOKEN__';
   const reveal = function () {
     video.hidden = false;
     const started = video.play();
@@ -830,6 +824,16 @@ def top_bar(depth: int) -> str:
     <button class="ghost" id="theme" type="button">Light</button>
   </nav>
 </div></div>"""
+
+
+def video_token() -> str:
+    """A fingerprint of the hero video, for the same reason the stylesheet has
+    one: replacing the file must replace it on every phone that cached it."""
+    import hashlib
+    video = ASSETS / "video" / "hero-4k.mp4"
+    if not video.is_file():
+        return "0"
+    return hashlib.sha256(video.read_bytes()).hexdigest()[:10]
 
 
 def style_token() -> str:
@@ -1253,7 +1257,8 @@ skillquarry uninstall {esc(str(skills[0]["name"]))}</code></pre></div>
 <script type="application/json" id="skill-data">{data}</script>"""
     return page("SkillQuarry — the open marketplace for agent skills",
                 "Discover, inspect and install reusable capabilities for AI coding agents.",
-                body, scripts=f"<script>{SCRIPT}</script>\n<script>{HERO_SCRIPT}</script>")
+                body, scripts=(f"<script>{SCRIPT}</script>\n"
+                               f"<script>{HERO_SCRIPT.replace('__VIDEO_TOKEN__', video_token())}</script>"))
 
 
 def build_detail(skill: dict[str, Any], manifest: dict[str, Any],

@@ -270,9 +270,11 @@ class DiscoveryTests(unittest.TestCase):
         video = blobs["assets/video/hero-4k.mp4"]
         size_mb = len(video) / 1024 / 1024
         self.assertLess(size_mb, 15, f"hero video is {size_mb:.1f} MB")
-        # A palindrome: the clip runs forward, then backward, so the last frame is
-        # the first frame's neighbour and the wrap has no visible seam.
-        self.assertGreater(len(video), 6 * 1024 * 1024, "the loop should carry both directions")
+        # A forward seamless loop: generated with its first frame as its own end
+        # state, then the tail crossfaded into the head. A palindrome was tried
+        # first and rejected — the direction reversal at each end reads as a
+        # restart even when no frame jumps.
+        self.assertGreater(len(video), 4 * 1024 * 1024, "suspiciously small for a 4K loop")
         self.assertEqual(self.mp4_dimensions(video), (3840, 2160), "the hero video must be true 4K")
         index = self.index
         self.assertIn('preload="none"', index)
@@ -280,6 +282,12 @@ class DiscoveryTests(unittest.TestCase):
         self.assertIn("saveData", index)
         self.assertNotIn("min-width: 900px", index)  # phones get the video too
         self.assertIn('poster="assets/img/hero-2400.webp"', index)
+        # The video URL carries a fingerprint of the file, so replacing the loop
+        # replaces it on phones that cached the previous one.
+        self.assertRegex(index, r"hero-4k\.mp4\?v=[0-9a-f]{10}")
+        import hashlib
+        expected = hashlib.sha256(blobs["assets/video/hero-4k.mp4"]).hexdigest()[:10]
+        self.assertIn(f"hero-4k.mp4?v={expected}", index)
 
     def test_the_site_shows_how_to_install_without_a_checkout(self):
         """A visitor must be able to install from the page alone.
@@ -371,7 +379,7 @@ class DiscoveryTests(unittest.TestCase):
         """
         self.assertIn('class="rail"', self.index)
         self.assertIn('data-rail="next"', self.index)
-        rail_script = self.index.split("readyRail")[1].split("};")[0]
+        rail_script = self.index.split("The rail moves only")[1].split("// The keyword tail")[0]
         for forbidden in ("setInterval", "setTimeout", "requestAnimationFrame"):
             self.assertNotIn(forbidden, rail_script, "the rail must not move on its own")
 
