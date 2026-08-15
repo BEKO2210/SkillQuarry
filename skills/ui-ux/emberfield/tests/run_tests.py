@@ -39,11 +39,22 @@ CONTROL_IDS = (
 )
 
 
+# macOS installs Chrome as an application bundle, not on PATH — GitHub's
+# macOS runners included. Checking only PATH made CI fail there.
+MAC_BROWSERS = (
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+)
+
+
 def browser() -> str | None:
     for name in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser"):
         path = shutil.which(name)
         if path:
             return path
+    for candidate in MAC_BROWSERS:
+        if Path(candidate).is_file():
+            return candidate
     return None
 
 
