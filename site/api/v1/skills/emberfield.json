@@ -1,6 +1,6 @@
 {
   "category": "ui-ux",
-  "checksum": "sha256:70f91d2421131b9be203c7f35599ca437805c471bae9d7c9f2badd6ce5005029",
+  "checksum": "sha256:d7df3b8f0856dc9fcd193e249cf4f36debd007130cdeb521edf57126a340376c",
   "compatibility": [
     "claude-code",
     "agent-neutral-manual-mode"

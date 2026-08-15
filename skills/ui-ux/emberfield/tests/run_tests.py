@@ -24,6 +24,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 VIEWER = ROOT / "templates" / "viewer.html"
 GENERATOR = ROOT / "templates" / "generator.js"
 
@@ -149,6 +150,8 @@ class RenderingTests(unittest.TestCase):
         cls.chrome = str(found)
         cls.temp = tempfile.TemporaryDirectory(prefix="emberfield-")
         cls.workdir = Path(cls.temp.name)
+        import cdp
+        cls.browser = cdp.launch_browser(cls.chrome)
 
         # Outside the skill directory on purpose: the registry checksum covers
         # every byte under the skill, and a test artefact that exists on one
@@ -180,25 +183,43 @@ class RenderingTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        if hasattr(cls, "browser"):
+            cls.browser.close()
         if hasattr(cls, "temp"):
             cls.temp.cleanup()
 
     def render(self, page: str, shot: str) -> bytes:
-        out = self.workdir / shot
-        finished = subprocess.run(
-            # --use-mock-keychain and --password-store=basic: on macOS a real
-            # Chrome asks the system keychain for permission, and a headless
-            # run waits forever on a dialog nobody can see. GitHub's macOS
-            # runners hung for the full timeout on exactly this.
-            [self.chrome, "--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars",
-             "--use-mock-keychain", "--password-store=basic", "--disable-dev-shm-usage",
-             "--window-size=1200,800", "--virtual-time-budget=8000", "--disable-lcd-text",
-             f"--screenshot={out}", f"--user-data-dir={self.workdir}/profile-{shot}",
-             (self.workdir / page).as_uri()],
-            capture_output=True, text=True, timeout=180,
-        )
-        self.assertEqual(finished.returncode, 0, finished.stderr[-500:])
-        data = out.read_bytes()
+        """One page, one screenshot, over the DevTools protocol.
+
+        Chrome's own --screenshot flag with a virtual-time budget hangs on
+        macOS CI runners; asking the running browser through CDP does not.
+        """
+        import base64
+        import time
+
+        import cdp
+
+        client = cdp.CDPClient(cdp.new_page(self.browser.devtools_base,
+                                            (self.workdir / page).as_uri()))
+        try:
+            client.call("Runtime.enable")
+            client.call("Page.enable")
+            client.call("Emulation.setDeviceMetricsOverride",
+                        {"width": 1200, "height": 800, "deviceScaleFactor": 1, "mobile": False})
+            deadline = time.monotonic() + 60
+            while time.monotonic() < deadline:
+                state = cdp.evaluate(client, "document.readyState")
+                drawn = cdp.evaluate(client, "!!document.querySelector('#canvas-container canvas')")
+                if state == "complete" and drawn:
+                    break
+                time.sleep(0.2)
+            else:
+                self.fail(f"{page} never finished rendering")
+            time.sleep(1.0)  # settle: p5 draws once after setup
+            result = client.call("Page.captureScreenshot", {"format": "png"}, timeout=60)
+            data = base64.b64decode(result["data"])
+        finally:
+            client.close()
         self.assertGreater(len(data), 10_000, "screenshot suspiciously small")
         return data
 
