@@ -1,0 +1,82 @@
+{
+  "name": "hitmap",
+  "displayName": "HITMAP",
+  "version": "0.1.0",
+  "description": "Scans a rendered Chromium page for visible, enabled interactive targets whose nine sampled interior points are all intercepted by another pointer-receiving element.",
+  "category": "ui-ux",
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Belkis Aslani",
+      "github": "BEKO2210",
+      "role": "maintainer"
+    }
+  ],
+  "tagline": "Measure whether the browser can actually hit the control.",
+  "banner": "assets/hitmap-banner.svg",
+  "agents": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "research": "RESEARCH.md",
+  "highlights": [
+    "Uses the rendered browser hit-test stack instead of inferring z-index behavior from source text.",
+    "Samples exactly nine interior points and reports only targets with zero reachable sampled points.",
+    "Returns ORACLE_UNAVAILABLE when Chromium is missing instead of silently falling back to a weaker judge.",
+    "Ships with a frozen historical protocol against three human-fixed interaction failures before any tested-quality claim."
+  ],
+  "quickstart": "cd skills/ui-ux/hitmap && ./install.sh\n\nhitmap doctor\nhitmap scan http://127.0.0.1:4173/ --width 1280 --height 720 --json",
+  "entrypoints": {
+    "skill": "SKILL.md",
+    "cli": "hitmap",
+    "install": "install.sh",
+    "uninstall": "uninstall.sh",
+    "prefix_env": "HITMAP_PREFIX"
+  },
+  "compatibility": [
+    "claude-code",
+    "agent-neutral-manual-mode"
+  ],
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "requires": {
+    "python": ">=3.10",
+    "binaries": [
+      "Chromium or Google Chrome"
+    ],
+    "packages": []
+  },
+  "permissions": {
+    "filesystem": "reads no target repository files directly; creates and removes a temporary Chromium profile under the operating-system temporary directory",
+    "shell": "spawns the user-selected Chromium or Google Chrome executable in headless mode",
+    "network": "direct through the launched browser to the exact URL supplied to hitmap scan; no telemetry or other service is contacted by HITMAP",
+    "environment": "reads HITMAP_PREFIX during install/uninstall and HITMAP_BROWSER when selecting the browser executable"
+  },
+  "tests": {
+    "command": "python3 tests/run_tests.py --min 17",
+    "count": 17,
+    "report": "TEST_REPORT.md"
+  },
+  "quality": "experimental",
+  "security": {
+    "network_access": "direct",
+    "runs_external_commands": true,
+    "writes_outside_repository": true,
+    "requires_secrets": false,
+    "destructive_operations": [],
+    "threat_model": "TEST_REPORT.md",
+    "reviewed_by": "Not independently reviewed; historical browser protocol remains incomplete as of 2026-08-15."
+  },
+  "keywords": [
+    "ux",
+    "browser",
+    "hit-testing",
+    "pointer-events",
+    "occlusion",
+    "chromium",
+    "interaction-testing",
+    "playwright-alternative"
+  ]
+}

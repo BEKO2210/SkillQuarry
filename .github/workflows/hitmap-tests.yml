@@ -1,0 +1,33 @@
+name: hitmap tests
+
+on:
+  push:
+    paths:
+      - "skills/ui-ux/hitmap/**"
+      - ".github/workflows/hitmap-tests.yml"
+  pull_request:
+    paths:
+      - "skills/ui-ux/hitmap/**"
+      - ".github/workflows/hitmap-tests.yml"
+
+jobs:
+  offline-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run frozen prototype suite
+        working-directory: skills/ui-ux/hitmap
+        run: python3 tests/run_tests.py --min 17
+      - name: Compile module
+        working-directory: skills/ui-ux/hitmap
+        run: PYTHONPATH=src python3 -m compileall -q src
+      - name: Version smoke test
+        working-directory: skills/ui-ux/hitmap
+        run: PYTHONPATH=src python3 -m hitmap --version
