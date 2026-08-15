@@ -404,6 +404,27 @@ details.alt summary { cursor: pointer; color: var(--dim); font-size: 14px; margi
 details.alt summary:hover { color: var(--accent); }
 @media (max-width: 900px) { .install .steps { grid-template-columns: 1fr; } }
 
+/* The Emberfield playground. The canvas keeps its own aspect and never
+   overflows; controls are finger-sized and centred on phones. */
+.play { border: 1px solid var(--edge); border-radius: var(--radius); overflow: hidden;
+  background: var(--raised); margin: 0 0 26px; }
+.play-tabs { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid var(--edge);
+  flex-wrap: wrap; }
+.play-tabs button { font: inherit; font-size: 13.5px; cursor: pointer; color: var(--muted);
+  background: none; border: 1px solid var(--edge); border-radius: 999px; padding: 7px 14px; }
+.play-tabs button.on { color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--edge)); background: var(--accent-soft); }
+.play-canvas { display: block; width: 100%; height: auto; background: #0a1016; }
+.play-bar { display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px; border-top: 1px solid var(--edge); }
+.play-bar button { font: inherit; font-size: 14px; cursor: pointer; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--edge); border-radius: 8px;
+  min-width: 44px; min-height: 40px; padding: 6px 14px; }
+.play-bar button:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--edge));
+  color: var(--accent); }
+.play-seed { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600;
+  min-width: 74px; text-align: center; }
+
 /* ---------- detail pages ---------- */
 .detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
 .detail-hero .wrap { padding: 40px 24px 34px; }
@@ -1261,6 +1282,196 @@ skillquarry uninstall {esc(str(skills[0]["name"]))}</code></pre></div>
                                f"<script>{HERO_SCRIPT.replace('__VIDEO_TOKEN__', video_token())}</script>"))
 
 
+# The Emberfield playground: four seeded generative systems, rendered on a
+# plain canvas with no library at all. The site's own rule — no byte from
+# another host — rules out the p5 CDN here, and a hand-rolled seeded RNG is
+# all these systems actually need. Heavy pieces draw in requestAnimationFrame
+# time slices of ~8 ms, so scrolling never stutters, and when a drawing is
+# finished nothing runs: zero idle CPU is what "smooth" means on a phone.
+PLAYGROUND_HTML = """
+    <h2 id="playground">Try it</h2>
+    <p>Four systems, one law: the seed decides everything. Same seed, same
+       picture — switch systems, step seeds, or roll a random one.</p>
+    <div class="play" data-playground>
+      <div class="play-tabs" role="tablist">
+        <button class="on" data-piece="orbits" role="tab" aria-selected="true">Orbits</button>
+        <button data-piece="slabs" role="tab" aria-selected="false">Slabs</button>
+        <button data-piece="waves" role="tab" aria-selected="false">Waves</button>
+        <button data-piece="automaton" role="tab" aria-selected="false">Automaton</button>
+      </div>
+      <canvas class="play-canvas" width="900" height="620" aria-label="Generative artwork demo"></canvas>
+      <div class="play-bar">
+        <button data-step="-1" aria-label="Previous seed">&#8592;</button>
+        <output class="play-seed">4711</output>
+        <button data-step="1" aria-label="Next seed">&#8594;</button>
+        <button data-roll aria-label="Random seed">&#8635; Random</button>
+      </div>
+    </div>
+"""
+
+PLAYGROUND_SCRIPT = r"""
+(() => {
+  const root = document.querySelector('[data-playground]');
+  if (!root) return;
+  const canvas = root.querySelector('.play-canvas');
+  const ctx = canvas.getContext('2d');
+  const seedOut = root.querySelector('.play-seed');
+  const W = canvas.width, H = canvas.height;
+  const AMBER = '#ffd479', DEEP = '#f0932b', SLATE = '#5b8298';
+  let seed = 4711, piece = 'orbits', job = 0, raf = 0;
+  const instant = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Deterministic randomness: the whole point of the skill, kept in the demo.
+  const rngFor = (n) => { let a = n >>> 0;
+    return () => { a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+
+  // Each piece yields work in batches; the scheduler grants ~8 ms per frame.
+  function* orbits(rng) {
+    ctx.fillStyle = '#0a1016'; ctx.fillRect(0, 0, W, H);
+    const centres = [];
+    for (let i = 0; i < 5; i++) centres.push({
+      x: W * (0.15 + 0.7 * rng()), y: H * (0.15 + 0.7 * rng()), m: 0.5 + 1.1 * rng() });
+    ctx.lineWidth = 1;
+    for (let p = 0; p < 1800; p++) {
+      let x = rng() * W, y = rng() * H, vx = rng() * 2 - 1, vy = rng() * 2 - 1;
+      for (let s = 0; s < 110; s++) {
+        let ax = 0, ay = 0;
+        for (const c of centres) {
+          const dx = c.x - x, dy = c.y - y, d2 = Math.max(140, dx * dx + dy * dy);
+          const f = (c.m * 900) / d2, d = Math.sqrt(d2);
+          ax += (dx / d) * f; ay += (dy / d) * f;
+        }
+        vx += ax * 0.55 - ay * 0.28; vy += ay * 0.55 + ax * 0.28;
+        const sp = Math.hypot(vx, vy);
+        if (sp > 3.2) { vx = vx / sp * 3.2; vy = vy / sp * 3.2; }
+        ctx.strokeStyle = sp > 2.4 ? AMBER : sp > 1.4 ? DEEP : SLATE;
+        ctx.globalAlpha = 0.07;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + vx, y + vy); ctx.stroke();
+        x += vx; y += vy;
+        if (x < -20 || y < -20 || x > W + 20 || y > H + 20) break;
+      }
+      if (p % 60 === 59) yield;
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function* slabs(rng) {
+    ctx.fillStyle = DEEP; ctx.fillRect(0, 0, W, H);
+    const tones = ['#16202b', '#1b2733', '#22303d', '#101820'];
+    const stack = [[0, 0, W, H, 8]];
+    while (stack.length) {
+      const [x, y, w, h, depth] = stack.pop();
+      if (depth <= 0 || (w < 60 && h < 60) || (depth < 5 && rng() < 0.22)) {
+        ctx.fillStyle = tones[(rng() * tones.length) | 0];
+        ctx.beginPath(); ctx.roundRect(x + 3, y + 3, w - 6, h - 6, 4); ctx.fill();
+        if (rng() < 0.14) {
+          ctx.strokeStyle = rng() < 0.5 ? AMBER : DEEP; ctx.lineWidth = 2;
+          const px = x + w * (0.2 + 0.6 * rng());
+          ctx.beginPath(); ctx.moveTo(px, y + 8);
+          ctx.lineTo(px + 28 * rng() - 14, y + h - 8); ctx.stroke();
+        }
+        continue;
+      }
+      if (w > h) { const cut = w * (0.3 + 0.4 * rng());
+        stack.push([x, y, cut, h, depth - 1], [x + cut, y, w - cut, h, depth - 1]); }
+      else { const cut = h * (0.3 + 0.4 * rng());
+        stack.push([x, y, w, cut, depth - 1], [x, y + cut, w, h - cut, depth - 1]); }
+    }
+    yield;
+  }
+
+  function* waves(rng) {
+    const sources = [];
+    const n = 3 + ((rng() * 3) | 0);
+    for (let i = 0; i < n; i++) sources.push({ x: rng() * W, y: rng() * H, f: 0.03 + rng() * 0.045 });
+    const img = ctx.createImageData(W, H), d = img.data;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        let v = 0;
+        for (const s of sources) v += Math.sin(Math.hypot(x - s.x, y - s.y) * s.f);
+        v /= sources.length;
+        const i = 4 * (y * W + x);
+        if (v > 0.55) { d[i] = 255; d[i+1] = 212; d[i+2] = 121; }
+        else if (v > 0.35) { d[i] = 240; d[i+1] = 147; d[i+2] = 43; }
+        else if (v < -0.55) { d[i] = 91; d[i+1] = 130; d[i+2] = 152; }
+        else { const g = 14 + (v + 1) * 10; d[i] = g * 0.7; d[i+1] = g; d[i+2] = g * 1.35; }
+        d[i+3] = 255;
+      }
+      if (y % 40 === 39) yield;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  function* automaton(rng) {
+    ctx.fillStyle = '#0a1016'; ctx.fillRect(0, 0, W, H);
+    const rules = [30, 45, 73, 89, 101, 105, 110, 135, 149, 169];
+    const ruleNumber = rules[(rng() * rules.length) | 0];
+    const rule = []; for (let i = 0; i < 8; i++) rule.push((ruleNumber >> i) & 1);
+    const cell = 4, cols = Math.ceil(W / cell);
+    let row = []; for (let i = 0; i < cols; i++) row.push(rng() < 0.5 ? 1 : 0);
+    for (let y = 0; y < Math.ceil(H / cell); y++) {
+      for (let x = 0; x < cols; x++) {
+        if (row[x]) {
+          const warm = rng();
+          ctx.fillStyle = warm > 0.72 ? AMBER : warm > 0.5 ? DEEP : SLATE;
+          ctx.fillRect(x * cell, y * cell, cell - 0.5, cell - 0.5);
+        }
+      }
+      const next = [];
+      for (let x = 0; x < cols; x++)
+        next.push(rule[row[(x + cols - 1) % cols] * 4 + row[x] * 2 + row[(x + 1) % cols]]);
+      row = next;
+      if (y % 30 === 29) yield;
+    }
+  }
+
+  const pieces = { orbits, slabs, waves, automaton };
+
+  // Time-sliced scheduler: ~8 ms of drawing per frame, then hand the thread
+  // back. A superseded job stops at its next slice; a finished one runs nothing.
+  function render() {
+    const mine = ++job;
+    cancelAnimationFrame(raf);
+    seedOut.textContent = String(seed);
+    const work = pieces[piece](rngFor(seed + piece.length * 7919));
+    const slice = () => {
+      if (mine !== job) return;
+      const until = performance.now() + 8;
+      let done = false;
+      do { done = work.next().done; } while (!done && performance.now() < until);
+      if (!done) raf = requestAnimationFrame(slice);
+    };
+    if (instant) { let done = false; while (!done) done = work.next().done; }
+    else slice();
+  }
+
+  for (const tab of root.querySelectorAll('[data-piece]')) {
+    tab.addEventListener('click', () => {
+      piece = tab.dataset.piece;
+      for (const other of root.querySelectorAll('[data-piece]')) {
+        other.classList.toggle('on', other === tab);
+        other.setAttribute('aria-selected', String(other === tab));
+      }
+      render();
+    });
+  }
+  for (const step of root.querySelectorAll('[data-step]'))
+    step.addEventListener('click', () => { seed += Number(step.dataset.step); render(); });
+  root.querySelector('[data-roll]').addEventListener('click', () => {
+    seed = 1 + ((Math.random() * 999999) | 0); render();
+  });
+
+  // Nothing draws until the demo is actually on screen.
+  new IntersectionObserver((entries, observer) => {
+    if (entries.some((entry) => entry.isIntersecting)) { observer.disconnect(); render(); }
+  }, { rootMargin: '120px' }).observe(canvas);
+})();
+"""
+
+
 def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
                  history: dict[str, Any] | None = None) -> str:
     security = skill.get("security") or {}
@@ -1305,6 +1516,12 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
         highlight_block = f"    <h2>What it does</h2>\n    <ul>\n{items}\n    </ul>\n"
 
     quickstart = manifest.get("quickstart")
+    playground_block = ""
+    playground_script = ""
+    if (manifest.get("extensions") or {}).get("demo") == "generative-playground":
+        playground_block = PLAYGROUND_HTML
+        playground_script = f"<script>{PLAYGROUND_SCRIPT}</script>"
+
     quickstart_block = ""
     if quickstart:
         quickstart_block = (
@@ -1378,7 +1595,7 @@ def build_detail(skill: dict[str, Any], manifest: dict[str, Any],
       {f'<img class="banner" src="../{esc(banner)}" alt="{esc(skill.get("displayName"))}" style="width:100%;border-radius:14px;border:1px solid var(--edge);margin:0 0 26px">' if banner else ''}
       <h2>Overview</h2>
       <p>{esc(skill.get('description'))}</p>
-{highlight_block}    <h2>Install</h2>
+{highlight_block}{playground_block}    <h2>Install</h2>
     <p>From this quarry, without a checkout:</p>
     <div class="code"><div class="head">shell</div><pre><code>mkdir -p ~/.local/bin
 curl -fsSL {esc(CLIENT_URL)} -o ~/.local/bin/skillquarry
@@ -1410,7 +1627,8 @@ skillquarry install {esc(name)}</code></pre></div></details>
   </div>
 </main>"""
     return page(f"{skill.get('displayName')} — SkillQuarry", str(skill.get("description", "")),
-                body, depth=1, scripts=f"<script>{INSTALL_SCRIPT}</script>")
+                body, depth=1,
+                scripts=f"<script>{INSTALL_SCRIPT}</script>{playground_script}")
 
 
 def build_maintainer(handle: str, person: dict[str, Any], skills: dict[str, dict[str, Any]],
