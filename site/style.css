@@ -306,6 +306,27 @@ details.alt summary { cursor: pointer; color: var(--dim); font-size: 14px; margi
 details.alt summary:hover { color: var(--accent); }
 @media (max-width: 900px) { .install .steps { grid-template-columns: 1fr; } }
 
+/* The Emberfield playground. The canvas keeps its own aspect and never
+   overflows; controls are finger-sized and centred on phones. */
+.play { border: 1px solid var(--edge); border-radius: var(--radius); overflow: hidden;
+  background: var(--raised); margin: 0 0 26px; }
+.play-tabs { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid var(--edge);
+  flex-wrap: wrap; }
+.play-tabs button { font: inherit; font-size: 13.5px; cursor: pointer; color: var(--muted);
+  background: none; border: 1px solid var(--edge); border-radius: 999px; padding: 7px 14px; }
+.play-tabs button.on { color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--edge)); background: var(--accent-soft); }
+.play-canvas { display: block; width: 100%; height: auto; background: #0a1016; }
+.play-bar { display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px; border-top: 1px solid var(--edge); }
+.play-bar button { font: inherit; font-size: 14px; cursor: pointer; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--edge); border-radius: 8px;
+  min-width: 44px; min-height: 40px; padding: 6px 14px; }
+.play-bar button:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--edge));
+  color: var(--accent); }
+.play-seed { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600;
+  min-width: 74px; text-align: center; }
+
 /* ---------- detail pages ---------- */
 .detail-hero { border-bottom: 1px solid var(--edge); background: linear-gradient(180deg, var(--raised), var(--ground)); }
 .detail-hero .wrap { padding: 40px 24px 34px; }

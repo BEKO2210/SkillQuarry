@@ -397,6 +397,33 @@ class DiscoveryTests(unittest.TestCase):
         self.assertGreater(folded, 0, "nothing is folded, so the control is pointless")
         self.assertIn("more</button>", cloud)
 
+    def test_the_playground_appears_only_where_a_manifest_asks_for_it(self):
+        """The demo is data-driven: extensions.demo, not a name check."""
+        import json as jsonlib
+        for entry in bs.load_registry():
+            page = self.files[f"skills/{entry['name']}.html"]
+            manifest = jsonlib.loads((bs.REPO / entry["path"] / "skill.json").read_text("utf-8"))
+            wants = (manifest.get("extensions") or {}).get("demo") == "generative-playground"
+            with self.subTest(skill=entry["name"]):
+                self.assertEqual('data-playground' in page, wants)
+
+    def test_the_playground_is_smooth_by_construction(self):
+        """Smoothness is a property of the code, and the code is checkable.
+
+        Work is sliced into ~8 ms requestAnimationFrame budgets, nothing
+        repeats forever, drawing waits for the demo to scroll into view, and
+        reduced-motion readers get the finished image at once.
+        """
+        page = self.files["skills/emberfield.html"]
+        script = page.split("data-playground")[-1]
+        self.assertNotIn("setInterval", script)
+        self.assertIn("requestAnimationFrame", script)
+        self.assertIn("cancelAnimationFrame", script)
+        self.assertIn("IntersectionObserver", script)
+        self.assertIn("prefers-reduced-motion", script)
+        # No external byte: the demo is hand-rolled canvas, not a library.
+        self.assertNotIn("p5", script)
+
     def css_rules(self):
         """Every `selector { body }` pair of the stylesheet, at-rules aside."""
         return [

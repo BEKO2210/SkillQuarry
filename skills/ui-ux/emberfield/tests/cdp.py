@@ -63,7 +63,9 @@ class BrowserProcess:
 
 
 def launch_browser(binary: str) -> BrowserProcess:
-    profile = tempfile.TemporaryDirectory(prefix="hitmap-chrome-")
+    # ignore_cleanup_errors: Chrome may still be flushing its profile when the
+    # process exits; a leftover file in a temp dir is not worth a traceback.
+    profile = tempfile.TemporaryDirectory(prefix="hitmap-chrome-", ignore_cleanup_errors=True)
     proc = subprocess.Popen(
         [
             binary,
