@@ -1,0 +1,66 @@
+name: Lock Closure Union frozen replay
+
+on:
+  push:
+    branches:
+      - research/platform-lock-closure-v0
+    paths:
+      - 'experiments/platform-lock-closure/**'
+      - '.github/workflows/platform-lock-closure.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-historical-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout SkillQuarry experiment
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm 10
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
+          run_install: false
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install Bundler 2.4.6
+        run: gem install bundler -v 2.4.6 --no-document
+
+      - name: Prepare pinned npm runtime
+        run: docker pull node:20-bookworm
+
+      - name: Verify frozen provenance
+        run: |
+          test -s experiments/platform-lock-closure/FROZEN_PROTOCOL.md
+          grep -Fq 'FROZEN BEFORE THE FIRST REPLAY RUN' experiments/platform-lock-closure/FROZEN_PROTOCOL.md
+          grep -Fq '0e8919618a6bcc207e265815cea53ed6c452b5c3' experiments/platform-lock-closure/FROZEN_PROTOCOL.md
+          grep -Fq '9ad9134f8b685dcc513be5165154d790da15953a' experiments/platform-lock-closure/FROZEN_PROTOCOL.md
+          grep -Fq 'a96f6c8f9c895703cf050faece66918685cfe5ee' experiments/platform-lock-closure/FROZEN_PROTOCOL.md
+          git log --oneline --decorate -8
+
+      - name: Run frozen historical gate
+        shell: bash
+        run: |
+          set +e
+          bash experiments/platform-lock-closure/run_frozen.sh 2>&1 | tee /tmp/platform-lock-replay.log
+          rc=${PIPESTATUS[0]}
+          {
+            echo '### Frozen Lock Closure Union replay'
+            echo '```text'
+            grep -E '^(H[123]_TOOL|REV|RESULT|SUMMARY)' /tmp/platform-lock-replay.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$rc"
